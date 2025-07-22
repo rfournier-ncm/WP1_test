@@ -35,7 +35,7 @@ pd2 <- position_dodge(1)
 #Load models
 ```{r}
 #Preregistered model
-load("models/LBA_exp2_v1_t0.RData")
+load("Exp_1/models/LBA_exp2_v1_t0.RData")
 ```
 
 #Quick plots
@@ -49,7 +49,7 @@ posterior_summary(LBA_exp1_v1_t0,selection="mu",probs = c(0.025, 0.5, 0.975),map
 #Parameters per subjects
 ```{r}
 #Preregistered model
-param_1_pid = EMC2::parameters(LBA_exp1_v1_t0,selection="alpha",map = TRUE)
+param_1_pid = EMC2::parameters(LBA_exp1_v1_t0,selection="alpha", N = NULL, resample = TRUE)
 #Remember:number of iters = 10000 / number of chains = 3 -> 10'000 x 30(subjects) x 3(number of chains) = 900'000 obs for each parameter
 ```
 

@@ -43,7 +43,7 @@ pd2 <- position_dodge(1)
 Load data (30 pids)
 
 ```{r}
-raw <- read_csv("data/data_exp_2/data_WP1_2_model.csv")
+raw <- read_csv("Exp_2/data/data_exp_2/data_WP1_2_model.csv")
 head(raw)
 str(raw)
 ```
@@ -55,10 +55,10 @@ data_emc <- raw %>%
   rename(subjects = pid, S = cond, R = keypress) %>% 
   mutate(subjects=factor(subjects),
          S=factor(S,
-                  levels = c("New", "Famous")),
-         R=if_else(R == "q", "Famous", "New"),
+                  levels = c("Novel", "Famous")),
+         R=if_else(R == "q", "Famous", "Novel"),
          R=factor(R,
-                  levels = c("New", "Famous"))) %>% 
+                  levels = c("Novel", "Famous"))) %>% 
   as.data.frame() ## in DMC, post predict need a df and not a tibble. Same for EMC2 I think.
 head(data_emc)
 str(data_emc)
@@ -79,13 +79,13 @@ design_exp2_v3_t0 <- design(data = data_emc,model=LBA,matchfun=matchfun,
 ```
 
 ```{r}
-p_vector <- c("v_SNew:lMFALSE"=4,"v_SFamous:lMFALSE"=4, "v_SNew:lMTRUE"=4, "v_SFamous:lMTRUE"=4,
+p_vector <- c("v_SNovel:lMFALSE"=4,"v_SFamous:lMFALSE"=4, "v_SNovel:lMTRUE"=4, "v_SFamous:lMTRUE"=4,
               sv_lMTRUE=log(.5), 
-              B_lRNew=log(2), B_lRFamous=log(2),
+              B_lRNovel=log(2), B_lRFamous=log(2),
               A=log(.5),
-              t0_SNew=log(.3), t0_SFamous=log(.3))
+              t0_SNovel=log(.3), t0_SFamous=log(.3))
 
-mapped_par(p_vector, design_exp2_v3_t0)
+mapped_pars(p_vector, x=design_exp2_v3_t0)
 ```
 
 ## set priors ##
@@ -95,21 +95,21 @@ try to copy dmc priors.
 I made the A and t0 sd priors smaller as they are fixed values and it seemed odd to sample a wide range when they are fixed at .5 and .3, respectively.
 
 ```{r}
-mu_mean=c("v_SNew:lMFALSE"=0,"v_SFamous:lMFALSE"=0, "v_SNew:lMTRUE"=1, "v_SFamous:lMTRUE"=1,
+mu_mean=c("v_SNovel:lMFALSE"=0,"v_SFamous:lMFALSE"=0, "v_SNovel:lMTRUE"=1, "v_SFamous:lMTRUE"=1,
           sv_lMTRUE=log(.5), 
-          B_lRNew=log(1), B_lRFamous=log(1),
+          B_lRNovle=log(1), B_lRFamous=log(1),
           A=log(.5),
-          t0_SNew=log(.3), t0_SFamous=log(.3))
+          t0_SNovel=log(.3), t0_SFamous=log(.3))
 
-mu_sd=c("v_SNew:lMFALSE"=2,"v_SFamous:lMFALSE"=2, "v_SNew:lMTRUE"=2, "v_SFamous:lMTRUE"=2,
+mu_sd=c("v_SNovel:lMFALSE"=2,"v_SFamous:lMFALSE"=2, "v_SNovel:lMTRUE"=2, "v_SFamous:lMTRUE"=2,
           sv_lMTRUE=.5, 
-          B_lRNew=.5, B_lRFamous=.5,
+          B_lRNovel=.5, B_lRFamous=.5,
           A=.3,
-          t0_SNew=.3, t0_SFamous=.3)
+          t0_SNovel=.3, t0_SFamous=.3)
 
 prior_exp2_v3_t0 <- prior(design_exp2_v3_t0, type ='standard',mu_mean=mu_mean,mu_sd=mu_sd)
 
-plot_prior(prior = prior_exp2_v3_t0, design = design_exp2_v3_t0,layout=c(3,3))
+plot(x = prior_exp2_v3_t0)
 ```            
 
 ## fit the model ##
@@ -118,10 +118,10 @@ Note that I changed iter and step_size to make the model fit better and sample q
 
 ```{r}
 LBA_exp2_v3_t0 <- make_emc(data_emc,design_exp2_v3_t0,type="standard",  prior=prior_exp2_v3_t0)
-LBA_exp2_v3_t0 <- fit(LBA_exp2_v3_t0, cores_per_chain = 3, fileName="models/tmp.RData",
+LBA_exp2_v3_t0 <- fit(LBA_exp2_v3_t0, cores_per_chain = 3, fileName="Exp_2/models/tmp.RData",
                      iter = 10000, step_size = 500)
-save(LBA_exp2_v3_t0,file="models/LBA_exp2_v3_t0.RData") 
-load("models/LBA_exp2_v3_t0.RData")
+save(LBA_exp2_v3_t0,file="Exp_2/models/LBA_exp2_v3_t0.RData") 
+load("Exp_2/models/LBA_exp2_v3_t0.RData")
 ```
 
 # 3. check the model #
@@ -144,7 +144,7 @@ plot_pars(LBA_exp2_v3_t0,selection="mu",layout=c(2,5))
 
 ```{r}
 pp_LBA_exp2_v3_t0 <- predict(LBA_exp2_v3_t0, n_cores = 10)
-save(pp_LBA_exp2_v3_t0,file="models/pp_LBA_exp2_v3_t0.RData")
+save(pp_LBA_exp2_v3_t0,file="Exp_2/models/pp_LBA_exp2_v3_t0.RData")
 plot_fit(data_emc, pp_LBA_exp2_v3_t0, factors = c("S"),layout=c(2,3))
 ```
 

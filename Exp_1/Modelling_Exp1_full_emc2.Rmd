@@ -43,7 +43,7 @@ pd2 <- position_dodge(1)
 Load data (30 pids)
 
 ```{r}
-raw <- read_csv("data/data.csv")
+raw <- read_csv("Exp_1/data/data.csv")
 head(raw)
 str(raw)
 ```
@@ -55,10 +55,10 @@ data_emc <- raw %>%
   rename(subjects = pid, S = cond, R = keypress) %>% 
   mutate(subjects=factor(subjects),
          S=factor(S,
-                  levels = c("unf", "fam")),
-         R=if_else(R == "q", "fam", "unf"),
+                  levels = c("Novel", "Learned")),
+         R=if_else(R == "q", "Learned", "Novel"),
          R=factor(R,
-                  levels = c("unf", "fam"))) %>% 
+                  levels = c("Novel", "Learned"))) %>% 
   as.data.frame() ## in DMC, post predict need a df and not a tibble. Same for EMC2 I think.
 head(data_emc)
 str(data_emc)
@@ -78,13 +78,13 @@ design_exp1_v1_full <- design(data = data_emc,model=LBA,matchfun=matchfun,
 ```
 
 ```{r}
-p_vector_full <- c("v_Sunf:lMFALSE"=4,"v_Sfam:lMFALSE"=4, "v_Sunf:lMTRUE"=4, "v_Sfam:lMTRUE"=4,
+p_vector_full <- c("v_SNovel:lMFALSE"=4,"v_SLearned:lMFALSE"=4, "v_SNovel:lMTRUE"=4, "v_SLearned:lMTRUE"=4,
               sv_lMTRUE=log(.5), 
-              B_lRunf=log(2), B_lRfam=log(2),
-              A_lRunf=log(.5), A_lRfam = log(.5),
-              t0_Sunf=log(.3),t0_Sfam=log(.3))
+              B_lRNovel=log(2), B_lRLearned=log(2),
+              A_lRNovel=log(.5), A_lRLearned = log(.5),
+              t0_SNovel=log(.3),t0_SLearned=log(.3))
 
-mapped_par(p_vector_full, design_exp1_v1_full)
+mapped_pars(p_vector_full, x=design_exp1_v1_full)
 ```
 
 ## set priors ##
@@ -94,21 +94,21 @@ try to copy dmc priors.
 I made the t0 and sd priors smaller as they are fixed values and it seemed odd to sample a wide range when they are fixed at .5 and .3, respectively.
 
 ```{r}
-mu_mean_full=c("v_Sunf:lMFALSE"=0,"v_Sfam:lMFALSE"=0, "v_Sunf:lMTRUE"=1, "v_Sfam:lMTRUE"=1,
+mu_mean_full=c("v_SNovel:lMFALSE"=0,"v_SLearned:lMFALSE"=0, "v_SNovel:lMTRUE"=1, "v_SLearned:lMTRUE"=1,
           sv_lMTRUE=log(.5), 
-          B_lRunf=log(1), B_lRfam=log(1),
-          A_lRunf=log(.5), A_lRfam = log(.5),
-          t0_Sunf=log(.3),t0_Sfam=log(.3))
+          B_lRNovel=log(1), B_lRLearned=log(1),
+          A_lRNovel=log(.5), A_lRLearned = log(.5),
+          t0_SNovel=log(.3),t0_SLearned=log(.3))
 
-mu_sd_full=c("v_Sunf:lMFALSE"=2,"v_Sfam:lMFALSE"=2, "v_Sunf:lMTRUE"=2, "v_Sfam:lMTRUE"=2,
+mu_sd_full=c("v_SNovel:lMFALSE"=2,"v_SLearned:lMFALSE"=2, "v_SNovel:lMTRUE"=2, "v_SLearned:lMTRUE"=2,
           sv_lMTRUE=.5, 
-          B_lRunf=.5, B_lRfam=.5,
-          A_lRunf=.3, A_lRfam = .3,
-          t0_Sunf=log(.3),t0_Sfam=log(.3))
+          B_lRNovel=.5, B_lRLearned=.5,
+          A_lRNovel=.3, A_lRLearned = .3,
+          t0_SNovel=log(.3),t0_SLearned=log(.3))
 
 prior_exp1_v1_full <- prior(design_exp1_v1_full, type ='standard',mu_mean=mu_mean_full,mu_sd=mu_sd_full)
 
-plot_prior(prior = prior_exp1_v1_full, design = design_exp1_v1_full,layout=c(3,3))
+plot(x = prior_exp1_v1_full)
 ```            
 
 ## fit the model ##
@@ -117,10 +117,10 @@ Note that I changed iter and step_size to make the model fit better and sample q
 
 ```{r}
 LBA_exp1_v1_full <- make_emc(data_emc,design_exp1_v1_full,type="standard",  prior=prior_exp1_v1_full)
-LBA_exp1_v1_full <- fit(LBA_exp1_v1_full, cores_per_chain = 3, fileName="models/tmp.RData",
+LBA_exp1_v1_full <- fit(LBA_exp1_v1_full, cores_per_chain = 3, fileName="Exp_1/models/tmp.RData",
                      iter = 10000, step_size = 500)
-save(LBA_exp1_v1_full,file="models/LBA_exp1_v1_full.RData") 
-load("models/LBA_exp1_v1_full.RData")
+save(LBA_exp1_v1_full,file="Exp_1/models/LBA_exp1_v1_full.RData") 
+load("Exp_1/models/LBA_exp1_v1_full.RData")
 ```
 
 # 3. check the model #
@@ -143,7 +143,7 @@ plot_pars(LBA_exp1_v1_full,selection="mu",layout=c(2,5))
 
 ```{r}
 pp_LBA_exp1_v1_full <- predict(LBA_exp1_v1_full, n_cores = 10)
-save(pp_LBA_exp1_v1_full,file="models/pp_LBA_exp1_v1_full.RData")
+save(pp_LBA_exp1_v1_full,file="Exp_1/models/pp_LBA_exp1_v1_full.RData")
 plot_fit(data_emc, pp_LBA_exp1_v1_full, factors = c("S"),layout=c(2,3))
 ```
 
