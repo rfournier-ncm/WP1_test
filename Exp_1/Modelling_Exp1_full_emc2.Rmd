@@ -1,0 +1,151 @@
+---
+title: "Modelling_Exp1_full_emc2"
+author: "Fournier Raphaël"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# load the libraries that we will be using #
+
+## load packages ##
+
+```{r load-pkg}
+pkxg <- c("EMC2", "tidyverse", "RColorBrewer", "patchwork")
+
+lapply(pkxg, library, character.only = TRUE)
+```
+
+## plot settings ##
+
+theme settings for ggplot
+
+```{r, eval = F}
+theme_set(
+  theme_bw() +
+    theme(text = element_text(size = 18, face="bold"), 
+          title = element_text(size = 18, face="bold"),
+          legend.position = "bottom")
+)
+
+## Set the amount of dodge in figures
+pd <- position_dodge(0.7)
+pd2 <- position_dodge(1)
+```
+
+# 1. read in the raw data and wrangle
+
+## read in the wrangled data ##
+
+Load data (30 pids)
+
+```{r}
+raw <- read_csv("data/data.csv")
+head(raw)
+str(raw)
+```
+
+Wrangle
+```{r}
+data_emc <- raw %>%
+  select(pid, cond, keypress, rt) %>% 
+  rename(subjects = pid, S = cond, R = keypress) %>% 
+  mutate(subjects=factor(subjects),
+         S=factor(S,
+                  levels = c("unf", "fam")),
+         R=if_else(R == "q", "fam", "unf"),
+         R=factor(R,
+                  levels = c("unf", "fam"))) %>% 
+  as.data.frame() ## in DMC, post predict need a df and not a tibble. Same for EMC2 I think.
+head(data_emc)
+str(data_emc)
+```
+# 2. build model with t0 #
+
+## set the match factor  ##
+
+```{r}
+matchfun=function(d)d$S==d$lR
+```
+
+```{r}
+design_exp1_v1_full <- design(data = data_emc,model=LBA,matchfun=matchfun,
+                       formula=list(v~0+S:lM,sv~0+lM,B~0+lR,A~0+lR,t0~0+S),
+                       constants=c(sv_lMFALSE=log(1)))
+```
+
+```{r}
+p_vector_full <- c("v_Sunf:lMFALSE"=4,"v_Sfam:lMFALSE"=4, "v_Sunf:lMTRUE"=4, "v_Sfam:lMTRUE"=4,
+              sv_lMTRUE=log(.5), 
+              B_lRunf=log(2), B_lRfam=log(2),
+              A_lRunf=log(.5), A_lRfam = log(.5),
+              t0_Sunf=log(.3),t0_Sfam=log(.3))
+
+mapped_par(p_vector_full, design_exp1_v1_full)
+```
+
+## set priors ##
+
+try to copy dmc priors.
+
+I made the t0 and sd priors smaller as they are fixed values and it seemed odd to sample a wide range when they are fixed at .5 and .3, respectively.
+
+```{r}
+mu_mean_full=c("v_Sunf:lMFALSE"=0,"v_Sfam:lMFALSE"=0, "v_Sunf:lMTRUE"=1, "v_Sfam:lMTRUE"=1,
+          sv_lMTRUE=log(.5), 
+          B_lRunf=log(1), B_lRfam=log(1),
+          A_lRunf=log(.5), A_lRfam = log(.5),
+          t0_Sunf=log(.3),t0_Sfam=log(.3))
+
+mu_sd_full=c("v_Sunf:lMFALSE"=2,"v_Sfam:lMFALSE"=2, "v_Sunf:lMTRUE"=2, "v_Sfam:lMTRUE"=2,
+          sv_lMTRUE=.5, 
+          B_lRunf=.5, B_lRfam=.5,
+          A_lRunf=.3, A_lRfam = .3,
+          t0_Sunf=log(.3),t0_Sfam=log(.3))
+
+prior_exp1_v1_full <- prior(design_exp1_v1_full, type ='standard',mu_mean=mu_mean_full,mu_sd=mu_sd_full)
+
+plot_prior(prior = prior_exp1_v1_full, design = design_exp1_v1_full,layout=c(3,3))
+```            
+
+## fit the model ##
+
+Note that I changed iter and step_size to make the model fit better and sample quicker.
+
+```{r}
+LBA_exp1_v1_full <- make_emc(data_emc,design_exp1_v1_full,type="standard",  prior=prior_exp1_v1_full)
+LBA_exp1_v1_full <- fit(LBA_exp1_v1_full, cores_per_chain = 3, fileName="models/tmp.RData",
+                     iter = 10000, step_size = 500)
+save(LBA_exp1_v1_full,file="models/LBA_exp1_v1_full.RData") 
+load("models/LBA_exp1_v1_full.RData")
+```
+
+# 3. check the model #
+
+convergence 
+efficiency?
+
+```{r}
+check(LBA_exp1_v1_full)
+get_pars(LBA_exp1_v1_full, map = TRUE)
+```
+
+plot pars
+
+```{r}
+plot_pars(LBA_exp1_v1_full,selection="mu",layout=c(2,5))
+```
+
+# 4. calculate and plot posterior predictions #
+
+```{r}
+pp_LBA_exp1_v1_full <- predict(LBA_exp1_v1_full, n_cores = 10)
+save(pp_LBA_exp1_v1_full,file="models/pp_LBA_exp1_v1_full.RData")
+plot_fit(data_emc, pp_LBA_exp1_v1_full, factors = c("S"),layout=c(2,3))
+```
+
+#5. Model check
+

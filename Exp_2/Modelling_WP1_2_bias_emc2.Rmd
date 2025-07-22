@@ -1,0 +1,151 @@
+---
+title: "Modelling_WP1_2_bias_emc2"
+author: "Fournier Raphaël"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# load the libraries that we will be using #
+
+## load packages ##
+
+```{r load-pkg}
+pkxg <- c("EMC2", "tidyverse", "RColorBrewer", "patchwork")
+
+lapply(pkxg, library, character.only = TRUE)
+```
+
+## plot settings ##
+
+theme settings for ggplot
+
+```{r, eval = F}
+theme_set(
+  theme_bw() +
+    theme(text = element_text(size = 18, face="bold"), 
+          title = element_text(size = 18, face="bold"),
+          legend.position = "bottom")
+)
+
+## Set the amount of dodge in figures
+pd <- position_dodge(0.7)
+pd2 <- position_dodge(1)
+```
+
+# 1. read in the raw data and wrangle
+
+## read in the wrangled data ##
+
+Load data (30 pids)
+
+```{r}
+raw <- read_csv("Exp_2/data/data_exp_2/data_WP1_2_model.csv")
+head(raw)
+str(raw)
+```
+
+#Wrangle
+```{r}
+data_emc <- raw %>%
+  select(pid, cond, keypress, rt) %>% 
+  rename(subjects = pid, S = cond, R = keypress) %>% 
+  mutate(subjects=factor(subjects),
+         S=factor(S,
+                  levels = c("Novel", "Famous")),
+         R=if_else(R == "q", "Famous", "New"),
+         R=factor(R,
+                  levels = c("New", "Famous")),
+         R = fct_recode(R, "Novel" = "New"))%>% 
+  as.data.frame() ## in DMC, post predict need a df and not a tibble. Same for EMC2 I think.
+head(data_emc)
+str(data_emc)
+```
+
+# 2. build model #
+
+## set the match factor  ##
+
+```{r}
+matchfun=function(d)d$S==d$lR
+```
+
+```{r}
+design_exp2_v2_bias <- design(data = data_emc,model=LBA,matchfun=matchfun,
+                       formula=list(v~0+S:lM,sv~0+lM,B~0+lR,A~0+lR,t0~1),
+                       constants=c(sv_lMFALSE=log(1)))
+```
+
+```{r}
+p_vector <- c("v_SNovel:lMFALSE"=4,"v_SFamous:lMFALSE"=4, "v_SNovel:lMTRUE"=4, "v_SFamous:lMTRUE"=4,
+              sv_lMTRUE=log(.5), 
+              B_lRNovel=log(2), B_lRFamous=log(2),
+              A_lRNovel=log(.5),A_lRFamous=log(.5),
+              t0=log(.3))
+
+mapped_par(p_vector, design_exp2_v2_bias)
+```
+
+## set priors ##
+
+try to copy dmc priors.
+
+I made the A and t0 sd priors smaller as they are fixed values and it seemed odd to sample a wide range when they are fixed at .5 and .3, respectively.
+
+```{r}
+mu_mean=c("v_SNovel:lMFALSE"=0,"v_SFamous:lMFALSE"=0, "v_SNovel:lMTRUE"=1, "v_SFamous:lMTRUE"=1,
+          sv_lMTRUE=log(.5), 
+          B_lRNovel=log(1), B_lRFamous=log(1),
+          A_lRNovel=log(.5),A_lRFamous=log(.5),
+          t0=log(.3))
+
+mu_sd=c("v_SNovel:lMFALSE"=2,"v_SFamous:lMFALSE"=2, "v_SNovel:lMTRUE"=2, "v_SFamous:lMTRUE"=2,
+          sv_lMTRUE=.5, 
+          B_lRNovel=.5, B_lRFamous=.5,
+          A_lRNovel=.3,A_lRFamous=.3,
+          t0=.3)
+
+prior_exp2_v2_bias <- prior(design_exp2_v2_bias, type ='standard',mu_mean=mu_mean,mu_sd=mu_sd)
+
+plot_prior(prior = prior_exp2_v2_bias, design = design_exp2_v2_bias,layout=c(3,3))
+```            
+
+## fit the model ##
+
+Note that I changed iter and step_size to make the model fit better and sample quicker.
+
+```{r}
+LBA_exp2_v2_bias <- make_emc(data_emc,design_exp2_v2_bias,type="standard",  prior=prior_exp2_v2_bias)
+LBA_exp2_v2_bias <- fit(LBA_exp2_v2_bias, cores_per_chain = 3, fileName="Exp_2/models/tmp.RData",
+                     iter = 10000, step_size = 500)
+save(LBA_exp2_v2_bias,file="Exp_2/models/LBA_exp2_v2_bias.RData") 
+load("Exp_2/models/LBA_exp2_v2_bias.RData")
+```
+
+# 3. check the model #
+
+convergence 
+efficiency?
+
+```{r}
+check(LBA_exp2_v2_bias)
+get_pars(LBA_exp2_v2_bias, map = TRUE)
+```
+
+plot pars
+
+```{r}
+plot_pars(LBA_exp2_v2_bias,selection="mu",layout=c(2,5))
+```
+
+# 4. calculate and plot posterior predictions #
+
+```{r}
+pp_LBA_exp2_v2_bias <- predict(LBA_exp2_v2_bias, n_cores = 10)
+save(pp_LBA_exp2_v2_bias,file="Exp_2/models/pp_LBA_exp2_v2_bias.RData")
+plot_fit(data_emc, pp_LBA_exp2_v2_bias, factors = c("S"),layout=c(1,2))
+```
+

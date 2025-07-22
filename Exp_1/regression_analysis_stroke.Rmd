@@ -1,0 +1,451 @@
+---
+title: "17_18_analysis"
+author: "Richard Ramsey"
+date: "26/11/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load the libraries we will be using ##
+
+```{r dependencies, echo=TRUE, message=FALSE, warning=FALSE}
+options(repos="https://cran.rstudio.com" )
+if (!require("install.load")){install.packages("install.load")} 
+install_load("here", "tidyverse", "ggplot2", "RColorBrewer", "cowplot", "ez", "psychReport","effsize","broom", "ggrepel","lme4", "modelr","ggstance", "GGally","tidymodels","ggfortify", "ggforce", "grid", "gridExtra", "gtsummary", "sjPlot")
+
+#if you don't have the libraries, this line of cold will install them, otherwise it loads them directly. 
+
+## Set the default size of figures
+#knitr::opts_chunk$set(fig.width=8, fig.height=5) 
+
+## Set position dodge figures
+pd <- position_dodge(0.7)
+```
+
+## NSW 17/18 Dataset ##
+
+## Read in rawdata ##
+
+```{r}
+data_nsw_all <- read_csv("nsw_2017-18_respondent_file_final_ukds.csv") %>% 
+  rename(ID = CaseNo)
+#look at first few lines
+head(data_nsw_all)
+```
+
+## select and create a demographics file ##
+```{r}
+# select and rename variables, filter non-respones where relevant.
+data_nsw_dg <- data_nsw_all %>% 
+  select(ID, Gender, Age, MarStat, DvWIMDOvr5, NumPep, IntHhHave, DvUrbRur, DvUrbRurMor, DvBUA) %>%
+  rename(gender=Gender, age = Age, mar_stat = MarStat, deprivation = DvWIMDOvr5, people = NumPep, internet = IntHhHave, urban_rural = DvUrbRurMor, pop_density = DvBUA) %>% 
+  filter(gender > 0) %>%  # filter non-responses / missing values
+  filter(age > -1) %>%
+  filter(mar_stat > 0) %>%
+  filter(people > 0) %>%
+  filter(internet > 0) %>%
+  filter(urban_rural > 0)
+
+#look at first few lines
+head(data_nsw_dg)
+```
+
+# take a quick look
+
+```{r}
+glimpse(data_nsw_dg)
+summary(data_nsw_dg)
+```
+
+# tally particular variables and categories
+
+```{r}
+data_nsw_dg_tally <- data_nsw_dg %>%
+  select(-age) %>% # remove age variable and look at it seperately (see next code chunk)
+  gather("category", "value", c(gender:pop_density)) %>% 
+  group_by(category, value) %>%
+  tally() %>% 
+  pivot_wider(names_from = category, values_from = n) %>% 
+  select(value, gender, mar_stat, deprivation, people, internet, DvUrbRur, urban_rural, pop_density)
+data_nsw_dg_tally
+```
+
+# tally the age variable seperately
+
+```{r}
+data_nsw_dg_tally_age <- data_nsw_dg %>%
+  select(ID, age) %>% 
+  group_by(age) %>% 
+  tally()
+head(data_nsw_dg_tally_age)
+tail(data_nsw_dg_tally_age)
+```
+
+## select loneliness variables ##
+
+```{r}
+data_nsw_dv <- data_nsw_all %>% 
+  select(ID, DvFGLonelySc) %>% 
+  filter(DvFGLonelySc > -1) %>%  # filter non-responses from loneliness variable
+  rename(loneliness = DvFGLonelySc)
+
+#look at first few lines
+head(data_nsw_dv)
+
+summary(data_nsw_dv)
+```
+
+## select health columns to keep and add a combined 'health' column ##
+
+```{r}
+# health/illness / stroke, cerebrovascular accident (cva) / arthritis
+data_nsw_health <- data_nsw_all %>% 
+  select(ID, Dvillness0, Dvillness15, Dvillness34) %>%
+  filter(Dvillness0 > -1) %>%  # filter non-responses from general health/illness variable
+  filter(Dvillness15 > -1) %>%  # filter non-responses from illness variables 
+  filter(Dvillness34 > -1) %>%   # filter non-responses from illness variables
+  # add a health column that labels each health condition
+  mutate(health = if_else(Dvillness0 > 0, "healthy", 
+                          if_else (Dvillness15 > 0, "stroke",
+                          if_else (Dvillness34 > 0, "arthritis", "ill")))) %>% 
+  rename(longstanding = Dvillness0, stroke = Dvillness15, arthritis = Dvillness34) # rename columns
+
+#look at first few lines
+head(data_nsw_health)
+
+# take a look at the health column
+data_nsw_health %>% 
+  group_by(health) %>% 
+  tally()
+```
+
+## join demographics, health factors and loneliness scores
+
+```{r}
+data_nsw_loneliness <- data_nsw_dg %>% 
+  inner_join(data_nsw_health, by = "ID") %>% 
+  inner_join(data_nsw_dv, by = "ID")
+head(data_nsw_loneliness)
+```
+
+```{r}
+# take a quick look
+glimpse(data_nsw_loneliness)
+summary(data_nsw_loneliness)
+```
+
+```{r echo=FALSE}
+# loneliness histogram for entire sample
+hist_0_6 <- ggplot(data_nsw_loneliness,
+       aes(x = loneliness)) +
+      stat_count() +
+      # Add a title
+      ggtitle("Loneliness") +
+      # Customize the x-axis
+      xlab("score") +
+      # Customize the y-axis
+      ylab("Count") +
+      #ylim(c(0,25))
+      # Remove dark background
+      theme_classic() +
+      # Additional paramaters for displaying plot
+      theme(text=element_text(size=18), title=element_text(size=18),
+            legend.position="none",
+            strip.background = element_rect(color="white", fill="white"))
+hist_0_6
+
+# save it
+ggsave ("figures/hist_loneliness_0_6.tiff")
+```
+
+# recode demographics and health variables and create factors #
+
+```{r}
+# create factors
+# creating factors for gender 
+data_nsw_loneliness$gender[grepl("1", data_nsw_loneliness$gender)] <- "male" 
+data_nsw_loneliness$gender[grepl("2", data_nsw_loneliness$gender)] <- "female" 
+data_nsw_loneliness$gender <- factor(data_nsw_loneliness$gender, levels=c("male","female"))
+
+# creating factors for deprivation  
+data_nsw_loneliness$deprivation[grepl("1", data_nsw_loneliness$deprivation)] <- "most_deprived" 
+data_nsw_loneliness$deprivation[grepl("2", data_nsw_loneliness$deprivation)] <- "Q2" 
+data_nsw_loneliness$deprivation[grepl("3", data_nsw_loneliness$deprivation)] <- "Q3" 
+data_nsw_loneliness$deprivation[grepl("4", data_nsw_loneliness$deprivation)] <- "Q4" 
+data_nsw_loneliness$deprivation[grepl("5", data_nsw_loneliness$deprivation)] <- "least_deprived" 
+
+data_nsw_loneliness$deprivation <- factor(data_nsw_loneliness$deprivation, levels=c("most_deprived","Q2","Q3", "Q4", "least_deprived"))
+
+# creating factors for number of people 
+# data_nsw_loneliness$people[grepl("1", data_nsw_loneliness$people)] <- "1" 
+# data_nsw_loneliness$people[grepl("2", data_nsw_loneliness$people)] <- "2" 
+# data_nsw_loneliness$people[grepl("3", data_nsw_loneliness$people)] <- "3" 
+# data_nsw_loneliness$people[grepl("4", data_nsw_loneliness$people)] <- "4" 
+# data_nsw_loneliness$people[grepl("5", data_nsw_loneliness$people)] <- "5" 
+# data_nsw_loneliness$people[grepl("6", data_nsw_loneliness$people)] <- "5" 
+# data_nsw_loneliness$people[grepl("7", data_nsw_loneliness$people)] <- "5"
+# data_nsw_loneliness$people[grepl("8", data_nsw_loneliness$people)] <- "5"
+
+# data_nsw_loneliness$people <- factor(data_nsw_loneliness$people)
+
+# creating factors for internet 
+data_nsw_loneliness$internet[grepl("1", data_nsw_loneliness$internet)] <- "yes" 
+data_nsw_loneliness$internet[grepl("2", data_nsw_loneliness$internet)] <- "no" 
+data_nsw_loneliness$internet <- factor(data_nsw_loneliness$internet, levels=c("no","yes"))
+
+# creating factors for urban / rural 
+data_nsw_loneliness$DvUrbRur[grepl("1", data_nsw_loneliness$DvUrbRur)] <- "urban" 
+data_nsw_loneliness$DvUrbRur[grepl("2", data_nsw_loneliness$DvUrbRur)] <- "rural" 
+
+data_nsw_loneliness$DvUrbRur <- factor(data_nsw_loneliness$DvUrbRur, levels=c("urban","rural"))
+
+data_nsw_loneliness$urban_rural[grepl("1", data_nsw_loneliness$urban_rural)] <- "urban" 
+data_nsw_loneliness$urban_rural[grepl("2", data_nsw_loneliness$urban_rural)] <- "town_fringe" 
+data_nsw_loneliness$urban_rural[grepl("3", data_nsw_loneliness$urban_rural)] <- "village" 
+data_nsw_loneliness$urban_rural[grepl("4", data_nsw_loneliness$urban_rural)] <- "hamlet_isolated" 
+
+data_nsw_loneliness$urban_rural <- factor(data_nsw_loneliness$urban_rural, levels=c("urban","town_fringe", "village","hamlet_isolated"))
+
+# creating factors for population density. 
+data_nsw_loneliness$pop_density[grepl("1", data_nsw_loneliness$pop_density)] <- "under_2000" 
+data_nsw_loneliness$pop_density[grepl("2", data_nsw_loneliness$pop_density)] <- "under_2000" 
+data_nsw_loneliness$pop_density[grepl("3", data_nsw_loneliness$pop_density)] <- "2000_9999" 
+data_nsw_loneliness$pop_density[grepl("4", data_nsw_loneliness$pop_density)] <- "10000_24999"
+data_nsw_loneliness$pop_density[grepl("5", data_nsw_loneliness$pop_density)] <- "25000_99999" 
+data_nsw_loneliness$pop_density[grepl("6", data_nsw_loneliness$pop_density)] <- "100000_over"
+
+data_nsw_loneliness$pop_density <- factor(data_nsw_loneliness$pop_density, levels=c("under_2000","2000_9999","10000_24999","25000_99999","100000_over"))
+
+# creating factors for health. 
+data_nsw_loneliness$health <- factor(data_nsw_loneliness$health, 
+                                     levels=c("healthy","ill","arthritis","stroke"))
+#tally per health category
+data_nsw_loneliness %>% 
+  group_by(health) %>% 
+  tally()
+
+data_nsw_loneliness$ID <- factor(data_nsw_loneliness$ID)
+
+head(data_nsw_loneliness)
+```
+
+```{r}
+# creating factors for marital status. This needs recoding, then factoring. 
+# "married"" includes civil partnership "3", "ended" takes everything else (i.e., separated, divorced, widowed etc.).
+
+data_nsw_loneliness <- data_nsw_loneliness %>%
+  mutate(mar_stat.r = if_else(mar_stat == 1, "single",
+                           if_else(mar_stat == 2, "married",
+                           if_else(mar_stat == 3, "married", "ended")))) %>% 
+  select(ID, gender, age, mar_stat, mar_stat.r, everything()) # reorder, unecessary step.
+head(data_nsw_loneliness)
+
+# create factor
+data_nsw_loneliness$mar_stat.r<-factor(data_nsw_loneliness$mar_stat.r,levels=c("single","married","ended"))
+
+# tally per new category
+data_nsw_loneliness %>% 
+  group_by(mar_stat.r) %>% 
+  tally()
+
+head(data_nsw_loneliness)
+```
+
+```{r}
+# creating factors for age. this needs recoding, then factoring. 
+data_nsw_loneliness <- data_nsw_loneliness %>%
+  mutate(age.r = if_else(age %in% 16:29, "16_29",
+                 if_else(age %in% 30:39, "30_39",
+                 if_else(age %in% 40:49, "40_49",
+                 if_else(age %in% 50:59, "50_59",
+                 if_else(age %in% 60:69, "60_69",
+                 if_else(age %in% 70:79, "70_79", "80_plus"))))))) %>% 
+  select(ID, gender, age, age.r, everything()) # reorder, unecessary step.
+head(data_nsw_loneliness)
+
+# create factor
+data_nsw_loneliness$age.r<-factor(data_nsw_loneliness$age.r,levels=c("16_29","30_39","40_49","50_59","60_69", "70_79","80_plus"))
+
+data_nsw_loneliness %>% 
+  group_by(age.r) %>% 
+  tally()
+
+head(data_nsw_loneliness)
+```
+
+# recode loneliness for logistic regression #
+
+```{r}
+data_nsw_loneliness <- data_nsw_loneliness %>%
+  mutate(loneliness.l = if_else(loneliness > 2, 1, 0))
+
+head(data_nsw_loneliness)
+
+data_nsw_loneliness %>% 
+  group_by(loneliness.l) %>% 
+  tally()
+```
+
+## How about some running some models ##
+
+# logistic regression models #
+
+Model 1 - Demographic variables as predictors (age =  age as continuous, age.r = age as category)
+```{r}
+m1 <- glm(loneliness.l ~ + gender + age + mar_stat.r + deprivation,
+            data = data_nsw_loneliness,
+            family = "binomial")
+m1_tidy_b <- tidy(m1, conf.int = T)
+m1_tidy_b
+
+m1_tidy_or <- tidy(m1, conf.int = T, exponentiate = T)
+m1_tidy_or 
+
+m1_augment <- augment(m1)
+m1_augment
+
+m1_glance <- glance(m1)
+m1_glance 
+```
+
+Model 2 - Demographic variables plus social isolation measures as predictors
+```{r}
+m2 <- glm(loneliness.l ~ + gender + age + mar_stat.r + deprivation + people + internet + pop_density,
+            data = data_nsw_loneliness,
+            family = "binomial")
+m2_tidy_b <- tidy(m2, conf.int = T)
+m2_tidy_b
+
+m2_tidy_or <- tidy(m2, conf.int = T, exponentiate = T)
+m2_tidy_or 
+
+m2_augment <- augment(m2)
+m2_augment
+
+m2_glance <- glance(m2)
+m2_glance 
+```
+
+Model 3 - Demographic variables plus social isolation measures plus health as predictors
+```{r}
+m3 <- glm(loneliness.l ~ + gender + age + mar_stat.r + deprivation + people + internet + pop_density + health,
+            data = data_nsw_loneliness,
+            family = "binomial")
+
+m3_tidy_b <- tidy(m3, conf.int = T)
+m3_tidy_b
+
+m3_tidy_or <- tidy(m3, conf.int = T, exponentiate = T)
+m3_tidy_or 
+
+m3_augment <- augment(m3)
+m3_augment
+
+m3_glance <- glance(m3)
+m3_glance 
+write_csv(m3_glance, "data/model_info_17_18.csv")
+```
+
+# make a table of model data #
+
+sjPlot
+```{r}
+tab <- tab_model(m1,m2,m3,
+          dv.labels = c("Model 1: Demographics", "Model 2: Social isolation", "Model 3: Health"),
+          show.reflvl = TRUE,
+          title="Study 2 logistic regression summary data",
+          file="tables/reg_table.doc")
+tab
+```
+
+# make a table of data to be used in a forest plot of odds ratio data #
+
+odds ratio forest plot data
+```{r}
+m3_or <- m3_tidy_or %>% 
+  select(term, estimate, conf.low, conf.high) %>% 
+  rename(odds_ratio = "estimate") %>% 
+  filter(term != "(Intercept)")
+m3_or
+
+write_csv(m3_or, "data/odds_ratios_17_18.csv")
+```
+
+# Assumption checks and residuals #
+
+# using plot #
+
+```{r}
+plot(m3)
+```
+
+# using ggfortify #
+
+```{r}
+
+p_resid_check <- autoplot(m3, which = 1:6) +
+  theme_minimal()
+p_resid_check 
+
+ggsave (grid.draw(p_resid_check),file="figures/regression/m3_resid_check.tiff")
+
+p_resid_check2 <- autoplot(m3, which = 1:6, colour = 'red',
+         smooth.colour = 'black', smooth.linetype = 'dashed',
+         ad.colour = 'blue',
+         label.size = 3, label.n = 5, label.colour = 'blue',
+         ncol = 3)
+p_resid_check2
+
+ggsave (grid.draw(p_resid_check2),file="figures/regression/m3_resid_check2.tiff")
+
+```
+
+# Colinearity #
+
+# Calculate variance inflation factors - VIF #
+notes: http://www.sthda.com/english/articles/36-classification-methods-essentials/148-logistic-regression-assumptions-and-diagnostics-in-r/#logistic-regression-diagnostics
+
+Multicollinearity is an important issue in regression analysis and should be fixed by removing the concerned variables. It can be assessed using the R function vif() [car package], which computes the variance inflation factors:
+
+As a rule of thumb, a VIF value that exceeds 5 or 10 indicates a problematic amount of collinearity. In our example, there is no collinearity: all variables have a value of VIF well below 5.
+
+```{r}
+m3_vif <- car::vif(m3) %>% 
+  as_tibble(rownames = "term")
+m3_vif
+
+write_csv(m3_vif, "data/vif_17_18.csv")
+
+tab_df(m3_vif,
+       alternate.rows = T,
+       title="Study 2 17/18 Variation inflation factors - VIF",
+       file="tables/vif_17_18.doc")
+
+```
+
+# plot using ggforce #
+
+```{r}
+predictors <- c("gender", "age", "mar_stat.r", "deprivation", "people", "internet", "pop_density", "health")
+
+pp1 <- ggplot(data_nsw_loneliness, aes(x = .panel_x, y = .panel_y)) + 
+  geom_point(shape = 16, size = 0.5, position = 'auto') + 
+  facet_matrix(vars(all_of(predictors)))
+pp1
+
+ggsave ("figures/regression/m3_pairs_plot2.tiff")
+
+pp2 <- ggplot(data_nsw_loneliness, aes(x = .panel_x, y = .panel_y)) + 
+  geom_point(shape = 16, size = 0.5, position = 'auto') + 
+  geom_autodensity(alpha = 0.3, colour = NA, position = 'identity') + 
+  facet_matrix(vars(all_of(predictors)))
+pp2
+
+ggsave ("figures/regression/m3_pairs_plot5.tiff")
+
+```
+
+

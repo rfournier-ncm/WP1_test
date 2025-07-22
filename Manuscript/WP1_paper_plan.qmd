@@ -1,0 +1,151 @@
+---
+title: "WP1_paper_plan"
+author: "R. Fournier, P. Downing and R.Ramsey"
+format: html
+editor: visual
+bibliography: references.bib
+---
+
+```{r}
+#| label: load-packages
+#| include: false
+
+library(tidyverse)
+library(readxl)
+library(eeptools)
+```
+
+# Abstract
+
+# Introduction
+
+-   The ability to quickly recognize a familiar face is very important because ()
+
+-   Unsurprisingly, the face recognition process has been intensively investigated over the last 50 years (@johnston2009, @natu2011) and several attempts to model face recognition have been made (@haxby2000) One of the most influential model is the functional model of face recognition by @bruce1986. Very quick description of the model and putting the emphasis on three components: face recognition units (visual familiarity), person identity nodes (conceptual, semantic familiarity) and "cognitive system' component.
+
+-   Face recognition units (visual familiarity): literature on the effect of visual familiarity on the face recognition ability/performance @clutterbuck2005, @dwyer2009, @hahn2017, @klatzky1984,
+
+-   Person identity nodes (conceptual, semantic familiarity): literature on the effect of conceptual and semantic familiarity on the face recognition ability/performance @akan2023, @bird2011, @schwaninger2002
+
+-   However, and like Brice and Young themselves mention, the face recognition process is supervised by a "cognitive system" component, processing and comparing information from the face recognition units and the person identity nodes (attention, associative memory and decision-making processes). However, impossible to investigate these processes with typical analysis and response times and accuracy. Using computational approach to gain new insights on this "cognitive system" component. @hackel2018,
+
+-   Evidence-accumulation models are a class of models which... translate the distribution of response times for correct and incorrect responses into latent psychological variables. Able to make inference about latent variable of interest (drift rate and threshold). Few examples of past successes (@parker2023, @axt2021, @ratcliff2001)
+
+-   Two experiments to assess the effect of familiarity (visual familiarity and visual + perceptual familiarity) on parameters of the LBA model. More specifically... Developing hypotheses here.
+
+# Experiment 1
+
+## Method and Materials
+
+### Pre-registration and open science
+
+The research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered (link). All raw data, stimuli, data wrangling and analysis code are available on the open science framework (see link).
+
+```{r}
+#| label: load-demo-exp1
+#| include: false
+
+demo_exp1 <- read_xlsx(path = "/Users/rfournier/Documents/PhD_stuff/WP_1/WP1_1_Administration/Master_list/Master_list_WP1_1.xlsx") %>%
+    mutate(Index = as.factor(Index),
+         Gender = as.factor(Gender),
+         Date_of_birth = as.Date(Date_of_birth),
+         Age = floor(age_calc(Date_of_birth, units = "years")))
+mean_age_exp1 = round(mean(demo_exp1$Age), digits = 2)
+sd_age_exp1 = round(sd(demo_exp1$Age), digits = 2)
+female_exp1 = sum(demo_exp1$Gender== "F")
+male_exp1 = sum(demo_exp1$Gender== "M")
+participant_n_exp1 = female_exp1 + male_exp1
+min_age_exp1 = min(demo_exp1$Age)
+max_age_exp1 = max(demo_exp1$Age)
+```
+
+### Participants
+
+All participant were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. Sample size was determined in advance. Following previous suggestions from @heathcote2019, a parameter recovery study was run to estimate if 30 usable participant datasets were sufficient to accurately recover the parameter estimates. The parameter recovery study included 30 participant datasets, each with 180 trials (90 trials "familiar" and 90 trials "unfamiliar") and with our selected model parameterisation. The data-generated parameters were sufficiently well-recovered (See Supplementary Materials).
+
+`r participant_n_exp1` healthy participants took part in experiment 2 (`r male_exp1` men and `r female_exp1` women). Ages ranged from `r min_age_exp1` to `r max_age_exp1` years old ($M_{age} =$ `r mean_age_exp1`, $SD_{age} =$ `r sd_age_exp1`). All participants reported normal or corrected-to-normal vision and received payment (20 CHF) for participating in the experiment. Based on our preregistration, response times longer than 2.5 seconds were removed from the analysis. However, this cutoff value led to the the removal of 59% of the trials of one participant. Given the recommendation of having a certain number of trials per condition per participant when using evidence-accumulation models @heathcote2019, @parker we decided to exclude this participant from the data analysis. This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.
+
+### Stimuli
+
+The stimuli consisted of images selected from two different data sets of face images: the Face Research Lab London Set (DeBruine, Lisa; Jones, Benedict (2017). Face Research Lab London Set. figshare. Data set. <https://doi.org/10.6084/m9.figshare.5047666.v5>) and the (other datas et). Each of these data sets is composed of images of different identities faces taken from different angle points. (X) identities were selected from the Face Research Lab London Set and (X) from the . For each selected identity, three pictures of the face at three different view points (3/4 left view, frontal view and 3/4 right view) were cropped to remove any (Fig. 1). All of the images processing was realized using the GNU Image Manipulation Program (GIMP, ref). After 4 pilots experiments, we removed 27 identities (21 from the Face Research Lab London Set and 6 from the blablabla) due to to the presence of (blablabla). In total, the data set of face images used in the main experiment contained 756 images: one set of three colorful face images and one set of three gray scaled face images for each of the 126 identities.
+
+### Material
+
+Stimuli were presented on the screen of MacBook (blabla). The experiment was run on Psychopy Coder (version: 2022.5, ref).
+
+### Procedure
+
+The experimental task was divided into two distinct parts: a familiarization part and a recognition part (Fig.2). In the familiarization part, the face of 30 unknown identities were presented on the screen and participants were told to memorize the identity of the faces. One familiarization trial consisted of the presentation of 6 face images, one after the other, depicting the same identity but varying in viewing points (3/4 left view, frontal view and 3/4 right view) and the colorimetry (colorful image, gray scale image). The duration of each image presentation was 0.75 second. Each participant underwent 30 familiarization trials. During the familiarization, we introduced catch trials to ensure participants attention. After some familiarization trials, a gray scale image of a person's face was presented on the screen. Participants were asked to press the "q" key if the face belonged to the last seen identity or the "p" key if it was not. The faces seen during the familiarization were considered the "Learned faces" within-subject condition.
+
+In the recognition part, participants completed three blocks of 90 recognition trials. Each block was separated from another by a short break. Half of the trials were learned identities trials and the other half were new, previously unseen identities trials. At each trial, a gray scale image of a face was shown on the screen. Participants were asked to choose if they had previously seen this face in the familiarization part or not. If they did, the should press the "q" key and if they did not, the "p" key. Response time \[s\] and accuracy were collected after each recognition trial.
+
+### Data analysis
+
+Following our preregistration, trials with a response time longer than 2.5s were removed from the analysis. The evidence-accumulation modelling analyses of the distributions of response times for the correct and wrong answers were realized using the EMC2 R package (Cit. Niek Stevenson). For the separate analysis of response times and accuracy, we used (blablabla).
+
+## Results
+
+## Discussion
+
+# Experiment 2
+
+## Method and Materials
+
+### Pre-registration and open science
+
+The research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered (<https://osf.io/xehf4>). All raw data, stimuli, data wrangling and analysis code are available on the open science framework (see link).
+
+```{r}
+#| label: load-demo-exp2
+#| include: false
+
+demo_exp2 <- read_xlsx(path = "/Users/rfournier/Documents/PhD_stuff/WP_1/WP1_2_Administration/Participants/Master_list_WP1_2.xlsx", sheet =1) %>%
+    mutate(Index = as.factor(Index),
+         Gender = as.factor(Gender),
+         Age = as.numeric(Age))
+mean_age_exp2 = round(mean(demo_exp2$Age), digits = 2)
+sd_age_exp2 = round(sd(demo_exp2$Age), digits = 2)
+female_exp2 = sum(demo_exp2$Gender== "F")
+male_exp2 = sum(demo_exp2$Gender== "M")
+participant_n_exp2 = female_exp2 + male_exp2
+min_age_exp2 = min(demo_exp2$Age)
+max_age_exp2 = max(demo_exp2$Age)
+```
+
+### Participants
+
+All participant were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. Sample size was determined in advance. Following previous suggestions from @heathcote2019, a parameter recovery study was run to estimate if 30 usable participant datasets were sufficient to accurately recover the parameter estimates. The parameter recovery study included 30 participant datasets, each with 180 trials (90 trials "familiar" and 90 trials "unfamiliar") and with our selected model parameterisation. The data-generated parameters were sufficiently well-recovered (See Supplementary Materials).
+
+`r participant_n_exp2` healthy participants took part in experiment 2 (`r male_exp2` men and `r female_exp2` women). Ages ranged from `r min_age_exp2` to `r max_age_exp2` years old ($M_{age} =$ `r mean_age_exp2`, $SD_{age} =$ `r sd_age_exp2`). Participants were recruited by . All participants reported normal or corrected-to-normal vision and received payment (25 CHF) for participating in the experiment. Based on our preregistration criterion, 3 participants were excluded from the data analysis: 1 of them had an overall recognition accuracy larger than 95% and 2 of them had a overall accuracy lower than 55% (chance at 50%).
+
+We deviated from our preregistration in...
+
+This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.
+
+### Stimuli
+
+Two types of pictures were used for this experiment to create our within-subject stimuli conditions. Pictures depicting celebrities were taken from the internet The stimuli consisted of images selected from two different data sets of face images: the Face Research Lab London Set (DeBruine, Lisa; Jones, Benedict (2017). Face Research Lab London Set. figshare. Data set. <https://doi.org/10.6084/m9.figshare.5047666.v5>) and the (other datas et). Each of these data sets is composed of images of different identities faces taken from different angle points. (X) identities were selected from the Face Research Lab London Set and (X) from the . For each selected identity, three pictures of the face at three different view points (3/4 left view, frontal view and 3/4 right view) were cropped to remove any (Fig. 1). All of the images processing was realized using the GNU Image Manipulation Program (GIMP, ref). After 4 pilots experiments, we removed 27 identities (21 from the Face Research Lab London Set and 6 from the blablabla) due to to the presence of (blablabla). In total, the data set of face images used in the main experiment contained 756 images: one set of three colorful face images and one set of three gray scaled face images for each of the 126 identities.
+
+### Material
+
+Stimuli were presented on the screen of MacBook (blabla). The experiment was run on Psychopy Coder (version: 2022.5, ref).
+
+### Procedure
+
+The experimental task was divided into two distinct parts: a rating part and a recognition part (Fig.3). During the rating part, participants were presented pictures of 60 celebrities. They were asked to rate these celebrities, based on two dimensions: how familiar the celebrity was to them and how positive or negative were their feelings towards the celebrity. The familiarity rating scale went from 0 (Highly unfamiliar) to 10 (Highly familiar).
+
+In the recognition part, participants completed three blocks of 90 recognition trials. Each block was separated from another by a short break. Half of the trials were famous identities trials and the other half were new, previously unseen identities trials. At each trial, a gray scale image of a face was shown on the screen. Participants were asked to choose if they recognize the face (and not the picture) seen this face in the familiarization part or not. If they did, the should press the "q" key and if they did not, the "p" key. Response time \[s\] and accuracy were collected after each trial. Time limit
+
+### Data analysis
+
+The evidence-accumulation modelling analyses of the distribution of response times for the correct and wrong answers were realized using the EMC2 R package (Cit. Niek Stevenson). For the separate analysis of response times and accuracy, we used (blablabla).
+
+## Results
+
+## Discussion
+
+# General discussion
+
+# Conclusion
+
+# Bibliography

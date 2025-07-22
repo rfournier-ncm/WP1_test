@@ -1,0 +1,945 @@
+---
+title: "wrangle"
+author: "Rich"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This file wrangles the pilot data for the familiarity face perception study.
+
+## load the libraries that we will be using ## 
+
+## install ##
+
+```{r install-pkg}
+# install.packages(c("tidyverse", "RColorBrewer", "patchwork"))
+```
+
+take a snapshot of loaded packages and update the lock.file using renv
+
+```{r snapshot-renv}
+# take a snapshot and update the lock.file
+renv::snapshot() # this is only necessary when new packages or installed or packages are updated.
+```
+
+## load ##
+
+```{r load-pkg}
+pkg <- c("tidyverse", "RColorBrewer", "patchwork", "gtsummary", "paletteer")
+
+lapply(pkg, library, character.only = TRUE)
+```
+
+## plot settings ##
+
+```{r}
+## Set the amount of dodge in figures
+pd <- position_dodge(0.7)
+pd2 <- position_dodge(1)
+```
+
+theme settings for ggplot
+
+```{r, eval = F}
+theme_set(
+  theme_bw() +
+    theme(text = element_text(size = 20), 
+          title = element_text(size = 22),
+          legend.position = "bottom")
+)
+```
+custom_color
+```{r}
+myColors <- c("Novel" = paletteer_d("rcartocolor::Safe",4)[1],"Famous" =  paletteer_d("rcartocolor::Safe",4)[3])
+```
+
+## section 1 - read in the raw data ##
+
+This chunk reads in the main raw data file
+
+```{r}
+raw <- list.files(path = "/Users/rfournier/Documents/PhD_Exp/WP1/Exp_2/Data/Exp_2", pattern = "^raw.*csv", full.names = TRUE,
+                  recursive = TRUE) %>% # check out list.files for info on selecting a bunch of files
+  set_names() %>% 
+  map_dfr(read_csv, col_names = c("subj", "block", "trial", "keypress", "rt",
+                                  "ori", "stim", "fam")) %>% # map makes read_csv iterative across the file names
+  mutate(pid = as.numeric(str_sub(subj, 2, -1)),
+         keypress = as.factor(keypress),
+         cond = if_else(fam == 1, "Famous", "Novel"),
+         cond = factor(cond, 
+                       levels = c("Novel", "Famous")),
+         block = factor(block)) %>%# make a numerical pid variable
+  select(pid, everything(), -subj) # reorder things
+head(raw)
+glimpse(raw)
+summary(raw)
+```
+
+data check
+
+```{r}
+raw %>% 
+   distinct(pid)
+```
+
+
+### Wrangle the Familiarity ratings ###
+```{r}
+data_ratings <- list.files(path = "/Users/rfournier/Documents/PhD_Exp/WP1/Exp_2/Data/Exp_2", pattern = "Ratings.*csv", full.names = TRUE, recursive = TRUE)%>% # check out list.files for info on selecting a bunch of files
+  set_names() %>% 
+  map_dfr(read_csv, col_names = c("Image_ID", "Fam_ratings", "Val_ratings", "Chosen_name")) %>%
+  add_column(pid = rep(1:40, each = 60), .before = "Image_ID") 
+
+#list of participants with number of fam ratings between 7-10 is lower than 30
+number_ratings <- data_ratings %>%
+  select(pid, Fam_ratings) %>%
+  group_by(pid) %>%
+  mutate(number_fam = sum(Fam_ratings > 6)) %>%
+  select(pid, number_fam) %>%
+  distinct() %>%
+  filter(number_fam < 30)
+```
+
+```{r}
+#remove these participants
+raw <- raw %>%
+  filter(pid != 16,
+         pid != 21,
+         pid != 23,
+         pid != 24,
+         pid != 29,
+         pid != 30,
+         pid != 33,
+         pid != 36,
+         pid != 37)
+```
+
+### Exclusion criteria (preregistration OSF) ###
+
+## Missed trials
+
+# Calculate the number of missed trials for each participant and removing the ones with more than 40% of missed trials (72 trials)
+```{r}
+raw <- raw %>% 
+  mutate(missed_trial = if_else(
+        is.na(keypress), "yes", "no"))
+filtered_subjects <- raw %>%  
+  group_by(pid) %>%
+  summarise(missed_count = sum(missed_trial == "yes", na.rm = TRUE)) %>%
+  filter(missed_count > 45)#here 45 is 25% of the total number of trials (180)
+raw <- raw %>%
+  filter(!pid %in% filtered_subjects$pid)
+```
+
+#Checking for each participant the percentage of missed trials
+```{r}
+raw %>%
+  select(pid,missed_trial) %>%
+  tbl_summary(
+    by = pid) %>%
+  bold_labels()
+```
+
+#If needed, remove participants with percentage of missed trials > 40%
+```{r}
+#Here code
+```
+
+
+## Accuracy 
+
+# Calculate accuracy
+```{r}
+data <- raw %>% 
+  mutate(acc = case_when(
+         cond == "Famous" & keypress == "q" ~ 1,
+         cond == "Novel" & keypress == "p" ~ 1,
+         TRUE ~ 0))%>%
+  mutate(cond = fct_relevel(cond,"Novel", "Famous")) %>%
+  drop_na(rt) #Removing the missed trials 
+head(data)
+```
+
+data check
+
+```{r}
+data %>% 
+  distinct(pid, block, cond, acc)
+
+data %>%
+  group_by(pid, block, cond) %>% 
+  tally(acc)
+
+```
+
+#Checking participant on accuracy (Overall and per condtion) for each subject
+```{r}
+#Check overall accuracy
+acc_pid_check <- data %>%
+  group_by(pid) %>%
+  summarise(sum = sum(acc),
+            n = n(), # n here is the total trials per grouping
+            perc = sum/n*100)
+
+#Check accuracy per condition
+acc_pid_check_cond <- data %>%
+  group_by(pid,cond) %>%
+  summarise(sum = sum(acc),
+            n = n(), # n here is the total trials per grouping
+            perc = sum/n*100)
+```
+
+#Plot check overall accuracy
+```{r}
+p.acc <-ggplot(acc_pid_check, aes(x=pid, y=perc)) +
+   geom_bar(stat="identity") +
+   geom_hline(yintercept = 95, linetype = "dashed", color = "red")+
+   geom_hline(yintercept = 55, linetype = "dashed", color = "red")+
+   scale_fill_paletteer_d("rcartocolor::Safe") +
+   scale_colour_paletteer_d("rcartocolor::Safe")  +
+   ggtitle("Overall accuracy") +
+   xlab("Pid") +
+   ylab("Accuracy [%]") + ylim(c(0,100))
+p.acc
+ggsave("Exp_2/figures/acc_pid_barplot.jpeg",
+       width = 8, height = 6)
+```
+
+#Remove participants if overall accuracy is <55% or >95%
+```{r}
+filtered_subjects_acc <- data %>%  
+  group_by(pid) %>%
+  summarise(accuracy = sum(acc),
+            n = n(),
+            perc = accuracy/n*100) %>%
+  filter(perc > 95 | perc < 55)
+data <- data %>%
+  filter(!pid %in% filtered_subjects_acc$pid)
+```
+
+#Plot check overall accuracy again
+```{r}
+#Check overall accuracy
+acc_pid_check_without <- data %>%
+  group_by(pid) %>%
+  summarise(sum = sum(acc),
+            n = n(), # n here is the total trials per grouping
+            perc = sum/n*100)
+
+p.acc_without <-ggplot(acc_pid_check_without, aes(x=pid, y=perc)) +
+   geom_bar(stat="identity") +
+   geom_hline(yintercept = 95, linetype = "dashed", color = "red")+
+   geom_hline(yintercept = 55, linetype = "dashed", color = "red")+
+   scale_fill_paletteer_d("rcartocolor::Safe") +
+   scale_colour_paletteer_d("rcartocolor::Safe")  +
+   ggtitle("Overall accuracy") +
+   xlab("Pid") +
+   ylab("Accuracy [%]") + ylim(c(0,100))
+p.acc_without
+ggsave("Exp_2/figures/acc_pid_barplot_without.jpeg",
+       width = 8, height = 6)
+```
+
+##saving data
+```{r}
+write_csv(data, "Exp_2/data/data_exp_2/data_WP1_2_model.csv")
+data<-read_csv("Exp_2/data/data_exp_2/data_WP1_2_model.csv")
+data <- data %>%
+    mutate(cond = fct_relevel(cond,"Novel", "Famous")) 
+```
+
+
+## section 3 - create summary data ##
+
+first, create summary data for rt and accuracy at the pid level and at the 
+group level
+
+at the pid level
+### rt ###
+```{r}
+rt_pid <- data %>% 
+  group_by(pid,block, cond) %>%
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = n(), # n here is the total trials per grouping
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96)
+rt_pid
+```
+
+
+### acc ###
+```{r}
+acc_pid <- data %>% 
+  group_by(pid, block, cond) %>% 
+  summarise(sum = sum(acc),
+            n = n(), # n here is the total trials per grouping
+            perc = sum/n*100)
+acc_pid
+```
+
+at the group level
+
+### rt ###
+```{r}
+rt_group <- data %>% 
+  group_by(block, cond) %>% 
+  drop_na(rt) %>%
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = length(unique(pid)), # n here is the total subjs
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96)
+rt_group
+```
+
+### acc ###
+```{r}
+acc_group <- acc_pid %>% 
+  group_by(cond,block) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), # n here is the total trials per grouping
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc)
+acc_group
+```
+
+
+### without block###
+## rt ##
+```{r}
+rt_group_wblock <- data %>% 
+  group_by(cond) %>% 
+  drop_na(rt) %>%
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = length(unique(pid)), # n here is the total subjs
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96)
+rt_group_wblock
+```
+
+## acc ##
+```{r}
+acc_group_wblock <- acc_pid %>% 
+  group_by(cond) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), # n here is the total trials per grouping
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc)
+acc_group_wblock
+```
+
+
+## section 4 - plot ##
+
+just a few quick and dirty plots for now
+
+density
+
+rt
+
+```{r}
+p4.1 <- ggplot(data, aes(x=rt, fill=cond, colour=cond)) +
+   geom_density(alpha=0.5) +
+   scale_fill_manual(values = myColors) +
+   scale_color_manual(values = myColors) +
+   ggtitle("Response time by block and condition") +
+   facet_wrap(~block) +
+   xlab("Response time [s]") +
+   ylab("Density") +
+   xlim(0,1.75)
+p4.1
+
+#ggsave("/Users/rfournier/Rstudio/pilot5_dmc/figures_exp_1/rt_density_pid.jpeg",
+       #width = 8, height = 6)
+```
+
+acc
+
+```{r}
+p4.2 <- ggplot(data, aes(x=acc, fill=cond, colour=cond)) +
+   geom_density(alpha=0.5) +
+   scale_fill_manual(values = myColors) +
+   scale_color_manual(values = myColors) +
+   ggtitle("Accuracy by block and condition") +
+   facet_wrap(~block) +
+   xlab("Accuracy") +
+   ylab("Density")  
+p4.2 
+
+#ggsave("/Users/rfournier/Rstudio/pilot5_dmc/figures_exp_1/acc_density_pid.jpeg",
+       #width = 8, height = 6)
+```
+
+summary plots
+
+rt
+
+```{r}
+p4.3 <- ggplot(rt_pid, aes(x=block, y=mean, 
+                           fill=cond, colour=cond)) +
+   geom_point(alpha = 3) +
+   geom_line(aes(group = cond)) +
+   scale_fill_manual(values = myColors) +
+   scale_color_manual(values = myColors) +
+   ggtitle("Mean response time by block and condition") +
+   facet_wrap(~pid) +
+   xlab("Blocks") +
+   ylab("Mean response time [s]") +
+  ylim(0,1)
+p4.3
+
+ggsave("Exp_2/figures/rt_line_pid.jpeg",
+      width = 8, height = 8)
+```
+
+acc
+
+```{r}
+p4.4 <- ggplot(acc_pid, aes(x=block, y=perc, 
+                           fill=cond, colour=cond)) +
+   geom_point(alpha = 3) +
+   geom_line(aes(group = cond)) +
+   scale_fill_manual(values = myColors) +
+   scale_color_manual(values = myColors) +
+   ggtitle("Accuracy by block and condition") +
+   facet_wrap(~pid) +
+   xlab("Blocks") +
+   ylab("Accuracy [%]") + ylim(c(0,100))
+  
+p4.4
+
+ggsave("Exp_2/figures/acc_line_pid_prob.jpeg",
+       width = 8, height = 8)
+```
+
+group level summary data
+
+rt
+
+```{r}
+p4.5 <- ggplot(rt_group, aes(x=block, y=mean, 
+                           fill=cond, colour=cond)) +
+   geom_point(alpha = 3, position = pd2) +
+   geom_line(aes(group = cond), position = pd2) +
+   geom_errorbar(aes(ymin = mean-sem, ymax = mean+sem),
+                width=.2, position=pd2) +
+   scale_fill_manual(values = myColors) +
+   scale_color_manual(values = myColors) +
+   ggtitle("Response time by block and condition") +
+   xlab("Blocks") +
+   ylab("Mean response time [s]") +
+   ylim(0,1)
+p4.5
+
+ggsave("Exp_2/figures/rt_line_group.jpeg",
+        width = 7, height = 8)
+```
+
+acc
+
+```{r}
+p4.6 <- ggplot(acc_group, aes(x=block, y=perc, 
+                           fill=cond, colour=cond)) +
+   geom_point(alpha = 3, position = pd2) +
+   geom_line(aes(group = cond), position = pd2) +
+   geom_errorbar(aes(ymin = perc-sem, ymax = perc+sem),
+                width=.2, position=pd2) +
+   scale_fill_manual(values = myColors) +
+   scale_color_manual(values = myColors) +
+   ggtitle("Accuracy by block and condition") +
+   xlab("Blocks") +
+   ylab("Accuracy [%]") +
+   ylim(30,100)
+
+p4.6
+
+ggsave("Exp_2/figures/acc_line_group.jpeg",
+        width = 7, height = 8)
+```
+
+plot group data together
+
+```{r}
+p4.7 <- p4.5 | p4.6
+p4.7
+
+ggsave("Exp_2/figures/rt_acc_line_group.jpeg",
+        width = 15, height = 6)
+```
+
+add pid dots to the group data
+
+rt
+
+```{r}
+p4.8 <- ggplot(rt_group, aes(x=block, y=mean, 
+                           fill=cond, colour=cond)) +
+   geom_jitter(data = rt_pid,
+               position=position_jitterdodge(dodge.width =1), 
+               alpha = 1, colour = "darkgrey") +
+   geom_point(alpha = 3, position = pd2) +
+   geom_line(aes(group = cond), position = pd2) +
+   geom_errorbar(aes(ymin = mean-sem, ymax = mean+sem),
+                width=.2, position=pd2) +
+   scale_fill_manual(values = myColors) +
+   scale_color_manual(values = myColors) +
+   ggtitle("rt by block and condition") +
+   ylim(0,2.5)
+p4.8
+```
+
+acc
+
+```{r}
+p4.9 <- ggplot(acc_group, aes(x=block, y=perc, 
+                           fill=cond, colour=cond)) +
+   geom_jitter(data = acc_pid,
+               position=position_jitterdodge(dodge.width =1), 
+               alpha = 1, colour = "darkgrey") +
+   geom_point(alpha = 3, position = pd2) +
+   geom_line(aes(group = cond), position = pd2) +
+   geom_errorbar(aes(ymin = perc-sem, ymax = perc+sem),
+                width=.2, position=pd2) +
+   scale_fill_manual(values = myColors) +
+   scale_color_manual(values = myColors) +
+   ggtitle("acc by block and condition") +
+   ylim(0,100)
+p4.9
+```
+
+plot group data together
+
+```{r}
+p4.10 <- p4.8 | p4.9
+p4.10
+
+ggsave("figures/rt_acc_line_dots.jpeg",
+       width = 10, height = 6)
+```
+
+
+
+
+
+barplot acc
+```{r}
+p.4.11 <- ggplot(acc_group_wblock, aes(x = cond,y=perc, 
+                           fill=cond, colour=cond)) +
+   geom_col() +
+   geom_errorbar(aes(ymin = perc-sem, ymax = perc+sem), col = "black",
+                width=.2, position=pd2) +
+   scale_fill_manual(values = myColors) +
+   scale_color_manual(values = myColors) +
+   ggtitle("Accuracy by familiarity condition") +
+   xlab("Familiarity") +
+   ylab("Accuracy [%]") +
+   ylim(0,100)+
+   theme(legend.position = "none")
+
+p.4.11
+
+ggsave("Exp_2/figures/acc_barplot_group.jpeg",
+        width = 8, height = 8)
+```
+
+barplot rt
+```{r}
+p.4.12 <- ggplot(rt_group_wblock, aes(x = cond,y=mean, 
+                           fill=cond, colour=cond)) +
+   geom_col() +
+   geom_errorbar(aes(ymin = mean-sem, ymax = mean+sem), col = "black",
+                width=.2, position=pd2) +
+   scale_fill_manual(values = myColors) +
+   scale_color_manual(values = myColors) +
+   ggtitle("Response time by familiarity condition") +
+   xlab("Familiarity") +
+   ylab("Response time [s]") +
+   ylim(0,1)+
+   theme(legend.position = "none")
+
+p.4.12
+
+ggsave("Exp_2/figures/rt_barplot_group.jpeg",
+        width = 8, height = 8)
+```
+
+
+## section 5 - save out some files ##
+
+This is useful for future modelling and/or plotting without re-doing the wrangle
+file.
+
+
+
+##section 6 - exploratory analysis ##
+
+Here I just want to have a look at the reaction times and accuracy for the different head orientations
+
+#RT At pid level
+1st orientation
+```{r}
+rt_ori_1 <- data %>%
+  group_by(pid, block, cond, ori) %>% 
+  filter(ori == 1) %>% 
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = n(), # n here is the total trials per grouping
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96)
+rt_ori_1
+```
+Plot
+```{r}
+
+p5.1 <- ggplot(rt_ori_1, aes(x=block, y=mean, 
+                           fill=cond, colour=cond)) +
+   geom_point(alpha = 3) +
+   geom_line(aes(group = cond))+
+   ggtitle("Orientation 1") +
+   facet_wrap(~pid) +
+   xlab("Blocks") +
+   ylab("Mean response time [s]")
+p5.1
+```
+
+2nd orientation
+```{r}
+rt_ori_2 <- data %>%
+  group_by(pid, block, cond, ori) %>% 
+  filter(ori == 2) %>% 
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = n(), # n here is the total trials per grouping
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96)
+rt_ori_2
+```
+Plot
+```{r}
+
+p5.2 <- ggplot(rt_ori_2, aes(x=block, y=mean, 
+                           fill=cond, colour=cond)) +
+   geom_point(alpha = 3) +
+   geom_line(aes(group = cond))+
+   ggtitle("Orientation 2") +
+   facet_wrap(~pid) +
+   xlab("Blocks") +
+   ylab("Mean response time [s]")
+p5.2
+```
+
+3rd orientation
+```{r}
+rt_ori_3 <- data %>%
+  group_by(pid, block, cond, ori) %>% 
+  filter(ori == 3) %>% 
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = n(), # n here is the total trials per grouping
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96)
+rt_ori_3
+```
+Plot
+```{r}
+
+p5.3 <- ggplot(rt_ori_3, aes(x=block, y=mean, 
+                           fill=cond, colour=cond)) +
+   geom_point(alpha = 3) +
+   geom_line(aes(group = cond))+
+   ggtitle("Orientation 3") +
+   facet_wrap(~pid) +
+   xlab("Blocks") +
+   ylab("Mean response time [s]")
+p5.3
+```
+
+```{r}
+p5.4 <-p5.1 | p5.2 | p5.3
+p5.4
+```
+
+#At group level
+
+RT
+```{r}
+rt_group_ori <- data %>% 
+  group_by(block, ori) %>% 
+  mutate(ori = as.factor(ori))%>% 
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = length(unique(pid)), # n here is the total subjs
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96)
+rt_group_ori
+```
+Plot
+```{r}
+p5.5 <- ggplot(rt_group_ori, aes(x=block, y=mean, 
+                           fill=ori, colour=ori)) +
+   geom_bar(alpha = 3, position = pd2, stat = "identity") +
+   geom_errorbar(aes(ymin = mean-sem, ymax = mean+sem),
+                width=.2, position=pd2) +
+   ggtitle("Response time by block and orientation of picture") +
+   xlab("Blocks") +
+   ylab("Mean response time [s]") +
+   ylim(0,3)
+p5.5
+ggsave("figures/rt_bar_ori_blocks.jpeg",
+       width = 10, height = 6)
+```
+
+
+Acc / block
+
+```{r}
+acc_pid_ori<- data %>% 
+  group_by(pid, block, cond, ori) %>%
+  mutate(ori = as.factor(ori))%>%
+  summarise(sum = sum(acc),
+            n = n(), # n here is the total trials per grouping
+            perc = sum/n*100)
+acc_pid_ori
+```
+
+```{r}
+acc_group_ori <- acc_pid_ori %>% 
+  group_by(block, ori) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), # n here is the total trials per grouping
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc)
+acc_group_ori
+
+```
+Plot
+```{r}
+p4.6 <- ggplot(acc_group_ori, aes(x=block, y=perc, 
+                           fill=ori, colour=ori)) +
+   geom_bar(aes(group = ori), position = pd2, stat = "identity") +
+   geom_errorbar(aes(ymin = perc-sem, ymax = perc+sem),
+                width=.2, position=pd2) +
+  
+   ggtitle("Accuracy by block and condition") +
+   xlab("Blocks") +
+   ylab("Accuracy [%]") +
+   ylim(0,100)
+p4.6
+ggsave("figures/acc_bar_ori_blocks.jpeg",
+       width = 10, height = 6)
+```
+
+Acc / block / familiarity level
+#Block 1
+```{r}
+acc_pid_ori_block_1<- data %>% 
+  group_by(pid, block, cond, ori) %>%
+  mutate(ori = as.factor(ori))%>%
+  filter(block == "1")%>%
+  summarise(sum = sum(acc),
+            n = n(), # n here is the total trials per grouping
+            perc = sum/n*100)
+acc_pid_ori
+```
+
+```{r}
+acc_group_ori_block_1 <- acc_pid_ori_block_1 %>% 
+  group_by(block, ori, cond) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), # n here is the total trials per grouping
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc)
+acc_group_ori_block_1
+```
+Plot
+```{r}
+p4.6 <- ggplot(acc_group_ori_block_1, aes(x= ori, y=perc, colour=cond)) +
+   geom_bar(aes(group = cond), position = position_dodge(1), stat = "identity", fill = "white") +
+   geom_errorbar(aes(ymin = perc-sem, ymax = perc+sem, col = cond),
+                width=.2, position=position_dodge(1)) +
+   ggtitle("Block 1: Accuracy by picture orientation and condition") +
+   xlab("Picture orientation") +
+   ylab("Accuracy [%]") +
+   ylim(0,100)
+p4.6
+
+ggsave("figures/acc_bar_ori_block_1.jpeg",
+       width = 10, height = 6)
+```
+
+#Block 2
+```{r}
+acc_pid_ori_block_2<- data %>% 
+  group_by(pid, block, cond, ori) %>%
+  mutate(ori = as.factor(ori))%>%
+  filter(block == "2")%>%
+  summarise(sum = sum(acc),
+            n = n(), # n here is the total trials per grouping
+            perc = sum/n*100)
+acc_pid_ori_block_2
+```
+
+```{r}
+acc_group_ori_block_2 <- acc_pid_ori_block_2 %>% 
+  group_by(block, ori, cond) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), # n here is the total trials per grouping
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc)
+acc_group_ori_block_2
+```
+Plot
+```{r}
+p4.6 <- ggplot(acc_group_ori_block_2, aes(x= ori, y=perc, colour=cond)) +
+   geom_bar(aes(group = cond), position = position_dodge(1), stat = "identity", fill = "white") +
+   geom_errorbar(aes(ymin = perc-sem, ymax = perc+sem, col = cond),
+                width=.2, position=position_dodge(1)) +
+   ggtitle("Block 2: Accuracy by picture orientation and condition") +
+   xlab("Picture orientation") +
+   ylab("Accuracy [%]") +
+   ylim(0,100)
+p4.6
+
+ggsave("figures/acc_bar_ori_block_2.jpeg",
+       width = 10, height = 6)
+```
+
+#Block 3
+```{r}
+acc_pid_ori_block_3<- data %>% 
+  group_by(pid, block, cond, ori) %>%
+  mutate(ori = as.factor(ori))%>%
+  filter(block == "3")%>%
+  summarise(sum = sum(acc),
+            n = n(), # n here is the total trials per grouping
+            perc = sum/n*100)
+acc_pid_ori_block_3
+```
+
+```{r}
+acc_group_ori_block_3 <- acc_pid_ori_block_3 %>% 
+  group_by(block, ori, cond) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), # n here is the total trials per grouping
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc)
+acc_group_ori_block_3
+```
+Plot
+```{r}
+p4.6 <- ggplot(acc_group_ori_block_3, aes(x= ori, y=perc, colour=cond)) +
+   geom_bar(aes(group = cond), position = position_dodge(1), stat = "identity", fill = "white") +
+   geom_errorbar(aes(ymin = perc-sem, ymax = perc+sem, col = cond),
+                width=.2, position=position_dodge(1)) +
+   ggtitle("Block 3: Accuracy by picture orientation and condition") +
+   xlab("Picture orientation") +
+   ylab("Accuracy [%]") +
+   ylim(0,100)
+p4.6
+
+ggsave("figures/acc_bar_ori_block_3.jpeg",
+       width = 10, height = 6)
+```
+
+## Hit Rate and False Alarm Analysis ##
+
+
+# Familiar condition #
+Calculating hit rate "fam"
+```{r}
+data_fam <- data %>%
+  select(pid,block,trial,keypress,rt,fam,cond) %>%
+  filter(cond == "fam") %>%
+  mutate(hit = case_when(
+         cond == "fam" & keypress == "q" ~ 1,
+         cond == "fam" & keypress == "p" ~ 0,
+         TRUE ~ 0))
+```
+
+at the pid level
+
+```{r}
+hit_pid <- data_fam %>% 
+  group_by(pid, block,cond) %>% 
+  summarise(sum = sum(hit),
+            n = n(), # n here is the total trials per grouping
+            perc = sum/n*100)
+```
+
+at the group level
+
+```{r}
+hit_group <- hit_pid %>% 
+  group_by(block, cond) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), # n here is the total trials per grouping
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc)
+hit_group
+```
+
+Calculating false alarm for "fam" response
+```{r}
+data_unfam <- data %>%
+  select(pid,block,trial,keypress,rt,fam,cond) %>%
+  filter(cond == "unf") %>%
+  mutate(false = case_when(
+         cond == "unf" & keypress == "q" ~ 1,
+         cond == "unf" & keypress == "p" ~ 0,
+         TRUE ~ 0))
+```
+
+at the pid level
+```{r}
+false_pid <- data_unfam %>% 
+  group_by(pid, block, cond) %>%
+  summarise(sum = sum(false),
+            n = n(),
+            perc = sum/n*100)
+```
+
+at the group level
+
+```{r}
+false_group <- false_pid %>% 
+  group_by(block,cond) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), # n here is the total trials per grouping
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc)
+false_group
+```
+
+#Merge two stats together and plot
+```{r}
+false_group$perc_hit <- hit_group$perc
+p5.1 <- ggplot(false_group, aes(x = block, y = ))
+```
+
+
+
+

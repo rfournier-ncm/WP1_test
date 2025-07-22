@@ -1,0 +1,31 @@
+---
+title: "Testing_palettes"
+author: "Fournier Raphaël"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dichromat)
+library(prismatic)
+library(palmerpenguins)
+library(ggplot2)
+library(ggthemes)
+penguins
+```
+
+
+```{r}
+palettes <- ggthemes_data[["tableau"]][["color-palettes"]][["regular"]]
+for (palname in names(palettes)) {
+  pal <- tableau_color_pal(palname)
+  max_n <- attr(pal, "max_n")
+  show_col(pal(max_n))
+  title(main = palname)
+}
+```
+

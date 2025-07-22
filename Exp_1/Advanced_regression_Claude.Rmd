@@ -1,0 +1,282 @@
+---
+title: "Advanced_regression_Claude"
+author: "Fournier Raphaël"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Loading libraries
+```{r}
+library(tidyverse)
+library(glmnet)        # Regularized regression
+library(mgcv)          # GAMs
+library(randomForest)  # Machine learning
+library(quantreg)      # Quantile regression
+library(boot)          # Bootstrap
+library(car)           # Diagnostics
+library(performance)   # Model comparison
+library(see)           # Visualization
+library(corrplot)      # Correlation plots
+```
+
+
+#Simulate a larger data set
+```{r}
+# Simulate larger dataset (N=300) based on your structure
+set.seed(123)
+n_participants <- 300
+
+# Create expanded simulated dataset
+corr_data_300 <- tibble(
+  pid = 1:n_participants,
+  Age = sample(18:65, n_participants, replace = TRUE),
+  Gender = factor(sample(c("Male", "Female"), n_participants, replace = TRUE)),
+  Face = sample(10:54, n_participants, replace = TRUE),
+  Car = sample(10:54, n_participants, replace = TRUE),
+  # Add some realistic correlations
+  Diff_drift = rnorm(n_participants, mean = 0.5, sd = 0.3) + 
+               0.02 * Face + 0.01 * Car + rnorm(n_participants, 0, 0.1),
+  Diff_thresh = rnorm(n_participants, mean = 0.8, sd = 0.4) + 
+                0.015 * Face - 0.005 * Age + rnorm(n_participants, 0, 0.15)
+) %>%
+  mutate(
+    Age_centered = scale(Age)[,1],
+    Face_centered = scale(Face)[,1],
+    Car_centered = scale(Car)[,1]
+  )
+```
+
+
+# 1. REGULARIZED REGRESSION (Lasso/Ridge/Elastic Net) ====
+# Excellent for variable selection and handling multicollinearity. Identifying the core predictions.
+```{r}
+# Prepare data for glmnet
+X <- model.matrix(~ Face + Car + Age + Gender + Face*Car + Age*Gender - 1, 
+                  data = corr_data_300)
+y_drift <- corr_data_300$Diff_drift
+y_thresh <- corr_data_300$Diff_thresh
+
+# Cross-validated Lasso for drift rate
+lasso_drift <- cv.glmnet(X, y_drift, alpha = 1, nfolds = 10)
+plot(lasso_drift)
+coef(lasso_drift, s = "lambda.min")
+
+# Elastic Net (combines Ridge and Lasso)
+elastic_drift <- cv.glmnet(X, y_drift, alpha = 0.5, nfolds = 10)
+
+# Extract optimal coefficients
+lasso_coefs <- coef(lasso_drift, s = "lambda.min") %>% 
+  as.matrix() %>% 
+  as.data.frame() %>%
+  rownames_to_column("predictor") %>%
+  rename(coefficient = s1) %>%
+  filter(coefficient != 0, predictor != "(Intercept)")
+
+print("Lasso selected predictors:")
+print(lasso_coefs)
+```
+# 2. GENERALIZED ADDITIVE MODELS (GAMs) ====
+# For non-linear relationships
+```{r}
+# GAM with smooth terms for continuous predictors
+gam_drift <- gam(Diff_drift ~ s(Face) + s(Car) + s(Age) + Gender + 
+                 ti(Face, Car),  # tensor product interaction
+                 data = corr_data_300)
+summary(gam_drift)
+
+# Plot smooth terms
+plot(gam_drift, pages = 1)
+
+# Check for non-linearity significance
+gam.check(gam_drift)
+```
+
+# 3. POLYNOMIAL REGRESSION ====
+# Test for quadratic/cubic age effects (common in cognitive aging)
+```{r}
+poly_drift <- lm(Diff_drift ~ Face + Car + poly(Age, 2) + Gender + 
+                 Face*Car, data = corr_data_300)
+summary(poly_drift)
+
+# Compare linear vs quadratic age effect
+anova(lm(Diff_drift ~ Face + Car + Age + Gender, data = corr_data_300),
+      poly_drift)
+
+# 4. QUANTILE REGRESSION ====
+# Examine effects across different parts of the distribution
+
+# Fit quantile regression for 25th, 50th, 75th percentiles
+q25_drift <- rq(Diff_drift ~ Face + Car + Age + Gender, 
+                tau = 0.25, data = corr_data_300)
+q50_drift <- rq(Diff_drift ~ Face + Car + Age + Gender, 
+                tau = 0.50, data = corr_data_300)
+q75_drift <- rq(Diff_drift ~ Face + Car + Age + Gender, 
+                tau = 0.75, data = corr_data_300)
+
+# Compare coefficients across quantiles
+summary(q25_drift)
+summary(q50_drift) 
+summary(q75_drift)
+
+# Plot quantile regression results
+plot(summary(rq(Diff_drift ~ Face + Car + Age + Gender, 
+                tau = seq(0.1, 0.9, 0.1), data = corr_data_300)))
+
+```
+
+# 5. MACHINE LEARNING APPROACHES ====
+```{r}
+# Random Forest for complex interactions
+rf_drift <- randomForest(Diff_drift ~ Face + Car + Age + Gender, 
+                         data = corr_data_300, importance = TRUE)
+print(rf_drift)
+importance(rf_drift)
+varImpPlot(rf_drift)
+
+# Cross-validation for model comparison
+set.seed(123)
+train_idx <- sample(1:nrow(corr_data_300), 0.8 * nrow(corr_data_300))
+train_data <- corr_data_300[train_idx, ]
+test_data <- corr_data_300[-train_idx, ]
+
+# Compare models on test set
+models <- list(
+  linear = lm(Diff_drift ~ Face + Car + Age + Gender, data = train_data),
+  polynomial = lm(Diff_drift ~ Face + Car + poly(Age, 2) + Gender, data = train_data),
+  rf = randomForest(Diff_drift ~ Face + Car + Age + Gender, data = train_data)
+)
+
+# Calculate test RMSE
+test_rmse <- map_dbl(models, ~{
+  if(class(.x)[1] == "randomForest") {
+    preds <- predict(.x, test_data)
+  } else {
+    preds <- predict(.x, test_data)
+  }
+  sqrt(mean((test_data$Diff_drift - preds)^2))
+})
+
+print("Test RMSE comparison:")
+print(test_rmse)
+```
+
+# 6. ADVANCED DIAGNOSTICS & VISUALIZATION ====
+```{r}
+# Enhanced residual analysis
+m_full <- lm(Diff_drift ~ Face * Car + Age + Gender, data = corr_data_300)
+
+# Multiple diagnostic plots
+check_model(m_full)
+
+# Influence measures
+influence_measures <- augment(m_full) %>%
+  mutate(
+    leverage = .hat,
+    cooks_d = .cooksd,
+    standardized_residuals = .std.resid
+  )
+
+# Identify influential points
+influential_points <- influence_measures %>%
+  filter(cooks_d > 4/nrow(corr_data_300) | abs(standardized_residuals) > 3)
+
+print(paste("Number of influential points:", nrow(influential_points)))
+```
+
+# 8. MODEL SELECTION WITH INFORMATION CRITERIA ====
+```{r}
+# Create multiple candidate models
+models_list <- list(
+  m1 = lm(Diff_drift ~ Face, data = corr_data_300),
+  m2 = lm(Diff_drift ~ Face + Car, data = corr_data_300),
+  m3 = lm(Diff_drift ~ Face + Car + Age, data = corr_data_300),
+  m4 = lm(Diff_drift ~ Face + Car + Age + Gender, data = corr_data_300),
+  m5 = lm(Diff_drift ~ Face * Car + Age + Gender, data = corr_data_300),
+  m6 = lm(Diff_drift ~ Face * Car + poly(Age, 2) + Gender, data = corr_data_300)
+)
+
+# Compare models using AIC/BIC
+model_comparison <- map_dfr(models_list, ~{
+  tibble(
+    AIC = AIC(.x),
+    BIC = BIC(.x),
+    R2 = summary(.x)$r.squared,
+    Adj_R2 = summary(.x)$adj.r.squared
+  )
+}, .id = "model")
+
+print("Model comparison:")
+print(model_comparison)
+
+```
+# 9. EFFECT SIZE ANALYSIS ====
+```{r}
+# Cohen's f² for practical significance
+
+f2_calculation <- function(r2_full, r2_reduced) {
+  (r2_full - r2_reduced) / (1 - r2_full)
+}
+
+# Example: Effect size of Face*Car interaction
+m_reduced <- lm(Diff_drift ~ Face + Car + Age + Gender, data = corr_data_300)
+m_full <- lm(Diff_drift ~ Face * Car + Age + Gender, data = corr_data_300)
+
+f2_interaction <- f2_calculation(
+  summary(m_full)$r.squared,
+  summary(m_reduced)$r.squared
+)
+
+print(paste("Cohen's f² for Face*Car interaction:", round(f2_interaction, 3)))
+```
+
+# 10. VISUALIZATION ENHANCEMENTS ====
+```{r}
+# Enhanced correlation matrix
+cor_matrix <- corr_data_300 %>%
+  select(Face, Car, Age, Diff_drift, Diff_thresh) %>%
+  cor()
+
+corrplot(cor_matrix, method = "color", type = "upper", 
+         order = "hclust", tl.cex = 0.8, tl.col = "black")
+
+# Partial regression plots
+avPlots(m_full)
+
+# Prediction intervals visualization
+pred_data <- expand_grid(
+  Face = seq(min(corr_data_300$Face), max(corr_data_300$Face), length.out = 50),
+  Car = mean(corr_data_300$Car),
+  Age = mean(corr_data_300$Age),
+  Gender = "Female"
+)
+
+pred_results <- bind_cols(
+  pred_data,
+  predict(m_full, pred_data, interval = "prediction") %>% as_tibble()
+)
+
+ggplot(pred_results, aes(x = Face, y = fit)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = lwr, ymax = upr), alpha = 0.3) +
+  geom_point(data = corr_data_300, aes(x = Face, y = Diff_drift), alpha = 0.5) +
+  labs(title = "Prediction intervals for Face score effect on Drift rate",
+       x = "Face Memory Score", y = "Drift Rate Difference") +
+  theme_minimal()
+
+# SUMMARY RECOMMENDATIONS FOR N=300 STUDY:
+print("=== RECOMMENDATIONS FOR N=300 INDIVIDUAL DIFFERENCES STUDY ===")
+print("1. Use regularized regression (Lasso) for variable selection")
+print("2. Test for non-linear age effects with GAMs or polynomials") 
+print("3. Consider quantile regression to examine individual differences")
+print("4. Use cross-validation for robust model comparison")
+print("5. Bootstrap confidence intervals for key effects")
+print("6. Check for influential observations with Cook's D")
+print("7. Report effect sizes (Cohen's f²) alongside p-values")
+```
+
+
+

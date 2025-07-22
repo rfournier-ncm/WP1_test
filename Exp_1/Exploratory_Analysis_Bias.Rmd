@@ -1,0 +1,847 @@
+---
+title: "Exploratory_Analysis_Bias"
+author: "Fournier Raphaël"
+date: "`r Sys.Date()`"
+output: html_document
+---
+## load packages ##
+```{r load-pkg}
+pkxg <- c("EMC2", "tidyverse", "RColorBrewer", "patchwork", "tidybayes", "DataExplorer","ggpubr")
+
+lapply(pkxg, library, character.only = TRUE)
+```
+
+## plot settings ##
+
+theme settings for ggplot
+
+```{r, eval = F}
+theme_set(
+  theme_bw() +
+    theme(text = element_text(size = 18, face="bold"), 
+          title = element_text(size = 18, face="bold"),
+          legend.position = "bottom")
+)
+
+## Set the amount of dodge in figures
+pd <- position_dodge(0.7)
+pd2 <- position_dodge(1)
+```
+
+Load model
+```{r}
+#Exploratory model (with bias allowed to vary depending on the Response key)
+load("models/LBA_exp1_v1_bias.RData")
+```
+
+#Quick plots
+```{r}
+#Bias model
+plot_pars(LBA_exp1_v1_bias,selection="mu",layout=c(2,5), map = TRUE)
+posterior_summary(LBA_exp1_v1_bias,selection="alpha",probs = c(0.025, 0.5, 0.975),map = TRUE)#for each participant
+posterior_summary(LBA_exp1_v1_bias,selection="mu",probs = c(0.025, 0.5, 0.975),map = TRUE)#at group level
+```
+
+#Parameters per subjects
+```{r}
+#Remember:number of iters = 10000 / number of chains = 3 -> 10'000 x 30(subjects) x 3(number of chains) = 900'000 obs for each parameter
+#Bias model
+param_2_pid = EMC2::parameters(LBA_exp1_v1_bias, selection = "alpha", map = TRUE)
+```
+
+
+###Model 2: bias
+```{r}
+split_tibble <- function(tibble, col = 'col') tibble %>% split(., .[, col])
+array_theta_2 <- split_tibble(param_2_pid, "subjects")
+array_theta_2<-do.call(rbind, array_theta_2)
+array_theta_pid_2 <- array_theta_2 %>%
+  pivot_longer(cols = c("v_Sunf_lMTRUE", "v_Sunf_lMFALSE", "v_Sfam_lMTRUE", "v_Sfam_lMFALSE", "sv_lMTRUE", "B_lRunf", "B_lRfam", "A_lRunf", "A_lRfam", "t0"), names_to = "param", values_to = "value")%>%
+  add_column(datapoint = rep(1:30501,each=10,times=30))%>%
+  rename(pid=subjects)
+```
+
+
+```{r}
+theta_group_2 <- array_theta_pid_2 %>%
+  group_by(datapoint,param) %>% 
+  summarise(value = mean(value, na.rm = T)) %>% 
+  ungroup() %>% 
+  add_column(pid = "average") %>% ## add a column which makes clear it is the avg. not needed but useful for plotting later
+  relocate(pid, .before = everything())
+head(theta_group_2)
+glimpse(theta_group_2)
+```
+
+
+## calculate quantiles ##
+
+calculate quantiles per parameter at the group level
+
+```{r}
+library(tidybayes)
+theta_group_2_q <- theta_group_2 %>%
+  group_by(param) %>% 
+  median_qi(value)
+theta_group_2_q
+```
+
+
+and do the same per pid
+
+```{r}
+theta_pid_2_q <- array_theta_pid_2 %>%
+  group_by(pid, param) %>% 
+  median_qi(value)
+theta_pid_2_q
+```
+
+## some quick and dirty plots with all of the parameters ##
+
+plot the distribution per parameter using a tidybayes halfeye plot
+
+```{r}
+p2.1 <- ggplot(theta_group_2, aes(x = value, y = fct_rev(param))) +  
+  stat_halfeye(alpha = 0.9) +
+  labs(x = "parameter estimate", y = "") 
+p2.1
+
+ggsave("/Users/rfournier/Rstudio/EMC_WP1_1/EMC_WP1_1/figures/all_params_2.jpeg",
+       width = 8, height = 6)
+```
+
+plot avg and individual pid parameters
+
+```{r}
+p2.2 <- ggplot(theta_group_2, aes(x = value, y = fct_rev(param))) +  
+  stat_halfeye(alpha = 0.9, position = position_nudge(y=-0.5)) +
+  geom_pointinterval(data = theta_pid_2_q, aes(xmin=.lower, xmax=.upper, 
+                                           colour = pid, fill = pid),
+                     position = position_dodge(width = 0.7)) +
+  labs(x = "parameter estimate", y = "") +
+  facet_wrap(~param, scales = "free_y") +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
+p2.2
+
+ggsave("/Users/rfournier/Rstudio/EMC_WP1_1/EMC_WP1_1/figures/all_params_pid_2_1.jpeg",
+       width = 8, height = 6)
+```
+
+# section 3 #
+
+## plot thresholds separately ##
+
+first, wrangle to make a separate dfs
+
+thresholds df per pid
+
+```{r}
+thresh_pid_2 <- array_theta_pid_2 %>% 
+  filter(str_detect(param, "B_")) %>% 
+  mutate(response = if_else(str_detect(param, "lRunf"), "unf_key", "fam_key"),
+         response = factor(response,
+                            levels = c("unf_key", "fam_key")))
+head(thresh_pid_2)
+str(thresh_pid_2)
+summary(thresh_pid_2)
+
+## data check
+thresh_pid_2 %>% 
+  distinct(param, response)
+```
+
+
+
+thresholds at the group level
+
+```{r}
+thresh_group_2 <- theta_group_2 %>% 
+  filter(str_detect(param, "B_")) %>% 
+  mutate(response = if_else(str_detect(param, "lRfam"), "fam_key", "unf_key"),
+         response = factor(response,
+                            levels = c("fam_key", "unf_key")))
+head(thresh_group_2)
+str(thresh_group_2)
+summary(thresh_group_2)
+```
+
+## plot ##
+
+
+
+at the group level
+
+```{r}
+p3.1 <- ggplot(thresh_group_2, aes(x = value, y = fct_rev(response))) +
+  stat_halfeye(alpha = 0.7, aes(fill = fct_rev(response))) +
+  scale_fill_brewer(palette = "Paired") +
+  scale_colour_brewer(palette = "Paired")  +
+  labs(y="Response", x="Threshold", title=bquote("Group level: 
+Threshold by key-press")) +
+  labs(fill = "Response")
+p3.1
+
+## save a figure
+ ggsave("/Users/rfournier/Rstudio/EMC_WP1_1/EMC_WP1_1/figures/thresh2.jpeg",width = 10, height = 6)
+```
+
+## caluclate a threshold response key difference ##
+
+per pid
+
+```{r}
+thresh_diff_pid_2 <- thresh_pid_2 %>%
+  pivot_wider(id_cols = -param,
+              names_from = "response",
+              values_from = "value") %>% 
+  mutate(diff = unf_key - fam_key)
+head(thresh_diff_pid_2)
+```
+
+
+
+at the group level
+
+```{r}
+thresh_diff_2 <- thresh_group_2 %>%
+  pivot_wider(id_cols = -param,
+              names_from = "response",
+              values_from = "value") %>% 
+  mutate(diff = unf_key - fam_key)
+head(thresh_diff_2)
+```
+
+## quantiles on the difference score ##
+
+per pid
+
+```{r}
+thresh_diff_pid_2_q <- thresh_diff_pid_2 %>%
+  group_by(pid) %>% 
+  median_qi(diff)
+thresh_diff_pid_2_q
+```
+
+at the group level
+
+```{r}
+thresh_diff_2_q <- thresh_diff_2 %>%
+  group_by(pid) %>%
+  median_qi(diff)
+thresh_diff_2_q
+```
+
+## plot the threshold difference score ##
+
+plot the average difference
+
+```{r}
+p3.2 <- ggplot(thresh_diff_2, aes(x = diff, y = "")) +  
+  stat_halfeye(alpha = 0.9, fill="firebrick") +
+  geom_vline(xintercept = 0, color = "darkgrey") +
+  labs(title = "Group level: 
+Threshold (unfamiliar > familiar)", 
+       x = "Threshold", y="") 
+p3.2
+```
+
+plot individual pids
+
+```{r}
+thresh_diff_pid_2$pid = with(thresh_diff_pid_2, reorder(pid, diff, mean))
+p3.3 <- ggplot(thresh_diff_pid_2, aes(x = diff, y = pid,
+                                    fill=pid)) +  
+  stat_halfeye(alpha = 0.7) +
+  geom_vline(xintercept = 0, color = "darkgrey") +
+  labs(title = "Participant level: Threshold (unf_key > fam_key)", 
+       x = "Threshold", y="participant") 
+p3.3
+```
+
+plot the average difference and individual pids
+
+```{r}
+p3.4 <- ggplot(thresh_diff_2, aes(x = diff, y= pid)) +  
+  stat_halfeye(alpha = 0.9, fill="firebrick",
+               position = position_nudge(y=0)) +
+  stat_halfeye(data = thresh_diff_pid_2,
+               alpha = 0.7) +
+  geom_vline(xintercept = 0, color = "darkgrey") +
+  labs(title = "Threshold (unf_key > fam_key)", 
+       x = "Threshold", y="participant ID")
+p3.4
+```
+
+## plot together ##
+
+```{r}
+p3.5 <- p3.1 / p3.2 | p3.3 +
+  labs(caption = "80% and 95% quantile intervals shown in black")
+p3.5
+
+# save a figure
+ ggsave("/Users/rfournier/Rstudio/EMC_WP1_1/EMC_WP1_1/figures/thresh2.jpeg",
+        width = 21, height = 10)
+```
+
+and now combine avg and pid difference plots
+
+```{r}
+p3.6 <- p3.1 | p3.2 +
+  labs(caption = "80% and 95% credible intervals shown in black")
+p3.6
+
+# save a figure
+ggsave("/Users/rfournier/Rstudio/EMC_WP1_1/EMC_WP1_1/figures/thresh2_2.jpeg",
+       width = 15, height = 10)
+```
+
+```{r}
+p3.6 <- p3.1 | p3.4 +
+  labs(caption = "80% and 95% quantile intervals shown in black")
+p3.6
+
+# save a figure
+ggsave("/Users/rfournier/Rstudio/EMC_WP1_1/EMC_WP1_1/figures/thresh2_3.jpeg",
+       width = 21, height = 10)
+```
+
+
+the exact layout, labels of factors and arrangement may need polishing and re-arranging.
+
+But for now, the data seem to be what we want.
+
+# section 4 #
+
+## plot drift rate separately ##
+
+## wrangle ##
+
+create a drift-rate df
+
+```{r}
+drift_rate_pid_2 <- array_theta_pid_2 %>% 
+  filter(str_detect(param, "v_S")) %>% 
+  mutate(condition = if_else(str_detect(param, "unf"), "unf", "fam"),
+         accuracy = if_else(str_detect(param, "TRUE"), "true", "false"),
+         condition = factor(condition,
+                            levels = c("unf", "fam")),
+         accuracy = factor(accuracy,
+                            levels = c("false", "true")))
+head(drift_rate_pid_2)
+str(drift_rate_pid_2)
+summary(drift_rate_pid_2)
+
+## data check
+drift_rate_pid_2 %>% 
+  distinct(param, condition, accuracy)
+```
+
+
+drift rate at the group level
+
+```{r}
+drift_rate_group_2 <- theta_group_2 %>% 
+  filter(str_detect(param, "v_S")) %>% 
+  mutate(condition = if_else(str_detect(param, "unf"), "unf", "fam"),
+         accuracy = if_else(str_detect(param, "TRUE"), "true", "false"),
+         condition = factor(condition,
+                            levels = c("unf", "fam")),
+         accuracy = factor(accuracy,
+                            levels = c("false", "true"))) 
+head(drift_rate_group_2)
+str(drift_rate_group_2)
+summary(drift_rate_group_2)
+```
+
+## plot ##
+
+#Create a custom manual colour scale: drift_rate group
+
+```{r}
+library(RColorBrewer)
+myColors_drift <- RColorBrewer::brewer.pal(12, "Dark2")[4:5]
+names(myColors_drift) <- levels(drift_rate_group_2$accuracy)
+colScale_drift <- scale_fill_manual(name = "accuracy", values = myColors_drift)
+```
+
+the average
+
+```{r}
+p4.1 <- ggplot(drift_rate_group_2, aes(x = value, y = fct_rev(condition), 
+                               fill = accuracy)) +
+  stat_halfeye(alpha = 0.7) +
+  colScale_drift +
+  labs(title = "Group level: True drift-rate and False 
+drift rate by condition", y="condition", x="Drift rate") 
+p4.1
+
+ggsave("figures/drift_rate_2.jpeg",
+        width = 10, height = 6)
+```
+
+and now facet by pid
+
+```{r}
+p4.2 <- ggplot(drift_rate_pid_2, aes(x = value, y = fct_rev(condition), 
+                               fill = accuracy)) +
+  stat_halfeye(alpha = 0.7) +
+  colScale_drift +
+  labs(title = "Participant level: Drift-rate by condition",
+       y="condition", x="Drift rate") +
+  facet_wrap(~pid)
+p4.2
+```
+
+take a look together
+
+```{r}
+p4.1 / p4.2
+ggsave("figures/drift_rate_true_false_2.jpeg", 
+       width = 16, height = 13)
+```
+
+## caluclate drift rate differences between conditions and accuracy ##
+
+per pid
+
+```{r}
+## just true > false differences (accuracy)
+drift_acc_diff_pid_2 <- drift_rate_pid_2 %>%
+  pivot_wider(id_cols = -param,
+               names_from = accuracy,
+               values_from = value) %>%
+  mutate(diff = true - false)
+drift_acc_diff_pid_2
+
+## unf > fam differences
+drift_acc_cond_diff_pid_2 <- drift_acc_diff_pid_2 %>%
+  pivot_wider(id_cols = -c("true", "false"), 
+              names_from = condition,
+              values_from = diff) %>%
+  mutate(diff = unf - fam)
+drift_acc_cond_diff_pid_2
+```
+
+at the group level
+
+```{r}
+## just true > false differences (accuracy)
+drift_acc_diff_2 <- drift_rate_group_2 %>%
+  pivot_wider(id_cols = -param,
+               names_from = accuracy,
+               values_from = value) %>%
+  mutate(diff = true - false)
+drift_acc_diff_2
+
+## unf > fam differences
+drift_acc_cond_diff_2 <- drift_acc_diff_2 %>%
+  pivot_wider(id_cols = -c("true", "false"), 
+              names_from = condition,
+              values_from = diff) %>%
+  mutate(diff = unf - fam)
+drift_acc_cond_diff_2
+```
+
+## plot the differences ##
+
+differences between true and false, separately for unf and fam
+
+at the group average level
+
+```{r}
+myColors_drift_diff <- RColorBrewer::brewer.pal(12, "Paired")[c(1,2)]
+names(myColors_drift_diff) <- levels(drift_acc_diff_2$condition)
+colScale_drift_diff <- scale_fill_manual(name = "fct_rev(condition)", values = myColors_drift_diff)
+```
+
+
+plot
+
+```{r}
+p4.3 <- ggplot(drift_acc_diff_2, aes(x = diff, y = fct_rev(condition))) +
+  stat_halfeye(aes(fill = fct_rev(condition)), alpha = 0.7) +
+  colScale_drift_diff +
+  geom_vline(xintercept = 0, color = "darkgrey") +
+  labs(title = "Group level: Drift rate (True > false)
+by condition",
+       x="Drift rate", y="") +
+  xlim(-1,3.5)
+p4.3
+```
+
+quantiles
+
+```{r}
+drift_acc_diff_2_q <- drift_acc_diff_2 %>%
+  group_by(condition) %>% 
+  median_qi(diff)
+drift_acc_diff_2_q
+```
+
+difference between unf (true and false) > fam (true > false)
+
+plot
+
+```{r}
+p4.4 <- ggplot(drift_acc_cond_diff_2, aes(x = diff, y = "")) +
+  stat_halfeye(fill = "firebrick", alpha = 0.9) +
+  geom_vline(xintercept = 0, color = "darkgrey") +
+  labs(title = "Group level:Drift rate (unf > fam)",
+       x="Drift rate", y="") +
+  xlim(0,5)
+p4.4
+```
+
+quantiles
+
+```{r}
+drift_acc_cond_diff_2_q <- drift_acc_cond_diff_2 %>%
+  median_qi(diff)
+drift_acc_cond_diff_2_q
+```
+
+## plot together ##
+
+```{r}
+p4.5 <- p4.3 | p4.4 +
+  labs(caption = "80% and 95% credible intervals shown in black")
+p4.5
+
+# save a figure
+ggsave("figures/drift_rat_mini_2.jpeg",
+       width = 15, height = 10)
+```
+
+## plot the average difference and pid differences ##
+
+```{r}
+drift_acc_cond_diff_pid_2$pid = with(drift_acc_cond_diff_pid_2, reorder(pid, diff, mean))
+p4.6 <- ggplot(drift_acc_cond_diff_2, aes(x = diff, y=pid)) +  
+  stat_halfeye(alpha = 0.9, fill="firebrick") +
+  stat_halfeye(data = drift_acc_cond_diff_pid_2,
+               alpha = 0.7) +
+  geom_vline(xintercept = 0, color = "darkgrey") +
+  labs(title = "Individual and average 
+drift rate difference", 
+       x = "Drift rate", y="participant ID") 
+p4.6
+```
+
+## combine drift rate plots ##
+
+```{r}
+p4.7 <- p4.3 / p4.4 | p4.6 +
+  labs(caption = "80% and 95% quantile intervals shown in black")
+p4.7 
+
+# save a figure
+ggsave("figures/drift_rate_pid_2.jpeg",
+       width = 15, height = 10)
+```
+
+
+## compare threshold and drift rate ##
+
+```{r}
+p3.4 | p4.6
+```
+
+ok, so the plots need polishing, but they look pretty good.
+
+
+
+
+## plot bias separately ##
+```{r}
+bias_pid <- array_theta_pid_2 %>% 
+  filter(str_detect(param, "A_")) %>% 
+  mutate(response = if_else(str_detect(param, "lRunf"), "unf_key", "fam_key"),
+         response = factor(response,
+                            levels = c("unf_key", "fam_key")))
+head(bias_pid)
+str(bias_pid)
+summary(bias_pid)
+
+## data check
+bias_pid %>% 
+  distinct(param, response)
+```
+
+bias at the group level
+
+```{r}
+bias_group <- theta_group_2 %>% 
+  filter(str_detect(param, "A_")) %>% 
+  mutate(response = if_else(str_detect(param, "lRfam"), "fam_key", "unf_key"),
+         response = factor(response,
+                            levels = c("fam_key", "unf_key")))
+head(bias_group)
+str(bias_group)
+summary(bias_group)
+```
+
+## plot ##
+
+
+
+at the group level
+
+```{r}
+p3.1 <- ggplot(bias_group, aes(x = value, y = fct_rev(response))) +
+  stat_halfeye(alpha = 0.7, aes(fill = fct_rev(response))) +
+  scale_fill_brewer(palette = "Paired") +
+  scale_colour_brewer(palette = "Paired")  +
+  labs(y="Response", x="Bias parameter", title=bquote("Group level: 
+Bias by key-press")) +
+  labs(fill = "Response")
+p3.1
+
+## save a figure
+ ggsave("/Users/rfournier/Rstudio/pilot5_dmc/figures/bias_2.jpeg",width = 10, height = 6)
+```
+
+## calculate a bias response key difference ##
+
+per pid
+
+```{r}
+bias_diff_pid <- bias_pid %>%
+  pivot_wider(id_cols = -param,
+              names_from = "response",
+              values_from = "value") %>% 
+  mutate(diff = unf_key - fam_key)
+head(bias_diff_pid)
+```
+
+at the group level
+
+```{r}
+bias_diff <- bias_group %>%
+  pivot_wider(id_cols = -param,
+              names_from = "response",
+              values_from = "value") %>% 
+  mutate(diff = unf_key - fam_key)
+head(bias_diff)
+```
+
+## quantiles on the difference score ##
+
+per pid
+
+```{r}
+bias_diff_pid_q <- bias_diff_pid %>%
+  group_by(pid) %>% 
+  median_qi(diff)
+bias_diff_pid_q
+```
+
+at the group level
+
+```{r}
+bias_diff_q <- bias_diff %>%
+  group_by(pid) %>%
+  median_qi(diff)
+bias_diff_q
+```
+
+## plot the threshold difference score ##
+
+plot the average difference
+
+```{r}
+p3.2 <- ggplot(bias_diff, aes(x = diff, y = "")) +  
+  stat_halfeye(alpha = 0.9, fill="firebrick") +
+  geom_vline(xintercept = 0, color = "darkgrey") +
+  labs(title = "Group level: 
+Bias (unfamiliar > familiar)", 
+       x = "Bias", y="") 
+p3.2
+```
+
+plot individual pids
+
+```{r}
+bias_diff_pid$pid = with(bias_diff_pid, reorder(pid, diff, mean))
+p3.3 <- ggplot(bias_diff_pid, aes(x = diff, y = pid,
+                                    fill=pid)) +  
+  stat_halfeye(alpha = 0.7) +
+  geom_vline(xintercept = 0, color = "darkgrey") +
+  labs(title = "Participant level: Bias (unf_key > fam_key)", 
+       x = "Bias", y="participant") 
+p3.3
+```
+
+plot the average difference and individual pids
+
+```{r}
+
+p3.4 <- ggplot(bias_diff, aes(x = diff, y=pid)) +  
+  stat_halfeye(data = bias_diff_pid,
+               alpha = 0.7) +
+    stat_halfeye(alpha = 0.9, fill="firebrick",
+               position = position_nudge(y=0)) +
+  geom_vline(xintercept = 0, color = "darkgrey") +
+  labs(title = "Bias (unf_key > fam_key)", 
+       x = "Bias", y="participant ID")
+p3.4
+```
+
+## plot together ##
+
+```{r}
+p3.5 <- p3.1 / p3.2 | p3.3 +
+  labs(caption = "80% and 95% quantile intervals shown in black")
+p3.5
+
+# save a figure
+ ggsave("figures/bias_2.jpeg",
+        width = 21, height = 10)
+```
+
+and now combine avg and pid difference plots
+
+```{r}
+p3.6 <- p3.1 | p3.2 +
+  labs(caption = "80% and 95% credible intervals shown in black")
+p3.6
+
+# save a figure
+ggsave("figures/bias2_2.jpeg",
+       width = 15, height = 10)
+```
+
+```{r}
+p3.6 <- p3.1 | p3.4 +
+  labs(caption = "80% and 95% quantile intervals shown in black")
+p3.6
+
+# save a figure
+ggsave("figures/bias2_3.jpeg",
+       width = 21, height = 10)
+```
+
+
+## Compute decision threshold (Threshold parameter + Starting point)
+```{r}
+
+```
+
+
+
+
+
+### Criterion and correlations with bias parameter
+
+#Compute and plot correlation: D' - Drift rate diff.
+
+Decision criterion computation: (-z(hit rate) + z(false alarm rate))/2
+
+#Load data
+```{r}
+data<-read_csv("/Users/rfournier/Rstudio/EMC_WP1_1/EMC_WP1_1/data/data.csv")
+```
+```{r}
+source("dprime_lab.R") # label indiviudal trilas (i.e., rows in a dataframe) as hits, false alarm, or correct rejection
+
+source("dprime_cat.R") # total number of hits, misses, false alarms, and correct rejections for each participant
+```
+
+#Calculate Hit rate and False Alarm rate
+```{r}
+data_prime <- data %>%
+  mutate(keys = if_else(keypress == "q", "fam", "unf"),
+         keys = as.factor(keys)) %>%
+  select(pid,cond,keys,acc) %>%
+  rename(correct = acc)
+
+
+data_prime.dprime <- dprime_lab("cond", "keys", "correct", data = data_prime)
+df.cat <- dprime_cat(data_prime.dprime,pid)
+```
+
+#Compute criterion
+```{r}
+criterion <- df.cat %>%
+  mutate(hit_rate_fam = Hits/TotalTarg,
+         false_alarm_fam = FalseAlarms/TotalDis,
+         hit_rate_unf = CorrectRejs/TotalDis,
+         false_alarm_unf = Misses/TotalTarg,
+         criterion_fam = -(qnorm(hit_rate_fam) - qnorm(false_alarm_unf))/2,
+         criterion_unf = -(qnorm(hit_rate_unf) - qnorm(false_alarm_fam))/2) %>%
+  mutate(pid = as.numeric(as.factor(pid)))%>%
+  filter(!false_alarm_fam == 0)
+```
+
+#Plotting criterion
+
+```{r}
+#More wrangle for correlations plotting
+test_bias <- theta_pid_2_q %>%
+  select(pid,param,value) %>%
+  pivot_wider(names_from = param, values_from = value)
+bias_corr <- test_bias %>%
+  select(pid,A_lRfam, A_lRunf) %>%
+  rename(Bias_Learned = "A_lRfam", Bias_New = "A_lRunf") %>%
+  select(pid,Bias_Learned,Bias_New) %>%
+  mutate(pid = as.numeric(as.factor(pid))) %>%
+  filter(!pid == "1",
+         !pid == "27")
+
+bias_corr$crit_fam = criterion$criterion_fam
+bias_corr$crit_unf = criterion$criterion_unf
+
+```
+
+```{r}
+c_plot <- bias_corr %>%
+  select(pid, crit_fam, crit_unf) %>%
+  rename(Learned = "crit_fam", New = "crit_unf") %>%
+  pivot_longer(!pid, names_to = "cond", values_to = "Criterion") %>%
+  group_by(cond) %>%
+  median_qi(Criterion) %>% 
+  mutate(sd = sd(Criterion))%>% 
+  ggplot(aes(cond, Criterion, fill = cond)) +
+    geom_col() +
+    geom_errorbar(aes(cond, ymin = Criterion-sd, ymax = Criterion+sd), width = 0.4, colour= "black", alpha = .9) +
+    xlab("Condition") +
+    ylab("d'") +
+    labs(title = "Criterion per condition") +
+    ylim(-2,0.5) 
+c_plot
+ggsave("figures/crit_comp.jpeg")
+```
+Corr plots
+```{r}
+#Learned faces
+bias_corr <- bias_corr %>%
+  rename(Criterion_Learned = "crit_fam", Criterion_New = "crit_unf")
+mat_cor<-plot_correlation(bias_corr[2:5])
+mat_cor
+ggsave("figures/mat_cor_bias.jpeg")
+c1 <- ggplot(bias_corr, aes(x = Bias_Learned, y = Criterion_Learned)) +
+  geom_point() +
+  geom_smooth(method = 'lm', formula = y~x)+
+  labs(title = "Learned faces: Correlation between criterion 
+and bias parameter") +
+  xlab("Bias for Learned faces")+
+  ylab("Criterion for Learned faces") +
+  stat_cor(method = "pearson")
+c1
+ggsave("figures/learned_corr_bias.jpeg", width = 10, height = 6)
+#New faces
+c2 <- ggplot(bias_corr, aes(x = Bias_New, y = Criterion_New)) +
+  geom_point() +
+  geom_smooth(method = 'lm', formula = y~x)+
+  labs(title = "Learned faces: Correlation between criterion 
+and bias parameter") +
+  xlab("Bias for New faces")+
+  ylab("Criterion for New faces")+
+  stat_cor(method = "pearson")
+c2
+ggsave("figures/new_corr.jpeg", width = 10, height = 6)
+```
+
+
+
