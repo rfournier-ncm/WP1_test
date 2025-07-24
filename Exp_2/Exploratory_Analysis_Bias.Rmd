@@ -50,7 +50,7 @@ posterior_summary(LBA_exp2_v2_bias,selection="mu",probs = c(0.025, 0.5, 0.975),m
 ```{r}
 #Remember:number of iters = 10000 / number of chains = 3 -> 10'000 x 30(subjects) x 3(number of chains) = 900'000 obs for each parameter
 #Bias model
-param_2_pid = EMC2::parameters(LBA_exp2_v2_bias, selection = "alpha", map = TRUE)
+param_2_pid = EMC2::parameters(LBA_exp2_v2_bias, selection = "alpha", N = NULL, resample = TRUE)
 ```
 
 
@@ -60,8 +60,8 @@ split_tibble <- function(tibble, col = 'col') tibble %>% split(., .[, col])
 array_theta_2 <- split_tibble(param_2_pid, "subjects")
 array_theta_2<-do.call(rbind, array_theta_2)
 array_theta_pid_2 <- array_theta_2 %>%
-  pivot_longer(cols = c("v_SNew_lMTRUE", "v_SNew_lMFALSE", "v_SFamous_lMFALSE", "v_SFamous_lMTRUE", "sv_lMTRUE", "B_lRNew", "B_lRFamous", "A_lRNew", "A_lRFamous", "t0"), names_to = "param", values_to = "value")%>%
-  add_column(datapoint = rep(1:30165,each=10,times=30))%>%
+  pivot_longer(cols = c("v_SNovel:lMTRUE", "v_SNovel:lMFALSE", "v_SFamous:lMFALSE", "v_SFamous:lMTRUE", "sv_lMTRUE", "B_lRNovel", "B_lRFamous", "A_lRNovel", "A_lRFamous", "t0"), names_to = "param", values_to = "value")%>%
+  add_column(datapoint = rep(1:30000,each=10,times=30))%>%
   rename(pid=subjects)
 ```
 
@@ -143,7 +143,7 @@ thresholds df per pid
 ```{r}
 thresh_pid_2 <- array_theta_pid_2 %>% 
   filter(str_detect(param, "B_")) %>% 
-  mutate(response = if_else(str_detect(param, "lRNew"), "Novel", "Famous"),
+  mutate(response = if_else(str_detect(param, "lRNovel"), "Novel", "Famous"),
          response = factor(response,
                             levels = c("Novel", "Famous")))
 head(thresh_pid_2)
@@ -162,7 +162,7 @@ thresholds at the group level
 ```{r}
 thresh_group_2 <- theta_group_2 %>% 
   filter(str_detect(param, "B_")) %>% 
-  mutate(response = if_else(str_detect(param, "lRNew"), "Novel", "Famous"),
+  mutate(response = if_else(str_detect(param, "lRNovel"), "Novel", "Famous"),
          response = factor(response,
                             levels = c("Novel", "Famous")))
 head(thresh_group_2)
@@ -328,12 +328,12 @@ create a drift-rate df
 ```{r}
 drift_rate_pid_2 <- array_theta_pid_2 %>% 
   filter(str_detect(param, "v_S")) %>% 
-  mutate(condition = if_else(str_detect(param, "New"), "Novel", "Famous"),
-         accuracy = if_else(str_detect(param, "TRUE"), "true", "false"),
+  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Famous"),
+         accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
          condition = factor(condition,
                             levels = c("Novel", "Famous")),
          accuracy = factor(accuracy,
-                            levels = c("false", "true")))
+                            levels = c("False", "True")))
 head(drift_rate_pid_2)
 str(drift_rate_pid_2)
 summary(drift_rate_pid_2)
@@ -349,12 +349,12 @@ drift rate at the group level
 ```{r}
 drift_rate_group_2 <- theta_group_2 %>% 
   filter(str_detect(param, "v_S")) %>% 
-  mutate(condition = if_else(str_detect(param, "New"), "Novel", "Famous"),
-         accuracy = if_else(str_detect(param, "TRUE"), "true", "false"),
+  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Famous"),
+         accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
          condition = factor(condition,
                             levels = c("Novel", "Famous")),
          accuracy = factor(accuracy,
-                            levels = c("false", "true")))
+                            levels = c("False", "True")))
 head(drift_rate_group_2)
 str(drift_rate_group_2)
 summary(drift_rate_group_2)
@@ -378,8 +378,9 @@ p4.1 <- ggplot(drift_rate_group_2, aes(x = value, y = fct_rev(condition),
                                fill = accuracy)) +
   stat_halfeye(alpha = 0.7) +
   colScale_drift +
-  labs(title = "Group level: True drift-rate and False 
-drift rate by condition", y="condition", x="Drift rate") 
+  labs(title = "Group level: True and False 
+drift rate by familiarity condition", y="Familiarity", x="Drift rate") +
+  guides(fill = guide_legend(title = "Accuracy"))
 p4.1
 
 ggsave("Exp_2/figures/drift_rate_2_bias.jpeg",
@@ -417,12 +418,12 @@ drift_acc_diff_pid_2 <- drift_rate_pid_2 %>%
   pivot_wider(id_cols = -param,
                names_from = accuracy,
                values_from = value) %>%
-  mutate(diff = true - false)
+  mutate(diff = True - False)
 drift_acc_diff_pid_2
 
 ## unf > fam differences
 drift_acc_cond_diff_pid_2 <- drift_acc_diff_pid_2 %>%
-  pivot_wider(id_cols = -c("true", "false"), 
+  pivot_wider(id_cols = -c("True", "False"), 
               names_from = condition,
               values_from = diff) %>%
   mutate(diff = Novel - Famous)
@@ -437,12 +438,12 @@ drift_acc_diff_2 <- drift_rate_group_2 %>%
   pivot_wider(id_cols = -param,
                names_from = accuracy,
                values_from = value) %>%
-  mutate(diff = true - false)
+  mutate(diff = True - False)
 drift_acc_diff_2
 
 ## unf > fam differences
 drift_acc_cond_diff_2 <- drift_acc_diff_2 %>%
-  pivot_wider(id_cols = -c("true", "false"), 
+  pivot_wider(id_cols = -c("True", "False"), 
               names_from = condition,
               values_from = diff) %>%
   mutate(diff = Novel - Famous)
@@ -464,8 +465,8 @@ p4.3 <- ggplot(drift_acc_diff_2, aes(x = diff, y = fct_rev(condition))) +
   geom_vline(xintercept = 0, color = "darkgrey") +
   labs(title = "Group level: Drift rate (True > false)
 by condition",
-       x="Drift rate", y="") +
-  xlim(-1,3.5) +
+       x="Drift rate", y="Familiarity") +
+  xlim(0,3) +
    theme(legend.position = "none")
   
 p4.3
@@ -490,7 +491,7 @@ p4.4 <- ggplot(drift_acc_cond_diff_2, aes(x = diff, y = "")) +
   geom_vline(xintercept = 0, color = "darkgrey") +
   labs(title = "Group level:Drift rate (Novel > Famous)",
        x="Drift rate", y="") +
-  xlim(-1,5)
+  xlim(0,3)
 p4.4
 ```
 

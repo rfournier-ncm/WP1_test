@@ -14,6 +14,11 @@ lapply(pkxg, library, character.only = TRUE)
 
 
 ## plot settings ##
+#Colors
+```{r}
+myColors <- c("Novel" = paletteer_d("rcartocolor::Safe",4)[1],"Famous" =  paletteer_d("rcartocolor::Safe",4)[3])
+```
+
 
 theme settings for ggplot
 
@@ -54,7 +59,7 @@ posterior_summary(LBA_exp2_v1,selection="mu",probs = c(0.025, 0.5, 0.975),map = 
 #Parameters per subjects
 ```{r}
 #Preregistered model
-param_1_pid = EMC2::parameters(LBA_exp2_v1,selection="alpha",map = TRUE)
+param_1_pid = EMC2::parameters(LBA_exp2_v1,selection="alpha",N = NULL, resample = TRUE)
 #Remember:number of iters = 10000 / number of chains = 3 -> 10'000 x 30(subjects) x 3(number of chains) = 900'000 obs for each parameter
 ```
 
@@ -90,7 +95,7 @@ split_tibble <- function(tibble, col = 'col') tibble %>% split(., .[, col])
 array_theta_1 <- split_tibble(param_1_pid, "subjects")
 array_theta_1<-do.call(rbind, array_theta_1)
 array_theta_pid_1 <- array_theta_1 %>%
-  pivot_longer(cols = c("v_SNew_lMTRUE", "v_SNew_lMFALSE", "v_SFamous_lMFALSE", "v_SFamous_lMTRUE", "sv_lMTRUE", "B_lRNew", "B_lRFamous", "A", "t0"), names_to = "param", values_to = "value")%>%
+  pivot_longer(cols = c("v_SNovel:lMTRUE", "v_SNovel:lMFALSE", "v_SFamous:lMFALSE", "v_SFamous:lMTRUE", "sv_lMTRUE", "B_lRNovel", "B_lRFamous", "A", "t0"), names_to = "param", values_to = "value")%>%
   add_column(datapoint = rep(1:30000,each=9,times=30))%>% #here 30'000 = number of chains (3) x number of iteration (10'000)
   rename(pid=subjects)
 ```
@@ -357,7 +362,7 @@ create a drift-rate df
 ```{r}
 drift_rate_pid_1 <- array_theta_pid_1 %>% 
   filter(str_detect(param, "v_S")) %>% 
-  mutate(condition = if_else(str_detect(param, "New"), "Novel", "Famous"),
+  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Famous"),
          accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
          condition = factor(condition,
                             levels = c("Novel", "Famous")),
@@ -378,7 +383,7 @@ drift rate at the group level
 ```{r}
 drift_rate_group_1 <- theta_group_1 %>% 
   filter(str_detect(param, "v_S")) %>% 
-  mutate(condition = if_else(str_detect(param, "New"), "Novel", "Famous"),
+  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Famous"),
          accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
          condition = factor(condition,
                             levels = c("Novel", "Famous")),
@@ -407,8 +412,8 @@ p4.1 <- ggplot(drift_rate_group_1, aes(x = value, y = fct_rev(condition),
                                fill = accuracy)) +
   stat_halfeye(alpha = 0.7) +
   colScale_drift +
-  labs(title = "Group level: True drift rate and False 
-drift rate by condition", y="Condition", x="Drift rate") 
+  labs(title = "Group level: True and False 
+drift rate by familiarity condition", y="Familiarity", x="Drift rate") 
 p4.1
 
 ggsave("Exp_2/figures/drift_rate_1.jpeg",

@@ -56,7 +56,7 @@ data_emc <- raw %>%
   mutate(subjects=factor(subjects),
          S=factor(S,
                   levels = c("Novel", "Learned")),
-         R=if_else(R == "q", "Novel", "Learned"),
+         R=if_else(R == "q", "Learned", "Novel"),
          R=factor(R,
                   levels = c("Novel", "Learned"))) %>% 
   as.data.frame() ## in DMC, post predict need a df and not a tibble. Same for EMC2 I think.
@@ -117,8 +117,8 @@ Note that I changed iter and step_size to make the model fit better and sample q
 
 ```{r}
 LBA_exp1_v1_t0 <- make_emc(data_emc,design_exp1_v1_t0,type="standard",  prior=prior_exp1_v1_t0)
-LBA_exp1_v1_t0 <- fit(LBA_exp1_v1_t0, cores_per_chain = 3, fileName="Exp_1/models/tmp.RData",
-                     iter = 10000, step_size = 500)
+LBA_exp1_v1_t0 <- fit(LBA_exp1_v1_t0, cores_per_chain = 3, cores_for_chains = 2, fileName="Exp_1/models/tmp.RData",
+                     iter = 10000, step_size = 100)
 save(LBA_exp1_v1_t0,file="Exp_1/models/LBA_exp1_v1_t0.RData") 
 load("Exp_1/models/LBA_exp1_v1_t0.RData")
 ```
@@ -143,7 +143,7 @@ plot_pars(LBA_exp1_v1_t0,selection="mu",layout=c(2,5))
 
 ```{r}
 pp_LBA_exp1_v1_t0 <- predict(LBA_exp1_v1_t0, n_cores = 10)
-save(pp_LBA_exp1_v1_t0,file="models/pp_LBA_exp1_v1_t0.RData")
+save(pp_LBA_exp1_v1_t0,file="Exp_1/models/pp_LBA_exp1_v1_t0.RData")
 plot_fit(data_emc, pp_LBA_exp1_v1_t0, factors = c("S"),layout=c(2,3))
 ```
 

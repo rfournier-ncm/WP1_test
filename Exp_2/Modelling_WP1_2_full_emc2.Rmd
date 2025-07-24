@@ -148,3 +148,14 @@ save(pp_LBA_exp2_v4_full,file="models/pp_LBA_exp2_v4_full.RData")
 plot_fit(data_emc, pp_LBA_exp2_v4_full, factors = c("S"),layout=c(2,3))
 ```
 
+# 5. Models'comparison
+```{r}
+load("Exp_2/models/LBA_exp2_v1.RData")
+load("Exp_2/models/LBA_exp2_v2_bias.RData")
+load("Exp_2/models/LBA_exp2_v3_t0.RData")
+load("Exp_2/models/LBA_exp2_v4_full.RData")
+
+models = list(LBA_exp2_v1,LBA_exp2_v2_bias,LBA_exp2_v3_t0,LBA_exp2_v4_full)
+compare(models, cores_per_prop = 2)
+```
+

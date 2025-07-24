@@ -60,7 +60,7 @@ posterior_summary(LBA_exp1_v1,selection="mu",probs = c(0.025, 0.5, 0.975),map = 
 #Parameters per subjects
 ```{r}
 #Preregistered model
-param_1_pid = EMC2::parameters(LBA_exp1_v1,selection="alpha",map = TRUE)
+param_1_pid = EMC2::parameters(LBA_exp1_v1,selection="alpha", N = NULL, resample = TRUE)
 #Remember:number of iters = 10000 / number of chains = 3 -> 10'000 x 30(subjects) x 3(number of chains) = 900'000 obs for each parameter
 ```
 
@@ -96,7 +96,7 @@ split_tibble <- function(tibble, col = 'col') tibble %>% split(., .[, col])
 array_theta_1 <- split_tibble(param_1_pid, "subjects")
 array_theta_1<-do.call(rbind, array_theta_1)
 array_theta_pid_1 <- array_theta_1 %>%
-  pivot_longer(cols = c("v_Sunf_lMTRUE", "v_Sunf_lMFALSE", "v_Sfam_lMTRUE", "v_Sfam_lMFALSE", "sv_lMTRUE", "B_lRunf", "B_lRfam", "A", "t0"), names_to = "param", values_to = "value")%>%
+  pivot_longer(cols = c("v_SNovel:lMTRUE", "v_SNovel:lMFALSE", "v_SLearned:lMTRUE", "v_SLearned:lMFALSE", "sv_lMTRUE", "B_lRNovel", "B_lRLearned", "A", "t0"), names_to = "param", values_to = "value")%>%
   add_column(datapoint = rep(1:30000,each=9,times=30))%>% #here 30'000 = number of chains (3) x number of iteration (10'000)
   rename(pid=subjects)
 ```
@@ -358,7 +358,7 @@ create a drift-rate df
 ```{r}
 drift_rate_pid_1 <- array_theta_pid_1 %>% 
   filter(str_detect(param, "v_S")) %>% 
-  mutate(condition = if_else(str_detect(param, "unf"), "Novel", "Learned"),
+  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Learned"),
          accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
          condition = factor(condition,
                             levels = c("Novel", "Learned")),
@@ -379,7 +379,7 @@ drift rate at the group level
 ```{r}
 drift_rate_group_1 <- theta_group_1 %>% 
   filter(str_detect(param, "v_S")) %>% 
-  mutate(condition = if_else(str_detect(param, "unf"), "Novel", "Learned"),
+  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Learned"),
          accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
          condition = factor(condition,
                             levels = c("Novel", "Learned")),
@@ -409,7 +409,8 @@ p4.1 <- ggplot(drift_rate_group_1, aes(x = value, y = fct_rev(condition),
   stat_halfeye(alpha = 0.7) +
   colScale_drift +
   labs(title = "Group level: True and False 
-drift rate by familiarity condition", y="Familiarity", x="Drift rate") 
+drift rate by familiarity condition", y="Familiarity", x="Drift rate") +
+  guides(fill = guide_legend(title = "Accuracy"))
 
 p4.1
 
@@ -493,10 +494,11 @@ p4.3 <- ggplot(drift_acc_diff_1, aes(x = diff, y = fct_rev(condition))) +
   scale_fill_paletteer_d("rcartocolor::Safe") +
   scale_colour_paletteer_d("rcartocolor::Safe")  +
   geom_vline(xintercept = 0, color = "darkgrey") +
+  theme(legend.position = "none") +
   labs(title = "Group level: Drift rate (True > false)
 by familiarity condition",
-       x="Drift rate", y="Familiarity") +
-  theme(legend.position = "none")
+       x="Drift rate", y="Familiarity") 
+
 p4.3
 ```
 
