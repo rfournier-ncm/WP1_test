@@ -1,0 +1,74 @@
+---
+title: "Introduction"
+format: html
+editor: visual
+bibliography: references.bib
+---
+
+## Introduction
+
+P1: Introduction paragraph The ability to quickly and correctly recognize a familiar face is important in our everyday life. Not only does this ability allow us to anticipate another person's behaviour, but this recognition will influence our own behaviour as well. People will behave differently in function of the identity of the person they are interacting with. Most of the previous research focusing on face recognition/perception has used manifest measures (i.e. response times and accuracy) to assess one's ability to recognize faces. However, less is known about the computational processes that support face recognition. We investigated how different types/qualities of face familiarity affected the latent variables estimated by evidence accumulation models (EAMs; @ratcliff1998). This computational approach has provided new insights on the dynamics of the decision process supporting face recognition.
+
+P2: Models of face recognition The face recognition process has been intensely investigated over the last 50 years [@johnston2009; @natu2011]. One of the most influential models describing the face recognition process is the functional model of face recognition proposed by @bruce1986. This model advances that visual recognition happens when the encoded structural representation of a face matches the stored structural code of the same face. These structural codes are contained in the face recognition units (FRUs) which have access to person identity nodes that contains identity-specific semantic information. Based on neuroimaging findings, researchers have adapted this model to relate its different components/processes to specific brain areas [@gobbini2006; @gobbini2007; @haxby2000]. This general model of the distributed neural system for familiar face recognition incorporates two distinct systems. The core system, composed by the inferior occipital gyrus (occipital face area, OFA), the inferior fusiform gyrus (fusiform face area, FFA) and the posterior superior temporal sulcus (pSTS), is dedicated to modality-specific visual processing of faces. The core system is involved in the recognition of faces *supported by/based on (established on)* visual features only. The extended system participates in the encoding of the person knowledge and is mediated by a broader/larger network of brains areas [@duchaine2015; @gobbini2007; @ishai2008; @kanwisher2011; @haxby2000]. The extended system support the recognition of faces for which prior semantic knowledge have been stored, like famous faces (add ref.) or personally familiar faces (add ref.), by mediating the retrieval of identity-specific information from memory.
+
+P3: familiar and unfamiliar face recognition Previous studies have shown that this distinction/difference between visual familiarity and person knowledge was also reflected on manifest variables (i.e. response times and accuracy) in tasks assessing face recognition ability. • Visual familiarity, often experimentally induced by exposing faces previously of the experimental task, allows for a faster and more accurate matching of these faces compared to novel ones [@clutterbuck2005; @dwyer2009].
+
+• Relying on external features for matching unfamiliar faces? =\> check refs. In face matching tasks, unfamiliar face matching disproportionately relies on external features of the face, such as hairstyle and head outline and performance is severely impaired when these external features are removed (Bruce et al., 1999; Clutterbuck & Johnston, 2002; Estudillo & Bindemann, 2014; Henderson et al., 2001; Kemp, Caon, Howard, & Brook, 2016; Megreya & Bindemann, 2009).
+
+Required? Not sure... But make the point that for unfamiliar faces rely more on external visual features.
+
+• In face memory tasks: However, during a face memory task, the findings are less coherent/homogenous. Ref where visual fam faces recognition \< novel faces recognition
+
+• Person knowledge familiarity: [@akan2023; @schwaninger2002; @clutterbuck2005; @read; @jenkins2011; @johnston2009]
+
+• Other possible refs: (e.g., Cloutier, Kelley, & Heatherton, 2011; Dubois et al., 1999; Gobbini & Haxby, 2006; Guntupalli, Wheeler, & Gobbini, 2017; Kosaka et al., 2003; Natu & O'Toole, 2015; Rossion, Schiltz, Robaye, Pirenne, & Crommelinck, 2001).
+
+P4: lack of computational approach to investigate human social cognition For the last 50 years, research on face perception and face recognition has been singularly dominated by the separate analysis of manifest variables (i.e. response times and accuracy; ref) or a transformation of the accuracy score (d'; ref). The analysis of theses variables has outlined the understanding framework of face perception and face recognition. The ability to recognize a face is defined in terms of response times and accuracy, separately.
+
+• In human neuroscience research + human social cognition: lack of computational approaches [@parker; @anintro2024]
+
+• Why important?
+
+P5: Evidence accumulation models • One approach: evidence-accumulation models (LBA; @brown2008)
+
+• Computational models of decision-making, choice response: description
+
+• Figure 1: LBA figure (I know which one)
+
+• Latent psychological variables of interest: drift rate (evidence of accumulation) and threshold (response caution).
+
+• Past success in investigating psychology (mostly decision-making, ), some applications in human social cognition
+
+• Now: Increased application
+
+P6: Aims and predictions
+
+• Two experiments were conducted to investigate how familiarity affects the decision-making process of face recognition using evidence-accumulation models.
+
+• Non directional hypotheses:
+
+a\) Drift rate (accumulation of evidence) will be affected by familiarity
+
+b\) Threshold (response caution) will be affected by familiarity
+
+c\) Both drift rate and threshold will be affected by familiarity
+
+## Discussion
+
+Here we demonstrated that different computational processes support the recognition of different types of face. Whereas the signal-to-noise ratio provided by visual familiarity was poorer compared to novelty in the first experiment, the combination of visual and semantic knowledge about the individual in the second experiment induced a quicker evidence accumulation for familiar faces compared to novel faces. This would suggest that the quality of the information processing varies as a function of the nature of the information. Such inference about the computational mechanisms involved in face recognition could not have been possible based on the commonly used separate analysis of response times and accuracy. Therefore, we suggest that further work uses evidence-accumulation models (EAM) and other cognitive modelling approaches to build a richer computational understanding of face recognition and familiarity effects.
+
+Accumulation of evidence for visually familiar faces was slower compared to novel faces in Experiment 1. This would suggest that when only surface level visual features are available for recognition, the novelty of the information prevails. In the case of short prior exposure to visual stimuli, our findings are in agreement with other studies that reported a better recognition ability for novel faces than for visually familiar faces [@bindemann2014; @read]. Visually familiar faces are processed in the core network of face recognition [@bruce1986; @gobbini2006]. This core network manages and synthesizes the visual analysis of low-level visual features to the construction of a detailed perceptual representation of the face. The next step requires the activation of face memory representations, giving rise to a feeling of familiarity proportionate to the degree of overlap between the presented face and the memory trace [@rapcsak2019]. In the case of short prior visual exposure, these face memory traces might not be stable enough for the recognition process, leading to a slower evidence accumulation towards the "familiar" decision.
+
+\- Here, add the novelty effect (old/new references and explanations)
+
+P3: Effects of person identity (visual + semantic) knowledge (Experiment 2) and the extended network of the functional model of face recognition (Bruce & Young, 1986; Haxby et al., 2000). - 1 sentence: main finding: When richer semantic features available, familiarity prevails (faster accumulation of evidence in favor of familiar information vs novel information). - Extended network - Experiment 2: why Experiment 2 would elicit the extended network of face recognition. - Interpretation of our results within the functional model of face recognition framework. - Suggestion: (Landi et al., 2021) They suggest that there may be two pathways of face memory:
+
+ Pathway 1: from Anterior Medial Face area (AM) -- Anterior Temporal lobe: facilitate the formation of new associations and feeling of familiarity (Learned Faces)  Pathway 2: from Anterior Medial Face area (AM) -- Temporal Pole Face area (TP): access to long-term semantic face information (Familiar Faces) - Evidence accumulation faster for familiar faces could reflect the pathway 2 where semantic face information is accessed quicker than for visually learned faces which, without being associated with semantic information, would need further processing into the Anterior Temporal Lobe (pathway 1), leading to a slower accumulation of evidence.
+
+P3.5: Interpretation of drift rate results for Experiment 2: general issue
+
+P4: Constraints on generality (Simons et al., 2017) - Suggestion: visual familiarity effects not specific to faces - Here we used faces as recognition stimuli - Suggestion: experiment 1 effects generalizable to other visual stimuli processing (objects, scenes...) - However, experiment 2 effects more constrained to faces: difficult to imagine a similar semantic knowledge for objects or scenes that we do for faces. Maybe for very specific and personal object but not comparable to the number of faces that we have a rich semantic knowledge about (or something like that).
+
+P5: Limitations We do not exclude that our parameter estimation might have been affected by our restricted number of trials. Previous studies have investigated how a low number of trials have influenced the model fitting, leading to an incorrect parameter estimation (ref from Manke). While our two experimental designs reach the threshold of the required number of trials to use EAM, more trials could have been more appropriate. Our decision of using 90 trials for each condition was motivated by the fact that it is especially challenging to find or create a face pictures dataset that includes a large number of identities. Another limitation to note concerns the use of celebrities' picture in the second experiment. Indeed, we cannot exclude the fact that the categorization between familiar faces and novel faces might have been facilitated by low visual features from the celebrities' pictures (e.g. slightly different orientation of the face, different overall picture quality...). While we tried to control for these features as much as possible, this remains a possibility.
+
+P6: Future research To provide more evidence towards the findings of Landi et al.(2021), a joint-modelling approach could be applied/used/exploited (ref). Joint-modelling designates the particularity of modelling two different source of data (e.g. choice-response data and fMRI data) at the same time. This approach could provide precious insights about the relationship between latent variables and brain areas activity, like the temporal lobe face area (TP). Another direction for future studies would be to investigate how variability in the face recognition ability in the general population accounts for these latent variables' estimation. (develop this a little more, introducing our possible next experiment). - Last point: Familiarity as a continuum and not binary categorisation
