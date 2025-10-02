@@ -36,23 +36,24 @@ pkg <- c("tidyverse", "RColorBrewer", "patchwork", "gtsummary", "paletteer")
 lapply(pkg, library, character.only = TRUE)
 ```
 
-## plot settings ##
-
-```{r}
-## Set the amount of dodge in figures
-pd <- position_dodge(0.7)
-pd2 <- position_dodge(1)
-```
 
 theme settings for ggplot
 
 ```{r, eval = F}
 theme_set(
   theme_bw() +
-    theme(text = element_text(size = 20), 
-          title = element_text(size = 22),
+    theme(text = element_text(size = 18, face="bold"), 
+          title = element_text(size = 18, face="bold"),
           legend.position = "bottom")
 )
+
+## Set the amount of dodge in figures
+pd <- position_dodge(0.7)
+pd2 <- position_dodge(1)
+```
+
+```{r}
+myColors <- c("Novel" = paletteer_d("rcartocolor::Safe",4)[1],"Learned" =  paletteer_d("rcartocolor::Safe",4)[2])
 ```
 
 ## section 1 - read in the raw data ##
@@ -300,7 +301,7 @@ acc_group
 ```
 
 ### without block###
-## rt ##
+## rt group ##
 ```{r}
 rt_group_wblock <- data %>% 
   group_by(cond) %>% 
@@ -314,7 +315,22 @@ rt_group_wblock <- data %>%
 rt_group_wblock
 ```
 
-## acc ##
+## rt pid ##
+```{r}
+rt_pid_wblock <- data %>% 
+  group_by(pid,cond) %>% 
+  drop_na(rt) %>%
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = length(unique(pid)), # n here is the total subjs
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96) %>%
+  left_join(rt_group_wblock, by = join_by(cond))
+
+rt_pid_wblock
+```
+
+## acc group##
 ```{r}
 acc_group_wblock <- acc_pid %>% 
   group_by(cond) %>% 
@@ -327,6 +343,19 @@ acc_group_wblock <- acc_pid %>%
 acc_group_wblock
 ```
 
+## acc pid ##
+```{r}
+acc_pid_wblock <- acc_pid %>% 
+  group_by(pid,cond) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), # n here is the total trials per grouping
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc) %>%
+  left_join(acc_group_wblock, by = join_by(cond))
+acc_pid_wblock
+```
 
 ## section 4 - plot ##
 
@@ -554,44 +583,53 @@ barplot
 
 Accuracy
 ```{r}
-p.4.11 <- ggplot(acc_group_wblock, aes(x = cond,y=perc, 
+p.4.11 <- ggplot(acc_pid_wblock, aes(x = fct_reorder(cond, perc.y),y=perc.y, 
                            fill=cond, colour=cond)) +
    geom_col() +
-   geom_errorbar(aes(ymin = perc-sem, ymax = perc+sem), col = "black",
+   geom_errorbar(aes(ymin = perc.y-sem.y, ymax = perc.y+sem.y), col = "black",
                 width=.2, position=pd2) +
-   scale_fill_paletteer_d("rcartocolor::Safe") +
-   scale_colour_paletteer_d("rcartocolor::Safe")  +
-   ggtitle("Accuracy by familiarity condition") +
-   xlab("Familiarity") +
+  geom_point(aes(y = perc.x),
+             colour = "black",
+             stat = "identity",
+             position=pd2,
+             alpha = .7)+
+   scale_fill_manual(values = myColors) +
+   scale_color_manual(values = myColors) +
+   ggtitle("Accuracy by condition") +
+   xlab("Conditions") +
    ylab("Accuracy [%]") +
    ylim(0,100) +
-   theme(legend.position = "none")
+   theme(legend.position = "none") 
 
-p.4.11
-
+print(p.4.11)
 ggsave("Exp_1/figures/acc_barplot_group.jpeg",
-        width = 8, height = 8)
+        width = 6, height = 8)
 ```
 
 Reaction times
 ```{r}
-p.4.12 <- ggplot(rt_group_wblock, aes(x = cond,y=mean, 
+p.4.12 <- ggplot(rt_pid_wblock, aes(x = cond,y=mean.y, 
                            fill=cond, colour=cond)) +
    geom_col() +
-   geom_errorbar(aes(ymin = mean-sem, ymax = mean+sem), col = "black",
+   geom_errorbar(aes(ymin = mean.y-sem.y, ymax = mean.y+sem.y), col = "black",
                 width=.2, position=pd2) +
-   scale_fill_paletteer_d("rcartocolor::Safe") +
-   scale_colour_paletteer_d("rcartocolor::Safe")  +
-   ggtitle("Response time by familiarity condition") +
-   xlab("Familiarity") +
+  geom_point(aes(y = mean.x),
+             colour = "black",
+             stat = "identity",
+             position=pd2,
+             alpha = .7)+
+   scale_fill_manual(values = myColors) +
+   scale_color_manual(values = myColors) +
+   ggtitle("Response time by condition") +
+   xlab("Conditions") +
    ylab("Response time [s]") +
-   ylim(0,1.5)+
+   ylim(0,2)+
    theme(legend.position = "none")
 
 p.4.12
 
 ggsave("Exp_1/figures/rt_barplot_group.jpeg",
-        width = 8, height = 8)
+        width = 6, height = 8)
 ```
 
 
@@ -1047,6 +1085,11 @@ data_d_pid_unf <- data_d_pid_unf %>%
     zscoreFA = (FA - 0.1664701)/0.1385968,
     d_prime = zscoreHR - zscoreFA)
 ```
+
+
+
+
+
 
 ### Bayesian estimation approahc to multilevel modelling (McElreatch,2020) ###
 Import brms

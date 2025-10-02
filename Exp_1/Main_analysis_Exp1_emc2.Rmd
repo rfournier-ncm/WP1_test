@@ -36,6 +36,9 @@ pd <- position_dodge(0.7)
 pd2 <- position_dodge(1)
 ```
 
+```{r}
+myColors <- c("Novel" = paletteer_d("rcartocolor::Safe",4)[1],"Learned" =  paletteer_d("rcartocolor::Safe",4)[2])
+```
 
 #Load models
 ```{r}
@@ -60,7 +63,7 @@ posterior_summary(LBA_exp1_v1,selection="mu",probs = c(0.025, 0.5, 0.975),map = 
 #Parameters per subjects
 ```{r}
 #Preregistered model
-param_1_pid = EMC2::parameters(LBA_exp1_v1,selection="alpha", N = NULL, resample = TRUE)
+param_1_pid = EMC2::parameters(LBA_exp1_v1,selection="alpha", N = NULL)
 #Remember:number of iters = 10000 / number of chains = 3 -> 10'000 x 30(subjects) x 3(number of chains) = 900'000 obs for each parameter
 ```
 
@@ -178,7 +181,7 @@ thresholds df per pid
 ```{r}
 thresh_pid_1 <- array_theta_pid_1 %>% 
   filter(str_detect(param, "B_")) %>% 
-  mutate(response = if_else(str_detect(param, "lRfam"), "Learned", "Novel"),
+  mutate(response = if_else(str_detect(param, "lRLearned"), "Learned", "Novel"),
          response = factor(response,
                             levels = c("Novel", "Learned")))
 head(thresh_pid_1)
@@ -195,7 +198,7 @@ thresholds at the group level
 ```{r}
 thresh_group_1 <- theta_group_1 %>% 
   filter(str_detect(param, "B_")) %>% 
-  mutate(response = if_else(str_detect(param, "lRfam"), "Learned", "Novel"),
+  mutate(response = if_else(str_detect(param, "lRLearned"), "Learned", "Novel"),
          response = factor(response,
                             levels = c("Novel", "Learned")))
 head(thresh_group_1)
@@ -212,6 +215,7 @@ p3.1 <- ggplot(thresh_group_1, aes(x = value, y = fct_rev(response))) +
   stat_halfeye(alpha = 0.7, aes(fill = response)) +
   scale_fill_paletteer_d("rcartocolor::Safe") +
   scale_colour_paletteer_d("rcartocolor::Safe")  +
+  geom_vline(xintercept = 0, color = "darkgrey") +
   labs(y="Response", x="Threshold", title=bquote("Group level: 
 Threshold by response")) +
   labs(fill = "Response") +
