@@ -59,7 +59,7 @@ posterior_summary(LBA_exp2_v1,selection="mu",probs = c(0.025, 0.5, 0.975),map = 
 #Parameters per subjects
 ```{r}
 #Preregistered model
-param_1_pid = EMC2::parameters(LBA_exp2_v1,selection="alpha",N = NULL, resample = TRUE)
+param_1_pid = EMC2::parameters(LBA_exp2_v1,selection="alpha",N = NULL)
 #Remember:number of iters = 10000 / number of chains = 3 -> 10'000 x 30(subjects) x 3(number of chains) = 900'000 obs for each parameter
 ```
 
@@ -202,13 +202,6 @@ str(thresh_group_1)
 summary(thresh_group_1)
 ```
 
-## plot ##
-
-custom color
-```{r}
-myColors <- c("Novel" = paletteer_d("rcartocolor::Safe",4)[1],"Famous" =  paletteer_d("rcartocolor::Safe",4)[3])
-```
-
 
 at the group level
 
@@ -216,6 +209,7 @@ at the group level
 p3.1 <- ggplot(thresh_group_1, aes(x = value, y = fct_rev(response))) +
   stat_halfeye(alpha = 0.7, aes(fill = response)) +
   scale_fill_manual(values = myColors) +
+  geom_vline(xintercept = 0, color = "darkgrey") +
   labs(y="Response", x="Threshold", title=bquote("Group level: 
 Threshold by response")) +
    theme(legend.position = "none")
@@ -320,7 +314,7 @@ p3.5 <- p3.1 / p3.2 | p3.3 +
 p3.5
 
 # save a figure
- ggsave("Exp_2/figures/thresh_pilot.jpeg",
+ ggsave("Exp_2/figures/thresh_1.jpeg",
         width = 21, height = 10)
 ```
 
