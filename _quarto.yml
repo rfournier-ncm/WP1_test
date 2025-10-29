@@ -1,0 +1,9 @@
+project:
+  render:
+    - manuscript/manuscript.qmd
+    - manuscript/supplementary.qmd
+  output-dir: docs
+  
+execute:
+  cache: false
+  freeze: auto
