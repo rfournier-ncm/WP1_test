@@ -1,0 +1,31 @@
+---
+title: "notes"
+format: html
+---
+
+This file documents feedback on the manuscript.
+We can gitignore it later on.
+
+# October 29th 2025 #
+
+- You've made a good start. Nice work.
+- So far, I only looked at the project setup and the introduction.
+
+- For the project setup, I made the following changes:
+  - all docs are output to a /docs/ folder.
+  - the _quarto.yml file is at the root level of the directory.
+  - I deleted a bunch of unnecessary redundant stuff.
+  - I combined bibliography stuff into one doc.
+  - I made lower case text wherever possible. e.g., no caps or spaces in the tidy style guide.
+  - I added some custom funcions. see /custom_functions/
+  - I added a /freeze/ option to the _quarto.yml. Google it. It makes sense.
+  - I made an output that was a pdf and one that was .html. The .html is cool - take a look.
+  - I renamed stuff to make it simpler. e.g., manuscript.qmd
+  - On the thought of renaming, we should think carefully about the project name, since the github link will be posted and shared, it needs to make some sense and be short. e.g., blah blah github.com/face_familiarity/ or something. Try to see some examples online of papers/projects and ask claude for help also.
+  
+For the intro:
+
+- I kept the same basic structure but made it more concise and added lots more wider context and REFs.
+- Because I cannot have access to your reference software e.g., zotero, I just added in REFS in plain text. But you would need to add these into your zotero library and then update the bib file. I hope that makes sense.
+- Various bits that I added need polishing and finishing. This was just to give you a sense. 
+

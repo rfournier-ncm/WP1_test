@@ -1,0 +1,406 @@
+---
+title: Your Title Here
+subtitle: Optional Subtitle
+running-head: Short Title
+author:
+  - name: Raphaël Fournier
+    email: rfournier@ethz.ch
+    orcid: 0000-0002-5135-4066
+    url: https://example.com
+    corresponding: true
+    affiliation:
+      - ref: 1
+  - name: Paul Downing
+    affiliation: 
+      - ref: 2
+  - name: Richard Ramsey
+    email: rramsey@ethz.ch
+    orcid: 0000-0002-0329-2112
+    affiliation:
+      - ref: 1
+      - ref: 3
+affiliations:
+  - id: 1
+    name: Neural Control of Movement Laboratory
+    department: Department of Health Sciences and Technology, ETH Zurich
+  - id: 2
+    name: Name
+    department: department
+  - id: 3
+    name: Social Brain Sciences Laboratory
+    department: Department of Humanities, Social and Political Sciences, ETH Zurich
+abstract: |
+  Your abstract goes here. This will appear prominently at the top of your document.
+categories: [keyword1, keyword2, keyword3]
+authornote: |
+  Author notes go here.
+date: last-modified
+bibliography: bibliography.bib
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    fontsize: 14pt
+    mainfont: Fira Sans
+    code-fold: true
+    number-sections: true
+    citations-hover: true
+    crossrefs-hover: true
+    other-links:
+      - text: Preprint (PsyArXiv)
+        href: https://osf.io/preprints/psyarxiv/
+        icon: file-pdf
+      - text: Online supplement
+        href: https://rich-ramsey.github.io/preprint-example
+        icon: globe2
+      - text: GitHub Repository
+        href: https://github.com/rich-ramsey/preprint-example
+        icon: github
+      - text: OSF Repository
+        href: https://osf.io/
+        icon: archive
+  preprint-typst:
+    # Common options - uncomment to use
+    lang: "en"
+    wordcount: true
+    citeproc: true
+    # theme: jou                   # Journal theme (2-column)
+    line-number: true              # Line numbering
+    # fontsize: 11pt               # Font size
+<<<<<<< HEAD:Manuscript/WP_1_manuscript_preprint_extension.qmd
+    # leading: 0.6em               # Line spacing
+    # first-line-indent: 1.8em     # Paragraph indent
+knitr:
+  opts_chunk: 
+    dev: svglite
+---
+
+```{r load-pkg}
+#| include: false
+pkg <- c("tidyverse", "RColorBrewer", "patchwork", "gtsummary", "paletteer","readxl", "eeptools")
+
+lapply(pkg, library, character.only = TRUE)
+```
+
+=======
+    leading: "1.5em"               # Line spacing
+    spacing: "1.5em"               # Paragraph spacing
+    first-line-indent: "3em"       # Paragraph indent
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(tidyverse)
+library(gt)
+library(tinytable)
+
+knitr::opts_chunk$set(echo = FALSE)
+
+theme_set(
+  theme_bw() +
+    theme(text = element_text(size = 22, face = "bold"), 
+          title = element_text(size = 22, face = "bold"),
+          legend.position = "none")
+)
+```
+
+{{< pagebreak >}}
+
+>>>>>>> 5a78e2c58dc912738e66081831d21b51e520d840:Manuscript/manuscript.qmd
+# Introduction
+
+The ability to quickly and accurately recognise a familiar face is an important aspect of everyday life, as it guides social behaviour. The way that one might interact with a family member or friend is different to a stranger. Moreover, for familiar individuals, we not only know what they look like, but we also have access to person knowledge, such as their traits, attitudes, name and professional status. The same is true for famous individuals, such as movie stars, professional athletes and politicians. To date, most prior face recognition research has used manifest (observed) measures (i.e., response times and accuracy) to assess one's ability to recognise faces. As such, less is known about the latent computational processes that support face recognition (Phillips & White, 2025). In the current project, we investigated how different types of familiarity, including visual feature familiarity and stored person knowledge, affected the latent processes that can be estimated by evidence accumulation models (EAMs; @ratcliffModelingResponseTimes1998). This computational approach has provided new insights on the dynamics of the decision process supporting face recognition.
+
+Face recognition processes have been intensely investigated over the last 50 years [@johnstonFamiliarUnfamiliarFace2009; @natuNeuralProcessingFamiliar2011]. One influential cognitive model of face recognition proposed a division between structural encoding of facial features, and more elaborate processes associated with identity recognition and person information [@bruceUnderstandingFaceRecognition1986]. Subsequent neuroscience research in humans and monkeys has enriched this model by relating different cognitive processes to different brain circuits [@landiFastLinkFace2021 @gobbiniNeuralResponseVisual2006; @gobbiniNeuralSystemsRecognition2007; @haxbyDistributedHumanNeural2000; @duchaineRevisedNeuralFramework2015]. The resulting model is a distributed neural network that incorporates two distinct systems: a core system and an extended system. The core system is dedicated to structural coding of facial features and spans fusiform gryi, as well as occipital and posterior temporal cortices. In contrast, the extended system is involved in more elaborate processes, such as those related to person knowledge, and is mediated by a broader network of brains areas spanning anterior temporal and frontal cortices [@duchaineRevisedNeuralFramework2015; @gobbiniNeuralSystemsRecognition2007; @haxbyDistributedHumanNeural2000; @ishaiLetsFaceIt2008; @kanwisher111FunctionalArchitecture2011]. By mediating the retrieval of identity-specific information from memory, the extended system is able to support the recognition of faces for which prior person knowledge information has been stored [@idagobbiniSocialEmotionalAttachment2004; @leibenluftMothersNeuralActivation2004]. 
+
+Given the importance of knowing who it is you are interacting with, the study of familiarity has been a key aspect of the face perception research (Young & Burton, 2018, TICS). Largely using manifest measures, such as reaction time and accuracy, research consistently shows that familiar faces, especially those imbued with person knowledge, facilitate a range of face recognition processes compared to previously unseen individuals or visually familiar faces (REF Ramon & Gobbini, 2018, Visual Cognition; Young & Burton, 2018, TICS). It has been argued that person knowledge involves a qualitatively different and deeper level of processing than visual familiarity [@schwartzIndependentContributionPerceptual2019], which facilitates the accurate discrimination of familiar from unfamiliar faces [@akanHaventSeenYou2023; @schwartzRolesPerceptualConceptual2016; @akanHaventSeenYou2023; @birdEffectsPreexperimentalKnowledge2011; @klatzkyRecognizingFamiliarUnfamiliar1984; @schwaningerRoleFeaturalConfigural2002].
+
+Although manifest (observed) measures of performance have formed the bedrock of research findings on face perception, there have been many calls in recent years to embrace more computational approaches in social and cognitive neuroscience research [@parkerWhatCanEvidence; @forstmannIntroductionModelBasedCognitive2024a] (REFs Phillips & White 2025; Charpentier & O’Doherty, 2018; Cheong et al., 2017; Hackel & Amodio, 2018; Lockwood & Klein-Flugge, 2021). Two benefits of adopting more computational approaches are that relationships between parts of a system can be more explicitly specified (Hintzman, 1991; Yarkoni, 2022), which aids the development of theory (Proulx & Morey, 2021; Muthukrishna & Henrich, 2019; Oberauer & Lewandowsky, 2019), and that latent (unobserved) parameters can be estimated, which can give rise to different interpretations of the cognitive processes involved in task performance [@ratcliffEffectsAgingReaction2001]. Moreover, there is currently almost no understanding of the computational processes that support face recognition processes when familiarity is based on visual exposure to a face compared stored person knowledge (Phillips & White 2025 Brit J Psych).
+
+Evidence accumulation models (EAM) are one approach to investigate the computational processes that are involved in speeded decision tasks (for a review, see @ratcliffDiffusionDecisionModel2016). While a variety of different evidence accumulation models exists, they all share a similar set of assumptions: that evidence for each response option accumulates at different rates until one response option crosses a threshold and a response is triggered (see @fig-LBA for an example of the linear ballistic accumulator (LBA) model; @brownSimplestCompleteModel2008). These models work by translating the distribution of repsonse times for correct and incorrect responses into estimates of latent variables assumed to underlie the decision-making process [@tbl-lba; @brownSimplestCompleteModel2008; @donkinDrawingConclusionsChoice2011]. These latent variables can then be mapped onto psychological constructs (REF Myers et al, 2022 Frontiers). For example, drift rate is the rate at which evidence in favor of a decision accumulates over time, reflecting the signal-to-noise ratio provided by the stimulus. Threshold represents the amount of accumulated evidence needed to trigger the decision, reflecting the response caution towards a specific response. The starting point is the amount of evidence towards a response before the accumulation of evidence begins, reflecting the *a priori* bias towards a response. Finally, the non-decision time is an estimation of the time taken to complete processes that are not involved in the decision time, such as stimulus encoding and motor responses. 
+
+:::: {.place arguments="bottom, scope: \"parent\", float: true"}
+::: {#fig-LBA fig-cap = "Schematic of the linear ballistic accumulator (LBA) model"}
+<<<<<<< HEAD:Manuscript/WP_1_manuscript_preprint_extension.qmd
+![](Figures_manuscript/LBA_schematique.png){width=90%}
+=======
+![](figures/LBA_schematique.png)
+>>>>>>> 5a78e2c58dc912738e66081831d21b51e520d840:Manuscript/manuscript.qmd
+:::
+*This diagram represents the accumulation process one trial of a perceptual decision task for the linear ballistic accumulator (LBA). Participants are required to chose between two options (Response 1 and Response 2). In a LBA model, there is a separated accumulation of evidence (v) for each response option. In this example, the correct response is Response 1. The accumulator on the left is the accumulator for the correct response (Response 1), and the green line in represents the rate at which the evidence accumulates in favor of that response option. The accumulator on the right is the accumulator for the incorrect response (Response 2), and the dash red line represents the rate at which the evidence accumulates in favor of this response option. Once the accumulated evidence crosses the threshold (b) of a response option, the corresponding response is chosen (in this case Response 1).* 
+::::
+
+```{r}
+#| label: lba-params
+#| include: false
+
+# Helper function to handle format-dependent subscripts
+format_subscript <- function(text) {
+  if (knitr::is_html_output()) {
+    # For HTML output, use HTML tags
+    return(text)
+  } else {
+    # For Typst/PDF output, replace HTML tags with Typst's sub[] function
+    text <- gsub("<sub>(.*?)</sub>", "#sub[\\1]", text)
+    return(text)
+  }
+}
+
+# create a df
+lba_params <- tribble(
+  ~Parameter, ~Label, ~Construct,
+  "Start point", "A", "response bias",
+  "Drift rate", "v", "signal-to-noise ratio",
+  "Threshold", "b", "response caution",
+  "Non-decision time", format_subscript("t<sub>0</sub>"), "stimulus encoding and motor response"
+)
+```
+
+```{r}
+#| label: tbl-lba
+#| tbl-cap: Parameters in the linear ballistic accumulator model
+
+lba_params |> 
+  tt()
+```
+
+
+In the present study, we used evidence accumulation modelling to ask new and different questions regarding the computational processes that support the recognition of familiar versus unfamiliar individuals. More specifically, we address how different types of familiarity (visual feature familiarity versus visual feature familiarity plus person knowledge) impact response caution and signal-to-noise ratio. Based on prior work in experimental psychology (@ratcliffDiffusionDecisionModel2016; @parkerWhatCanEvidence), we chose to primarily focus on drift rate and response caution as our primary parameters of interest because we could easily and intuitively see how performance advantages could emerge based on familiarity. For instance, based on conventional use of EAMs (REF Myers et al, 2022 Frontiers), increases in signal-to-noise ratio and/or reductions in response caution could be interpreted as the task setting becoming easier. 
+
+We, therefore, hypothesised that either drift rate and/or threshold would be affected by the face familiarity manipulation. However, given the general lack of prior evidence accumulation modelling in face recognition research, we were unsure *a priori* of the direction of the effects. For instance, we considered it plausible that novel compared to familiar stimuli could provide a benefit in some instances, by virtue of a pop-out or novelty  detector (REF ??). Likewise, we also considered it plausible that familiar compared to novel stimuli could providing a benefit based on the many advantages reported for recognising personally familiar or famous individuals (REF Ramon & Gobbini, 2018, Visual Cognition; Young & Burton, 2018, TICS). Nonetheless, across a series of experiments, we used manipulations of familiarity that either only targeted the operation of core system only or the core and extended system for face perception (@tbl-exp), so that we could further understand the computational processes that underpin different types of familiar face recognition. 
+
+```{r}
+#| label: exp-details
+#| include: false
+
+# create a df
+exp_details <- tribble(
+  ~Exp, ~Setting, ~'Familiarity type', ~'Face comparision', ~'Face system',
+  "1", "laboratory", "visual", "visual exposure vs unknown", "core",
+  "2", "online", "visual", "visual exposure vs unknown", "core",
+  "3", "laboratory", "visual & person knowledge", "famous vs unknown", "core & extended",
+  "4", "online", "visual & person knowledge", "famous vs unknown", "core & extended",
+)
+```
+
+```{r}
+#| label: tbl-exp
+#| tbl-cap: An overview of the experimental work
+
+exp_details |> 
+  tt()
+```
+
+# Experiment 1
+
+## Method and Materials
+
+### Pre-registration and open science
+
+The research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered. The preregistration as well as raw data, stimuli, data wrangling and analysis code are available on the Open Science Framework (<https://osf.io/azyvu/overview>).
+
+```{r age-gender}
+#| label: load-demo-exp1
+#| include: false
+
+demo_exp1 <- read_xlsx(path = "/Users/rfournier/Documents/PhD_stuff/WP_1/WP1_1_Administration/Master_list/Master_list_WP1_1.xlsx") %>%
+    mutate(Index = as.factor(Index),
+         Gender = as.factor(Gender),
+         Date_of_birth = as.Date(Date_of_birth),
+         Age = floor(age_calc(Date_of_birth, units = "years")))
+mean_age_exp1 = round(mean(demo_exp1$Age), digits = 2)
+sd_age_exp1 = round(sd(demo_exp1$Age), digits = 2)
+female_exp1 = sum(demo_exp1$Gender== "F")
+male_exp1 = sum(demo_exp1$Gender== "M")
+participant_n_exp1 = female_exp1 + male_exp1
+min_age_exp1 = min(demo_exp1$Age)
+max_age_exp1 = max(demo_exp1$Age)
+```
+
+### Participants
+
+All participant were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. Sample size was determined in advance. Following previous suggestions from @heathcoteDynamicModelsChoice2019, a parameter recovery study was run to estimate if 30 usable participant datasets were sufficient to accurately recover the parameter estimates. The parameter recovery study included 30 participant datasets, each with 180 trials (90 trials "familiar" and 90 trials "unfamiliar") and with our selected model parameterisation. The data-generated parameters were sufficiently well-recovered (See Supplementary Materials).`r participant_n_exp1` healthy participants took part in experiment 1 (`r male_exp1` men and `r female_exp1` women). Ages ranged from `r min_age_exp1` to `r max_age_exp1` years old ($M_{age} =$ `r mean_age_exp1`, $SD_{age} =$ `r sd_age_exp1`). All participants reported normal or corrected-to-normal vision and received payment (20 CHF) for participating in the experiment. Based on our preregistration, response times longer than 2.5 seconds were removed from the analysis. However, this cutoff value led to the the removal of 59% of the trials of one participant. Given the recommendation of having a certain number of trials per condition per participant when using evidence-accumulation models [@heathcoteDynamicModelsChoice2019; @parkerWhatCanEvidence], this participant was excluded from the data analysis. This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.
+
+### Stimuli
+
+The stimuli consisted of images selected from two different data sets of face images: the Face Research Lab London Set (DeBruine, Lisa; Jones, Benedict (2017). Face Research Lab London Set. figshare. Data set. <https://doi.org/10.6084/m9.figshare.5047666.v5>) and the Color FERET Database (<https://www.nist.gov/itl/products-and-services/color-feret-database>). Each of these data sets is composed of images of different identities faces taken from different angle points. 102 identities were selected from the Face Research Lab London Set and 51 from the Color FERET Database. For each selected identity, three pictures of the face at three different view points (3/4 left view, frontal view and 3/4 right view) were cropped to only keep the internal features of the face. All of the images processing was realized using the free community-developed software GNU Image Manipulation Program (@GIMP). After 4 pilots experiments, we removed 27 identities (21 from the Face Research Lab London Set and 6 from the Color FERET Database) due to to the presence of identifiable features (i.e. skin marks, make-up...). In total, the data set of face images used in Experiment 1 contained 756 images: one set of three colorful face images and one set of three gray scaled face images for each of the 126 identities.
+
+### Material
+
+Stimuli were presented on the screen of a MacBook Pro (Apple M2 Pro, macOS 13 Ventura). The experiment was run on Psychopy Coder (version: 2022.5, @peircePsychoPy2ExperimentsBehavior2019) and the code used for the experimental procedure is available on OSF (<https://osf.io/azyvu/overview>).
+
+### Procedure
+
+The experimental task was divided into two distinct parts: a familiarization part and a recognition part (Fig.2). In the familiarization part, the face of 30 unknown identities were presented on the screen and participants were told to memorize the identity of the faces. One familiarization trial consisted of the presentation of 6 face images, one after the other, depicting the same identity but varying in viewing points (3/4 left view, frontal view and 3/4 right view) and the colorimetry (colorful image, gray scale image). The duration of each image presentation was 0.75 second. Each participant underwent 30 familiarization trials. During the familiarization, we introduced catch trials to ensure participants attention. After some familiarization trials, a gray scale image of a person's face was presented on the screen. Participants were asked to press the "q" key if the face belonged to the last seen identity or the "p" key if it was not. The faces seen during the familiarization were considered the "Learned faces" within-subject condition.
+
+In the recognition part, participants completed three blocks of 90 recognition trials. Each block was separated from another by a short break. Half of the trials were learned identities trials and the other half were new, previously unseen identities trials. In each trial, a gray scale image of a face was shown on the screen. Participants were asked to choose if they had previously seen this face in the familiarization part or not. If they did, the should press the "q" key and if they did not, the "p" key. Response time \[s\] and accuracy were collected after each recognition trial.
+
+\<Here schematic of Experiment 1 procedure\>
+
+### Data analysis
+
+Following our preregistration, trials with a response time longer than 2.5s were removed from the analysis. For the separate analysis of response times and accuracy, we used Bayesian Multilevel Models with R Package brms [@brms]. The evidence-accumulation modelling analyses of the distributions of response times for the correct and wrong answers were realized using the EMC2 R package [@EMC2].
+
+## Results
+
+**Analysis of manifest variables**
+
+Analysis of RT and accuracy
+
+Evidence-accumulation modeling
+
+Model specification
+
+# Experiment 2: replication of Experiment 1 online
+
+## Method and Materials
+
+### Pre-registration and open science
+
+The research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered. The preregistration as well as raw data, stimuli, data wrangling and analysis code are available on the Open Science Framework (<https://osf.io/tu2eh/overview>).
+
+\<code here for number of participants and age from Prolific demographics dataframe\>
+
+### Participants
+
+Prolific: All participant were recruited on the Prolific platform (<https://www.prolific.com>). 
+
+
+This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ). Participants who did not give their consent blablabla
+...and all participant gave their informed consent to participate in the study.
+
+### Stimuli
+
+Same stimuli as Experiment 1 
+
+### Material
+From Prolific
+
+### Procedure
+
+Pavlovia
+
+Same procedure on Pavlovia: 
+Their own computer...
+The experimental task was divided into two distinct parts: a rating part and a recognition part (Fig.3). During the rating part, participants were presented pictures of 60 celebrities. They were asked to rate these celebrities, based on two dimensions: how familiar the celebrity was to them and how positive or negative were their feelings towards the celebrity. The familiarity rating scale went from 0 (Highly unfamiliar) to 10 (Highly familiar).
+
+In the recognition part, participants completed three blocks of 90 recognition trials. Each block was separated from another by a short break. Half of the trials were famous identities trials and the other half were new, previously unseen identities trials. At each trial, a gray scale image of a face was shown on the screen. Participants were asked to choose if they recognize the face (and not the picture) seen this face in the familiarization part or not. If they did, the should press the "q" key and if they did not, the "p" key. Response time \[s\] and accuracy were collected after each trial. Time limit
+
+## Results
+
+## Discussion
+
+# Experiment 3: Famous faces
+
+## Method and Materials
+
+### Pre-registration and open science
+
+The research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered (<https://osf.io/xehf4/overview>). All raw data, stimuli, data wrangling and analysis code are available on the open science framework (see link).
+
+```{r}
+#| label: load-demo-exp2
+#| include: false
+
+demo_exp2 <- read_xlsx(path = "/Users/rfournier/Documents/PhD_stuff/WP_1/WP1_2_Administration/Participants/Master_list_WP1_2.xlsx", sheet =1) %>%
+    mutate(Index = as.factor(Index),
+         Gender = as.factor(Gender),
+         Age = as.numeric(Age))
+mean_age_exp2 = round(mean(demo_exp2$Age), digits = 2)
+sd_age_exp2 = round(sd(demo_exp2$Age), digits = 2)
+female_exp2 = sum(demo_exp2$Gender== "F")
+male_exp2 = sum(demo_exp2$Gender== "M")
+participant_n_exp2 = female_exp2 + male_exp2
+min_age_exp2 = min(demo_exp2$Age)
+max_age_exp2 = max(demo_exp2$Age)
+```
+
+### Participants
+
+All participant were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. Sample size was determined in advance. Following previous suggestions from @heathcote2019, a parameter recovery study was run to estimate if 30 usable participant data sets were sufficient to accurately recover the parameter estimates. The parameter recovery study included 30 participant data sets, each with 180 trials (90 trials "Famous" and 90 trials "Novel") and with our selected model parameterisation. The data-generated parameters were sufficiently well-recovered (See Supplementary Materials).
+
+`r participant_n_exp2` healthy participants took part in experiment 2 (`r male_exp2` men and `r female_exp2` women). Ages ranged from `r min_age_exp2` to `r max_age_exp2` years old ($M_{age} =$ `r mean_age_exp2`, $SD_{age} =$ `r sd_age_exp2`). Participants were recruited by . All participants reported normal or corrected-to-normal vision and received payment (25 CHF) for participating in the experiment. Based on our preregistration criterion, 3 participants were excluded from the data analysis: 1 of them had an overall recognition accuracy larger than 95% and 2 of them had a overall accuracy lower than 55% (chance at 50%). **We deviated from our preregistration in... : had to remove participants who did not have 30 celebrities with rating over 7/10 - remove 5 participants. Total number of participants for analysis was 30. **
+
+This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.
+
+### Stimuli
+Two types of pictures were used for this experiment to create our within-subject stimuli conditions. Images used for the "Novel" condition were the same pictures used in Experiment 1: the data set of face images contained 378 images since only the set of three gray scaled face images for each of the 126 identities was used for this experiment. Pictures depicting celebrities ("Famous" condition) were taken from the internet. For each of the 60 preselected celebrities, 3 pictures depicting them from a similar angle to the "Novel" faces were chosen (3/4 left view, frontal view and 3/4 right vie). All of the "Famous" images processing was realized using the GNU Image Manipulation Program (@GIMP). Backround was removed from the picture and replace by the same background used in the "Novel" images. In total, the data set of face images used in this experiment contained 558 images: 1 set of three gray scaled face images for each of the 126 novel identities and 1 set of three gray scaled face images for each of the 60 famous identities. 
+
+### Material
+Stimuli were presented on the screen of a MacBook Pro (Apple M2 Pro, macOS 14 Sonoma). The experiment was run on Psychopy Coder (version: 2022.5, @peircePsychoPy2ExperimentsBehavior2019) and the code used for the experimental procedure is available on OSF (<https://osf.io/azyvu/overview>).
+
+### Procedure
+The experimental task was divided into two distinct parts: a rating part and a recognition part (Fig.3). During the rating part, participants were presented pictures of 60 celebrities. They were asked to rate these celebrities, based on two dimensions: how familiar the celebrity was to them and how positive or negative were their feelings towards the celebrity. The familiarity rating scale went from 0 (Highly unfamiliar) to 10 (Highly familiar). In the recognition part, participants completed three blocks of 90 recognition trials. Each block was separated from another by a short break. Half of the trials were famous identities trials and the other half were new, previously unseen identities trials. At each trial, a gray scale image of a face was shown on the screen. Participants were asked to choose if they recognize the face (and not the picture) seen this face in the familiarization part or not. If they did, the should press the "q" key and if they did not, the "p" key. Response time \[s\] and accuracy were collected after each trial. **Time limit + Mask**
+
+### Data analysis
+For the separate analysis of response times and accuracy, we used Bayesian Multilevel Models with R Package brms [@brms]. The evidence-accumulation modelling analyses of the distributions of response times for the correct and wrong answers were realized using the EMC2 R package [@EMC2].
+
+## Results
+
+## Discussion
+
+# Experiment 4: replication of Experiment 3 online
+
+## Method and Materials
+
+### Pre-registration and open science
+
+The research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered (<https://osf.io/xehf4>). All raw data, stimuli, data wrangling and analysis code are available on the open science framework (see link).
+
+\<code here for number of participants and age\>
+
+### Participants
+
+Prolific
+
+### Stimuli
+
+### Material
+
+### Procedure
+
+Pavlovia
+
+### Data analysis
+
+## Results
+
+## Discussion
+
+# General discussion
+
+Here we demonstrated that different computational processes support the recognition of different types of face. Whereas the signal-to-noise ratio provided by visual familiarity was poorer compared to novelty in the first experiment, the combination of visual and semantic knowledge about the individual in the second experiment induced a quicker evidence accumulation for familiar faces compared to novel faces. This would suggest that the quality of the information processing varies as a function of the nature of the information. Such inference about the computational mechanisms involved in face recognition could not have been possible based on the commonly used separate analysis of response times and accuracy. Therefore, we suggest that further work uses evidence-accumulation models (EAM) and other cognitive modelling approaches to build a richer computational understanding of face recognition and familiarity effects.
+
+Accumulation of evidence for visually familiar faces was slower compared to novel faces in Experiment 1. This would suggest that when only surface level visual features are available for recognition, the novelty of the information prevails. In the case of short prior exposure to visual stimuli, our findings are in agreement with other studies that reported a better recognition ability for novel faces than for visually familiar faces [@bindemannPerceivedAbilityActual2014; @readChangingPhotosFaces]. Visually familiar faces are processed in the core network of face recognition [@bruceUnderstandingFaceRecognition1986; @gobbiniNeuralResponseVisual2006]. This core network manages and synthesizes the visual analysis of low-level visual features to the construction of a detailed perceptual representation of the face. The next step requires the activation of face memory representations, giving rise to a feeling of familiarity proportionate to the degree of overlap between the presented face and the memory trace [@rapcsakFaceRecognition2019]. In the case of short prior visual exposure, these face memory traces might not be stable enough for the recognition process, leading to a slower evidence accumulation towards the "familiar" decision.
+
+\- Here, add the novelty effect (old/new references and explanations)
+
+P3: Effects of person identity (visual + semantic) knowledge (Experiment 2) and the extended network of the functional model of face recognition (Bruce & Young, 1986; Haxby et al., 2000). - 1 sentence: main finding: When richer semantic features available, familiarity prevails (faster accumulation of evidence in favor of familiar information vs novel information). - Extended network - Experiment 2: why Experiment 2 would elicit the extended network of face recognition. - Interpretation of our results within the functional model of face recognition framework. - Suggestion: (Landi et al., 2021) They suggest that there may be two pathways of face memory:
+
+ Pathway 1: from Anterior Medial Face area (AM) -- Anterior Temporal lobe: facilitate the formation of new associations and feeling of familiarity (Learned Faces)  Pathway 2: from Anterior Medial Face area (AM) -- Temporal Pole Face area (TP): access to long-term semantic face information (Familiar Faces) - Evidence accumulation faster for familiar faces could reflect the pathway 2 where semantic face information is accessed quicker than for visually learned faces which, without being associated with semantic information, would need further processing into the Anterior Temporal Lobe (pathway 1), leading to a slower accumulation of evidence.
+
+P3.5: Interpretation of drift rate results for Experiment 2: general issue
+
+P4: Constraints on generality (Simons et al., 2017) - Suggestion: visual familiarity effects not specific to faces - Here we used faces as recognition stimuli - Suggestion: experiment 1 effects generalizable to other visual stimuli processing (objects, scenes...) - However, experiment 2 effects more constrained to faces: difficult to imagine a similar semantic knowledge for objects or scenes that we do for faces. Maybe for very specific and personal object but not comparable to the number of faces that we have a rich semantic knowledge about (or something like that).
+
+P5: Limitations We do not exclude that our parameter estimation might have been affected by our restricted number of trials. Previous studies have investigated how a low number of trials have influenced the model fitting, leading to an incorrect parameter estimation (ref from Manke). While our two experimental designs reach the threshold of the required number of trials to use EAM, more trials could have been more appropriate. Our decision of using 90 trials for each condition was motivated by the fact that it is especially challenging to find or create a face pictures dataset that includes a large number of identities. Another limitation to note concerns the use of celebrities' picture in the second experiment. Indeed, we cannot exclude the fact that the categorization between familiar faces and novel faces might have been facilitated by low visual features from the celebrities' pictures (e.g. slightly different orientation of the face, different overall picture quality...). While we tried to control for these features as much as possible, this remains a possibility.
+
+P6: Future research To provide more evidence towards the findings of Landi et al.(2021), a joint-modelling approach could be applied/used/exploited (ref). Joint-modelling designates the particularity of modelling two different source of data (e.g. choice-response data and fMRI data) at the same time. This approach could provide precious insights about the relationship between latent variables and brain areas activity, like the temporal lobe face area (TP). Another direction for future studies would be to investigate how variability in the face recognition ability in the general population accounts for these latent variables' estimation. (develop this a little more, introducing our possible next experiment). - Last point: Familiarity as a continuum and not binary categorisation
+
+{{< pagebreak >}}
+
+# References
+
+::: {#refs}
+:::
+
+```{=typst}
+#show: appendix.with()
+```
+# Appendix content here
+
+# Supplementary Materials
