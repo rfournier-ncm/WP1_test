@@ -81,7 +81,7 @@ write_csv(raw, "Exp_2/data/data_exp_2/raw_data_exp_2.csv")
 ## Data ONLINE ##
 ```{r}
 #Wrangle the raw data to extract the face recognition task data
-exp_2_data <- raw %>%
+wrangle <- raw %>%
   filter(!is.na(recognition_loop.thisRepN)) %>%
   rename(keypress = response_recog.keys, acc = response_recog.corr, rt = response_recog.rt, pid = `participant`) %>%
   relocate(pid, .before = keypress) %>%
@@ -95,6 +95,12 @@ exp_2_data <- raw %>%
   relocate(any_of(c("block", "cond")), .before = keypress) %>%
   arrange(pid)
 ```
+
+#Saving raw data
+```{r}
+write_csv(wrangle, "Exp_2/data/data_exp_2/wrangle_data_exp_2.csv")
+```
+
 ### Exclusion criteria (preregistration OSF) ###
 
 ## Missed trials
