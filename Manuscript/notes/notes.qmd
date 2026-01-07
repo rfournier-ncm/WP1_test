@@ -34,3 +34,63 @@ For the intro:
 - I wrote the methods section for Experiment 1, 2 and 3
 - I added the reference that you added in plain text in the introduction. However, there are two that I cannot access with the ETH access. Is there a way that you could sen them to me? (Cheong et al., 2017) and (Hintzman, 1991)
 - I added references for the novelty effect in the introduction as well.
+
+# January 7st 2026 #
+
+Thanks Raph. 
+
+- I sent you the references that you requested via email.
+
+- Also, some things from my initial comments were not addressed. I will repost them here:
+
+-- On the thought of renaming, we should think carefully about the project name, since the github link will be posted and shared, it needs to make some sense and be short. e.g., blah blah github.com/face_familiarity/ or something. I think this would work nicely: github.com/face_familiarity/
+
+-- use lower case letters for everything. no caps or spaces in the tidy style guide. This is the same for folder names also. e.g., exp_1 rather than Exp_1.
+
+- Some further comments as follows:
+
+- Intro. 
+
+The intro reads really nicely. Main points are covered clearly. 
+
+This sentence in the intro is long and confusing. Break into two sentences. 
+
+Two benefits of adopting more computational approaches are that relationships between parts of a system can be
+more explicitly specified (Hintzman, 1991; Yarkoni, 2022), which aids the development of theory
+(Proulx & Morey, 2021; Muthukrishna & Henrich, 2019; Oberauer & Lewandowsky, 2019), and that
+latent (unobserved) parameters can be estimated, which can give rise to different interpretations
+of the cognitive processes involved in task performance (Ratcliff, Thapar, and McKoon 2001).
+
+
+- Methods.
+
+I would include the 21 word statement by Simmons and co. in the first method and explain that it applies to all experiments. See here: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2160588
+
+Ref here also.
+
+@report{simmons2012,
+  type = {SSRN Scholarly Paper},
+  title = {A 21 {{Word Solution}}},
+  author = {Simmons, Joseph P. and Nelson, Leif D. and Simonsohn, Uri},
+  date = {2012-10-14},
+  number = {2160588},
+  institution = {Social Science Research Network},
+  location = {Rochester, NY},
+  doi = {10.2139/ssrn.2160588},
+  url = {https://papers.ssrn.com/abstract=2160588},
+  urldate = {2022-04-29},
+  abstract = {One year after publishing "False-Positive Psychology," we propose a simple implementation of disclosure that requires but 21 words to achieve full transparency. This article is written in a casual tone. It includes phone-taken pictures of milk-jars and references to ice-cream and sardines.},
+  langid = {english},
+  keywords = {disclosure,false positive,p-hacking,psycholog,transparency},
+  file = {/Users/rramsey/Dropbox/docs/journals/cog_neuro/Simmons_2012_A 21 Word SolutionA 21 Word Solution.pdf;/Users/rramsey/Zotero/storage/FR2WXRBA/papers.html}
+}
+
+
+Otherwise, the methods seem fine for now. There is of course a lot of detail required on data analysis that is currently missing.
+
+And once we have the results for the last online experiment it will shape how we think about the general discussion. But many of the points in the discussion seem reasonable and relevant already.
+
+
+
+
+
