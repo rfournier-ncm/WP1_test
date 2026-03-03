@@ -100,7 +100,7 @@ array_theta_1 <- split_tibble(param_1_pid, "subjects")
 array_theta_1<-do.call(rbind, array_theta_1)
 array_theta_pid_1 <- array_theta_1 %>%
   pivot_longer(cols = c("v_SNovel:lMTRUE", "v_SNovel:lMFALSE", "v_SLearned:lMTRUE", "v_SLearned:lMFALSE", "sv_lMTRUE", "B_lRNovel", "B_lRLearned", "A", "t0"), names_to = "param", values_to = "value")%>%
-  add_column(datapoint = rep(1:30000,each=9,times=30))%>% #here 30'000 = number of chains (3) x number of iteration (10'000)
+  add_column(datapoint = rep(1:15000,each=9,times=30))%>% #here 15'000 = number of chains (3) x number of iteration (5'000)
   rename(pid=subjects)
 ```
 
@@ -465,6 +465,14 @@ drift_acc_cond_diff_pid_1 <- drift_acc_diff_pid_1 %>%
 drift_acc_cond_diff_pid_1
 ```
 
+
+
+
+
+
+
+
+
 at the group level
 
 ```{r}
@@ -515,6 +523,7 @@ drift_acc_diff_1_q <- drift_acc_diff_1 %>%
 drift_acc_diff_1_q
 ```
 
+
 difference between unf (true and false) > fam (true > false)
 
 plot
@@ -564,6 +573,44 @@ drift rate differences",
 p4.6
 ```
 
+## plot the average difference and pid differences per condition##
+
+
+```{r}
+drift_acc_cond_diff_pid_1$pid = with(drift_acc_cond_diff_pid_1, reorder(pid, Novel, mean))
+p4.8 <- ggplot(drift_acc_cond_diff_1, aes(x = Novel, y=pid)) +  
+  stat_halfeye(alpha = 0.9, fill="firebrick") +
+  stat_halfeye(data = drift_acc_cond_diff_pid_1,
+               alpha = 0.7, fill = paletteer_d("rcartocolor::Safe",4)[1]) +
+  geom_vline(xintercept = 0, color = "darkgrey") +
+  labs(title = "Individual and average 
+drift rate for Novel faces", 
+       x = "Drift rate", y="participant ID") 
+p4.8
+
+ggsave("Exp_1/figures/drift_rat_ind_novel.jpeg",
+       width = 15, height = 10)
+
+drift_acc_cond_diff_pid_1$pid = with(drift_acc_cond_diff_pid_1, reorder(pid, Learned, mean))
+p4.9 <- ggplot(drift_acc_cond_diff_1, aes(x = Learned, y=pid)) +  
+  stat_halfeye(alpha = 0.9, fill="firebrick") +
+  stat_halfeye(data = drift_acc_cond_diff_pid_1,
+               alpha = 0.7, fill = paletteer_d("rcartocolor::Safe",4)[2]) +
+  geom_vline(xintercept = 0, color = "darkgrey") +
+  labs(title = "Individual and average 
+drift rate for Learned faces", 
+       x = "Drift rate", y="participant ID") 
+p4.9
+ggsave("Exp_1/figures/drift_rat_ind_learned.jpeg",
+       width = 15, height = 10)
+
+
+```
+
+
+
+
+
 ## combine drift rate plots ##
 
 ```{r}
@@ -583,202 +630,29 @@ ggsave("Exp_1/figures/drift_rate_pid_1.jpeg",
 p3.4 | p4.6
 ```
 
-ok, so the plots need polishing, but they look pretty good.
 
+## Multivel Bayesian estimation approach
 
-## Exploratory Analysis ##
-
-
-### Hit Rate and False Alarm Analysis - D' ###
-
-
+#Response time
 ```{r}
-source("dprime_lab.R") # label indiviudal trilas (i.e., rows in a dataframe) as hits, false alarm, or correct rejection
-
-source("dprime_cat.R") # total number of hits, misses, false alarms, and correct rejections for each participant
-```
-
-#Load the data
-```{r}
-data<-read_csv("/Users/rfournier/Rstudio/EMC_WP1_1/EMC_WP1_1/data/data.csv")
-theta_pid_1_q <- read_csv("data/theta_pid_1_q.csv")
-```
-
-
-
-## Learned faces condition
-
-#Calculating HR, FA, MISS AND CR
-```{r}
-data_prime <- data %>%
-  mutate(keys = if_else(keypress == "q", "fam", "unf"),
-         keys = as.factor(keys)) %>%
-  select(pid,cond,keys,acc) %>%
-  rename(correct = acc)
-
-
-data_prime.dprime <- dprime_lab("cond", "keys", "correct", data = data_prime)
-df.cat <- dprime_cat(data_prime.dprime,pid)
-```
-
-#Cacluating D prime for every participant
-```{r}
-dprime <- df.cat %>%
-  mutate(hit_rate_fam = Hits/TotalTarg,
-         false_alarm_fam = FalseAlarms/TotalDis,
-         hit_rate_unf = CorrectRejs/TotalDis,
-         false_alarm_unf = Misses/TotalTarg,
-         d_prime_fam = qnorm(hit_rate_fam) - qnorm(false_alarm_unf),
-         d_prime_unf = qnorm(hit_rate_unf) - qnorm(false_alarm_fam)) %>%
-  mutate(pid = as.numeric(as.factor(pid)))%>%
-  filter(!false_alarm_fam == 0,
-         !pid == "3")
 
 ```
 
-#Plotting D prime
+#Accuracy
 ```{r}
-#D'Fam
-d1<-ggplot(dprime, aes(x = false_alarm_fam, y = hit_rate_fam, label = round(d_prime_fam, 2))) +
-  geom_text()+
-  # xlim(0,1) +
-  # ylim(0,1) +
-  coord_cartesian(xlim = c(0,1), ylim = c(0,1)) +
-  geom_abline(slope = 1, alpha = .5, color = "red", linetype =2) +
-  labs(title = "d' values for Learned faces") +
-  xlab("False alarm rate") +
-  ylab("Hit rate")
-d1
-ggsave("figures/d'_learned.jpeg")
-```
-#D'Unf
-```{r}
-d2 <- ggplot(dprime, aes(x = false_alarm_unf, y = hit_rate_unf, label = round(d_prime_unf, 2))) +
-  geom_text()+
-  coord_cartesian(xlim = c(0,1), ylim = c(0,1)) +
-  geom_abline(slope = 1, alpha = .5, color = "red", linetype =2) +
-  labs(title = "d' values for New faces") +
-  xlab("False alarm rate") +
-  ylab("Hit rate")
-d2
-ggsave("figures/d'_new.jpeg")
+
 ```
 
-
-## Correlation D' - Drift rate ##
-
-#Organize theta pid
-```{r}
-theta_pid_1_q <- theta_pid_1_q %>%
-  mutate(pid = as.numeric(as.factor(pid)))
-theta_pid_1_q
-```
-
-#Compute and plot correlation: D' - Drift rate diff.
-```{r}
-#More wrangle for correlations plotting
-test <- theta_pid_1_q %>%
-  select(pid,param,value) %>%
-  pivot_wider(names_from = param, values_from = value)
-drift_corr <- test %>%
-  select(pid,v_Sfam_lMFALSE,v_Sfam_lMTRUE,v_Sunf_lMFALSE,v_Sunf_lMTRUE) %>%
-  mutate(diff_fam = v_Sfam_lMTRUE - v_Sfam_lMFALSE,
-         diff_unf = v_Sunf_lMTRUE - v_Sunf_lMFALSE) %>%
-  select(pid,diff_fam,diff_unf) %>%
-  mutate(pid = as.numeric(as.factor(pid))) %>%
-  filter(!is.na(diff_fam),
-         !pid == "1",
-         !pid == "27")
-drift_corr$d_prime_fam = dprime$d_prime_fam  
-drift_corr$d_prime_unf = dprime$d_prime_unf
-head(drift_corr)
-```
-
-Diff D' unf/fam
-```{r}
-#More wrangle for D' plotting
-d_plot <- drift_corr %>%
-  select(pid, d_prime_unf, d_prime_fam) %>%
-  rename(Learned = "d_prime_fam", New = "d_prime_unf") %>%
-  pivot_longer(!pid, names_to = "cond", values_to = "D") %>%
-  group_by(cond) %>%
-  median_qi(D) %>% 
-  mutate(sd = sd(D))%>% 
-  ggplot(aes(cond, D, fill = cond)) +
-    geom_errorbar(aes(cond, ymin = D-sd, ymax = D+sd), width = 0.4, colour= "black", alpha = .9) +
-    geom_col() +
-    xlab("Condition") +
-    ylab("d'") +
-    labs(title = "d' per condition") +
-    ylim(-1,5) 
-d_plot
-ggsave("figures/d_plot_comp.jpeg")
-```
-
-Corr plots
-```{r}
-#Learned faces
-drift_corr <- drift_corr %>%
-  rename(dprime_Learned = "d_prime_fam", dprime_New = "d_prime_unf", Drift_rate_Learned = "diff_fam", Drift_rate_New = "diff_unf")
-mat_cor<-plot_correlation(drift_corr[2:5])
-mat_cor
-ggsave("figures/mat_cor.jpeg")
-c1 <- ggplot(drift_corr, aes(x = Drift_rate_Learned, y = dprime_Learned)) +
-  geom_point() +
-  geom_smooth(method = 'lm', formula = y~x)+
-  labs(title = "Learned faces: Correlation between sensitivity (D') 
-and accumulation of evidence (Drift rate)") +
-  xlab("Drift rate for Learned faces")+
-  ylab("D' for Learned faces") +
-  stat_cor(method = "pearson")
-c1
-ggsave("figures/learned_corr.jpeg", width = 10, height = 6)
-#New faces
-c2 <- ggplot(drift_corr, aes(x = Drift_rate_New, y = dprime_New)) +
-  geom_point() +
-  geom_smooth(method = 'lm', formula = y~x)+
-  labs(title = "New faces: Correlation between sensitivity (D') 
-and accumulation of evidence (Drift rate)") +
-  xlab("Drift rate for New faces")+
-  ylab("D' for New faces")+
-  stat_cor(method = "pearson")
-c2
-ggsave("figures/new_corr.jpeg", width = 10, height = 6)
-```
-Corr plot TRUE-FALSE
-```{r}
-test_2 <- theta_pid_1_q %>%
-  select(pid,param,value) %>%
-  pivot_wider(names_from = param, values_from = value)
-drift_corr_2 <- test_2 %>%
-  select(pid,v_Sfam_lMFALSE,v_Sfam_lMTRUE,v_Sunf_lMFALSE,v_Sunf_lMTRUE) %>%
-  rename(drift_learned_TRUE = "v_Sfam_lMTRUE", drift_learned_FALSE = "v_Sfam_lMFALSE", drift_new_TRUE = "v_Sunf_lMTRUE", drift_new_FALSE = "v_Sunf_lMFALSE") %>%
-  mutate(pid = as.numeric(as.factor(pid))) %>%
-  filter(!is.na(drift_learned_TRUE),
-         !pid == "1",
-         !pid == "27")
-drift_corr_2$d_prime_fam = dprime$d_prime_fam  
-drift_corr_2$d_prime_unf = dprime$d_prime_unf
-head(drift_corr_2)
-
-drift_corr_2 <- drift_corr_2 %>%
-  rename(dprime_Learned = "d_prime_fam", dprime_New = "d_prime_unf")
-mat_cor<-plot_correlation(drift_corr_2[2:7])
-mat_cor
-ggsave("figures/mat_cor_T_F.jpeg")
-
-```
-### Criterion analysis (correlation with the bias parameter)
+#Threshold
 ```{r}
 
 ```
 
 
+#Drift diff (TRUE-FALSE)
+```{r}
 
-
-
-
-
+```
 
 
 

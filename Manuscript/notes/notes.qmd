@@ -90,7 +90,11 @@ Otherwise, the methods seem fine for now. There is of course a lot of detail req
 
 And once we have the results for the last online experiment it will shape how we think about the general discussion. But many of the points in the discussion seem reasonable and relevant already.
 
+# March 3rd 2026 #
 
+- Methods / Results
+- First draft discussion: a lot needs polishing but I think that the nature of the message is fine. i have to add one or two refs as well.
+- I added some questions for you in bold
 
 
 

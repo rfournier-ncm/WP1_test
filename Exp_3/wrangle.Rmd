@@ -1,6 +1,6 @@
 ---
 title: "wrangle"
-author: "Rich"
+author: "Fournier Raphaël"
 date: "`r Sys.Date()`"
 output: html_document
 editor_options: 
@@ -31,7 +31,7 @@ renv::snapshot() # this is only necessary when new packages or installed or pack
 ## load ##
 
 ```{r load-pkg}
-pkg <- c("tidyverse", "RColorBrewer", "patchwork", "gtsummary", "paletteer")
+pkg <- c("tidyverse", "RColorBrewer", "patchwork", "gtsummary", "paletteer", "here")
 
 lapply(pkg, library, character.only = TRUE)
 ```
@@ -83,10 +83,11 @@ raw %>%
    distinct(pid)
 ```
 
-#Saving raw data
+#Save raw data
 ```{r}
-write_csv(raw, "Exp_3/data/raw_data_exp_3.csv")
+write_csv(raw,"Exp_3/data/raw_data_exp_3.csv")
 ```
+
 
 
 ### Wrangle the Familiarity ratings ###
@@ -146,18 +147,24 @@ raw %>%
   bold_labels()
 ```
 
-#If needed, remove participants with percentage of missed trials > 40%
+#Remove NA (missed trials)
 ```{r}
-#Here code
+raw <- raw %>%
+  drop_na(rt)
 ```
-
+#Save_data
+```{r}
+write_csv(raw, here("Exp_3", "data", "data_exp_3.csv"))
+```
 
 ## Accuracy 
 
 # Calculate accuracy
 ```{r}
-data <- raw %>% 
-  mutate(acc = case_when(
+data <- raw %>%
+  mutate(fam = as.factor(as.character(fam)),
+         cond = fct_recode(fam, Famous = "1", Novel = "0"),
+         acc = case_when(
          cond == "Famous" & keypress == "q" ~ 1,
          cond == "Novel" & keypress == "p" ~ 1,
          TRUE ~ 0))%>%
@@ -208,7 +215,7 @@ p.acc <-ggplot(acc_pid_check, aes(x=pid, y=perc)) +
    xlab("Pid") +
    ylab("Accuracy [%]") + ylim(c(0,100))
 p.acc
-ggsave("Exp_2/figures/acc_pid_barplot.jpeg",
+ggsave("Exp_3/figures/acc_pid_barplot.jpeg",
        width = 8, height = 6)
 ```
 
@@ -243,16 +250,14 @@ p.acc_without <-ggplot(acc_pid_check_without, aes(x=pid, y=perc)) +
    xlab("Pid") +
    ylab("Accuracy [%]") + ylim(c(0,100))
 p.acc_without
-ggsave("Exp_2/figures/acc_pid_barplot_without.jpeg",
+ggsave("Exp_3/figures/acc_pid_barplot_without.jpeg",
        width = 8, height = 6)
 ```
 
-##saving data
+#Saving raw data
 ```{r}
-write_csv(data, "Exp_2/data/data_exp_2/data_WP1_2_model.csv")
-data<-read_csv("Exp_2/data/data_exp_2/data_WP1_2_model.csv")
-data <- data %>%
-    mutate(cond = fct_relevel(cond,"Famous", "Novel")) 
+write_csv(data, "Exp_3/data/data_exp_3.csv")
+data<-read_csv("Exp_3/data/data_exp_3.csv")
 ```
 
 
@@ -427,7 +432,7 @@ p.4.2.1 <- ggplot(data_error, aes(x=rt, fill=cond, colour=cond)) +
    xlim(0,1.75)
 p.4.2.1
 
-ggsave("Exp_2/figures/errors_distr_block.jpeg",
+ggsave("Exp_3/figures/errors_distr_block.jpeg",
        width = 8, height = 8)
 ```
 
@@ -444,7 +449,7 @@ p.4.2.2 <- ggplot(data_error, aes(x=rt, fill=cond, colour=cond)) +
    xlim(0,1.75)
 p.4.2.2
 
-ggsave("Exp_2/figures/errors_distr.jpeg",
+ggsave("Exp_3/figures/errors_distr.jpeg",
        width = 8, height = 8)
 ```
 
@@ -467,7 +472,7 @@ p4.3 <- ggplot(rt_pid, aes(x=block, y=mean,
   ylim(0,1)
 p4.3
 
-ggsave("Exp_2/figures/rt_line_pid.jpeg",
+ggsave("Exp_3/figures/rt_line_pid.jpeg",
       width = 8, height = 8)
 ```
 
@@ -487,7 +492,7 @@ p4.4 <- ggplot(acc_pid, aes(x=block, y=perc,
   
 p4.4
 
-ggsave("Exp_2/figures/acc_line_pid_prob.jpeg",
+ggsave("Exp_3/figures/acc_line_pid_prob.jpeg",
        width = 8, height = 8)
 ```
 
@@ -510,7 +515,7 @@ p4.5 <- ggplot(rt_group, aes(x=block, y=mean,
    ylim(0,1)
 p4.5
 
-ggsave("Exp_2/figures/rt_line_group.jpeg",
+ggsave("Exp_3/figures/rt_line_group.jpeg",
         width = 7, height = 8)
 ```
 
@@ -532,7 +537,7 @@ p4.6 <- ggplot(acc_group, aes(x=block, y=perc,
 
 p4.6
 
-ggsave("Exp_2/figures/acc_line_group.jpeg",
+ggsave("Exp_3/figures/acc_line_group.jpeg",
         width = 7, height = 8)
 ```
 
@@ -542,7 +547,7 @@ plot group data together
 p4.7 <- p4.5 | p4.6
 p4.7
 
-ggsave("Exp_2/figures/rt_acc_line_group.jpeg",
+ggsave("Exp_3/figures/rt_acc_line_group.jpeg",
         width = 15, height = 6)
 ```
 
@@ -592,7 +597,7 @@ plot group data together
 p4.10 <- p4.8 | p4.9
 p4.10
 
-ggsave("figures/rt_acc_line_dots.jpeg",
+ggsave("Exp_3/figures/rt_acc_line_dots.jpeg",
        width = 10, height = 6)
 ```
 
@@ -622,10 +627,10 @@ p.4.11 <- ggplot(acc_pid_wblock, aes(x = factor(cond),y=perc.y,
 
 p.4.11
 
-ggsave("Exp_2/figures/acc_barplot_group.jpeg",
+ggsave("Exp_3/figures/acc_barplot_group.jpeg",
         width = 6, height = 8)
 ```
-```
+
 
 barplot rt
 ```{r}
@@ -649,7 +654,7 @@ p.4.12 <- ggplot(rt_pid_wblock, aes(x = factor(cond),y=mean.y,
 
 p.4.12
 
-ggsave("Exp_2/figures/rt_barplot_group.jpeg",
+ggsave("Exp_3/figures/rt_barplot_group.jpeg",
         width = 6, height = 8)
 ```
 

@@ -31,7 +31,7 @@ renv::snapshot() # this is only necessary when new packages or installed or pack
 ## load ##
 
 ```{r load-pkg}
-pkg <- c("tidyverse", "RColorBrewer", "patchwork", "gtsummary", "paletteer")
+pkg <- c("tidyverse", "RColorBrewer", "patchwork", "gtsummary", "paletteer", "here")
 
 lapply(pkg, library, character.only = TRUE)
 ```
@@ -107,7 +107,7 @@ write_csv(wrangle, "Exp_2/data/data_exp_2/wrangle_data_exp_2.csv")
 
 #Check if all response times > 2 and < .02 have been correctly not recorded
 ```{r}
-exp_2_data <- exp_2_data %>% 
+exp_2_data <- wrangle %>% 
   mutate(rt_OSF = if_else(
          rt < 2.0 | rt < 0.2, "yes", "no"))
 head(exp_2_data)
@@ -174,6 +174,11 @@ data <- data %>%
   mutate(cond = fct_relevel(cond,"Learned", "Novel")) %>%
   drop_na(rt) #Removing the missed trials 
 head(data)
+```
+
+#Save data model
+```{r}
+write_csv(data, "Exp_2/data/data_model.csv")
 ```
 
 data check
