@@ -96,5 +96,27 @@ And once we have the results for the last online experiment it will shape how we
 - First draft discussion: a lot needs polishing but I think that the nature of the message is fine. i have to add one or two refs as well.
 - I added some questions for you in bold
 
+# March 9th 2026 #
 
+- 2.2.5 - you asked a question about informed consent when testing on Prolific. Mt answer would be that we should provide the same information that we would provide for in person lab testing. e.g., unless there is a specific reason, we should be consistent. So, if we do not provide the example consent form for the lab stuff, why should we do it for the online stuff? Maybe there is a reason, but I would just describe the process, rather than add more forms to Supps. Does this make sense?
+
+- Figure 3. These are not famous faces. But shouldn't they be? Ok, I get it now. These are the novel faces. Maybe explain in the legend that these are the novel images that were compared to the famous faces.
+
+- a gray mask is fine for now. Especially since they get to see a figure. But we need to say why a mask was added? e.g., out pilot work showed it was too easy? So to control error rate we added a mask?
+
+- exclusion criteria. I would just maybe describe the demographics of the sample once after exclusions. Rather than repeat it for pre-exclusion and post-exclusion. Does this make sense?
+
+- OSF links. You could add links. Maybe just do it in one place. e.g., pre-reg, OSF linls, github etc. Then folks know where to find everything.
+
+- Priors were weakly informative. Right? Non-informative is flat. But we didn't set flat priors, did we?
+
+- No need for the separate analysis of RT and accuracy to be added. Just maybe say it is available online.
+
+- We might want to add density plots for RT into SUpps though? These are useful and important to see in the context of EAMs.
+
+- EAM results. Your question about Figure 6. Yes, include the difference score. It is useful to see that there is small difference that excludes zero. 
+
+- Novelty detection. Yes, I would add something in here about the possibility of a novelty detection mechanism as one possibility. But it is only a possibility. So we remain cautious.
+
+- My main comment about the discussion is just that we should be clearer at the very start about one thing. In the first paragraph, we should say ... The results for visual familiarity were clear and consistent. They showed blah blah. The results for Visual and person knowledge we not consistent and we think that is due to the construction of stimuli. If you want I can help write the discussion. At this point, I suggest that you focus on getting all the other parts polished and put together and I can help edit the discussion.
 
