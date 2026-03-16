@@ -120,3 +120,8 @@ And once we have the results for the last online experiment it will shape how we
 
 - My main comment about the discussion is just that we should be clearer at the very start about one thing. In the first paragraph, we should say ... The results for visual familiarity were clear and consistent. They showed blah blah. The results for Visual and person knowledge we not consistent and we think that is due to the construction of stimuli. If you want I can help write the discussion. At this point, I suggest that you focus on getting all the other parts polished and put together and I can help edit the discussion.
 
+# March 16th 2026 #
+
+- I added the accuracy, rt and rt density plots in the supplementary materials. Density plot of the 3rd experiment look really weird and that may contribute to the observed results as well. 
+- I added the missing refs in the discussion and make the first paragraph of the discussion clearer. 
+I think that at this point, a good "stab" in the discussion from your part would be great so I can work on your ideas/advices as well. 

@@ -101,6 +101,7 @@ theme_set(
 ## Plot colors
 myColors_1 <- c("Novel" = paletteer_d("rcartocolor::Safe",4)[1],"Learned" =  paletteer_d("rcartocolor::Safe",4)[2])
 myColors_2 <- c("Novel" = paletteer_d("rcartocolor::Safe",4)[1],"Famous" =  paletteer_d("rcartocolor::Safe",4)[3])
+myColors_3 <- c("Novel" = paletteer_d("rcartocolor::Safe",4)[1],"Learned" =  paletteer_d("rcartocolor::Safe",4)[2], "Famous" = paletteer_d("rcartocolor::Safe",4)[3])
 ## Set the amount of dodge in figures
 pd <- position_dodge(0.7)
 pd2 <- position_dodge(1)
@@ -129,6 +130,7 @@ Evidence accumulation models (EAM) are one approach to investigate the computati
 :::{#fig-LBA fig-cap = "Schematic of the linear ballistic accumulator (LBA) model"}
 ![](figures/LBA_schematique.png){width="90%"}
 :::
+
 *This diagram represents the accumulation process one trial of a perceptual decision task for the linear ballistic accumulator (LBA). Participants are required to chose between two options (Response 1 and Response 2). In a LBA model, there is a separated accumulation of evidence (v) for each response option. In this example, the correct response is Response 1. The accumulator on the left is the accumulator for the correct response (Response 1), and the green line in represents the rate at which the evidence accumulates in favor of that response option. The accumulator on the right is the accumulator for the incorrect response (Response 2), and the dash red line represents the rate at which the evidence accumulates in favor of this response option. Once the accumulated evidence crosses the threshold (b) of a response option, the corresponding response is chosen (in this case Response 1).* 
 ::::
 
@@ -196,11 +198,11 @@ exp_details |>
 
 We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures in the four experiments [@simonsConstraintsGeneralityCOG2017].
 
+## Pre-registration and open science
+
+For every experiment, the research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered. The preregistration, raw data, stimuli, data wrangling and analysis code as well as the evidence-accumulation models outputs are available on the Open Science Framework: Experiment 1 (<https://osf.io/azyvu/overview>), Experiment 2 (<https://osf.io/tu2eh/overview>), Experiment 3 (<https://osf.io/ut78f/overview>) and Experiment 4 (<https://osf.io/vj2aq/overview>).
+
 ## Experiment 1
-
-### Pre-registration and open science
-
-The research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered. The preregistration, raw data, stimuli, data wrangling and analysis code as well as the evidence-accumulation models outputs are available on the Open Science Framework (<https://osf.io/azyvu/overview>).
 
 ```{r}
 #| label: load-demo-exp1
@@ -211,18 +213,21 @@ demo_exp1 <- read_xlsx(here("Exp_1", "data", "Master_list_WP1_1.xlsx")) %>%
          Gender = as.factor(Gender),
          Date_of_birth = as.Date(Date_of_birth),
          Age = floor(age_calc(Date_of_birth, units = "years")))
-mean_age_exp1 = round(mean(demo_exp1$Age), digits = 2)
-sd_age_exp1 = round(sd(demo_exp1$Age), digits = 2)
-female_exp1 = sum(demo_exp1$Gender== "F")
-male_exp1 = sum(demo_exp1$Gender== "M")
-participant_n_exp1 = female_exp1 + male_exp1
-min_age_exp1 = min(demo_exp1$Age)
-max_age_exp1 = max(demo_exp1$Age)
+demo_exp_1_total_part <- demo_exp1 %>%
+  filter(!Index =="1.1-RF-01")
+total_part_exp1 = length(demo_exp_1_total_part$Index)
+mean_age_exp1 = round(mean(demo_exp_1_total_part$Age), digits = 2)
+sd_age_exp1 = round(sd(demo_exp_1_total_part$Age), digits = 2)
+female_exp1 = sum(demo_exp_1_total_part$Gender== "F")
+male_exp1 = sum(demo_exp_1_total_part$Gender== "M")
+participant_n_exp1 = length(demo_exp1$Index)
+min_age_exp1 = min(demo_exp_1_total_part$Age)
+max_age_exp1 = max(demo_exp_1_total_part$Age)
 ```
 
 ### Participants
 
-All participants were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. Sample size was determined in advance. Following previous suggestions from @heathcoteDynamicModelsChoice2019, a parameter recovery study was run to estimate if 30 usable participant datasets were sufficient to accurately recover the parameter estimates. The parameter recovery study included 30 participant datasets, each with 180 trials (90 trials "familiar" and 90 trials "unfamiliar") and with our selected model parameterisation. The data-generated parameters were sufficiently well-recovered (See Supplementary Materials). `r participant_n_exp1` healthy participants took part in Experiment 1 (`r male_exp1` men and `r female_exp1` women). Ages ranged from `r min_age_exp1` to `r max_age_exp1` years old ($M_{age} =$ `r mean_age_exp1`, $SD_{age} =$ `r sd_age_exp1`). All participants reported normal or corrected-to-normal vision and received payment (20 CHF) for participating in the experiment. Based on our preregistration, response times longer than 2.5 seconds were removed from the analysis. However, this cutoff value led to the the removal of 59% of the trials of one participant. Given the recommendation of having a certain number of trials per condition per participant when using evidence-accumulation models [@heathcoteDynamicModelsChoice2019; @parker2024], this participant was excluded from the data analysis. This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.
+All participants were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. Sample size was determined in advance. Following previous suggestions from @heathcoteDynamicModelsChoice2019, a parameter recovery study was run to estimate if 30 usable participant datasets were sufficient to accurately recover the parameter estimates. The parameter recovery study included 30 participant datasets, each with 180 trials (90 trials "familiar" and 90 trials "unfamiliar") and with our selected model parameterisation. The data-generated parameters were sufficiently well-recovered (See Supplementary Materials). `r participant_n_exp1` healthy participants took part in Experiment 1. All participants reported normal or corrected-to-normal vision and received payment (20 CHF) for participating in the experiment. Based on our preregistration, response times longer than 2.5 seconds were removed from the analysis. However, this cutoff value led to the the removal of 59% of the trials of one participant. Given the recommendation of having a certain number of trials per condition per participant when using evidence-accumulation models [@heathcoteDynamicModelsChoice2019; @parker2024], this participant was excluded from the data analysis. In the end, the data of `r total_part_exp1` participants (`r male_exp1` men and `r female_exp1` women) was retained for the analysis and the LBA modeling. Ages ranged from `r min_age_exp1` to `r max_age_exp1` years old ($M_{age} =$ `r mean_age_exp1`, $SD_{age} =$ `r sd_age_exp1`). This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.
 
 ### Stimuli
 
@@ -247,33 +252,6 @@ In the recognition part, participants completed three blocks of 90 recognition t
 ::::
 
 ## Experiment 2
-
-### Pre-registration and open science
-
-The research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered. The preregistration, raw data, stimuli, data wrangling and analysis code as well as the evidence-accumulation models outputs are available on OSF (<https://osf.io/tu2eh/overview>).
-
-```{r}
-#| label: age-gender-exp2
-#| include: false
-
-demo_exp2 <- read_csv(here("Exp_2", "data", "data_exp_2", "prolific_demographic_exp2.csv")) %>%
-    mutate(`Participant id` = as.factor(`Participant id`),
-         Sex = as.factor(Sex), 
-         Age = as.numeric(Age))
-total_number_part <- length(demo_exp2$`Participant id`)
-inform_consent <- length(demo_exp2$`Participant id`[demo_exp2$Status=="RETURNED"])
-demo_exp2_completed <- demo_exp2 %>%
-  filter(!Status == "RETURNED")
-number_part_compl <- length(demo_exp2_completed$`Participant id`)
-
-mean_age_exp2 = round(mean(demo_exp2_completed$Age), digits = 2)
-sd_age_exp2 = round(sd(demo_exp2_completed$Age), digits = 2)
-female_exp2 = sum(demo_exp2_completed$Sex== "Female")
-male_exp2 = sum(demo_exp2_completed$Sex== "Male")
-participant_n_exp2 = female_exp1 + male_exp1
-min_age_exp2 = min(demo_exp2_completed$Age)
-max_age_exp2 = max(demo_exp2_completed$Age)
-```
 
 ```{r}
 #| label: exclusion-exp2
@@ -310,13 +288,39 @@ participant_analysis_2 <- data_wrangle_exp_2 %>%
   filter(!pid %in% part_trial_25_pid,
          !pid %in% part_acc_55_pid)
 number_participant_analysis_2 <- length(unique(participant_analysis_2$pid))
+list_participant_analysis_2 <- unique(participant_analysis_2$pid)
+
+```
+
+```{r}
+#| label: age-gender-exp2
+#| include: false
+
+demo_exp2 <- read_csv(here("Exp_2", "data", "data_exp_2", "prolific_demographic_exp2.csv")) %>%
+    mutate(`Participant id` = as.factor(`Participant id`),
+         Sex = as.factor(Sex), 
+         Age = as.numeric(Age))
+total_number_part <- length(demo_exp2$`Participant id`)
+inform_consent <- length(demo_exp2$`Participant id`[demo_exp2$Status=="RETURNED"])
+demo_exp2_completed <- demo_exp2 %>%
+  filter(!Status == "RETURNED") 
+number_part_compl <- length(demo_exp2_completed$`Participant id`)
+
+after_exclusion_demo_exp2 <- demo_exp2_completed %>%
+  filter(`Participant id` %in% list_participant_analysis_2)
+
+mean_age_exp2 = round(mean(after_exclusion_demo_exp2$Age), digits = 2)
+sd_age_exp2 = round(sd(after_exclusion_demo_exp2$Age), digits = 2)
+female_exp2 = sum(after_exclusion_demo_exp2$Sex== "Female")
+male_exp2 = sum(after_exclusion_demo_exp2$Sex== "Male")
+participant_n_exp2 = female_exp1 + male_exp1
+min_age_exp2 = min(after_exclusion_demo_exp2$Age)
+max_age_exp2 = max(after_exclusion_demo_exp2$Age)
 ```
 
 ### Participants
 
-All participant were recruited on the Prolific platform (<https://www.prolific.com>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. Furthermore, Prolific offers the option to chose the approval rate of the participants willing to take part in the study. The approval rate is the percentage for which participants has been approved in previous experiment. A approval rate between 95% and 100% was established in our study to ensure data quality. Following Prolific payment principles, each participant received 9 pound for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.
-
-`r total_number_part` participants started the experiment. After reading the inform consent, `r inform_consent` participants decided to not continue the experimental procedure and withdraw from the experiment. In the end, `r number_part_compl` participants completed the experiment (`r male_exp2` men and `r female_exp2` women) and gave their informed consent. Ages ranges from `r min_age_exp2` to `r max_age_exp2` ($M_{age} =$ `r mean_age_exp2`, $SD_{age} =$ `r sd_age_exp2`). Following our preregistration exclusion criterion, `r part_trial_25` participants were excluded because their percentage of missed trials was higher lower than 25% and `r part_acc_55` was removed because the overall accuracy was lower than 55%. In the end, the data of `r number_participant_analysis_2` participants was retained for the analysis and the LBA modeling.
+All participant were recruited on the Prolific platform (<https://www.prolific.com>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. Furthermore, Prolific offers the option to chose the approval rate of the participants willing to take part in the study. The approval rate is the percentage for which participants has been approved in previous experiment. A approval rate between 95% and 100% was established in our study to ensure data quality. `r total_number_part` participants started the experiment. After reading the inform consent, `r inform_consent` participants decided to not continue the experimental procedure and withdraw from the experiment. In the end, `r number_part_compl` participants completed the experiment and gave their informed consent. Following our preregistration exclusion criterion, `r part_trial_25` participants were excluded because their percentage of missed trials was higher lower than 25% and `r part_acc_55` was removed because the overall accuracy was lower than 55%. In the end, the data of `r number_participant_analysis_2` participants (`r male_exp2` men and `r female_exp2` women) was retained for the analysis and the LBA modeling. Ages ranged from `r min_age_exp2` to `r max_age_exp2` ($M_{age} =$ `r mean_age_exp2`, $SD_{age} =$ `r sd_age_exp2`). Following Prolific payment principles, each participant received 9£ for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.
 
 ### Stimuli
 
@@ -324,11 +328,11 @@ In an attempt to replicate the findings of Experiment 1, the stimuli used in thi
 
 ### Material
 
-Given the online nature of this experiment, participants were asked to complete the study using a desktop computer. The experimental procedure has been tested on three different operative systems (PC, Macintosh and Linux), as well as on three different web browsers (Google Chrome, Safari and Firefox). Participants were asked to specifically used these operating systems and web browsers to ensure a consistent procedure and participant experience. 
+Given the online nature of this experiment, participants were asked to complete the study using a desktop computer. The experimental procedure has been tested on three different operative systems (PC, Macintosh and Linux), as well as on three different web browsers (Google Chrome, Safari and Firefox). Participants were asked to specifically used these operating systems and web browsers to ensure a consistent procedure and participant experience.
 
 ### Procedure
 
-On Prolific, participants who wished to take part in the experiment read the study information and selected an URL link to the Pavlovia (Open Science Tools, Nottingham, UK) platform. After selecting the URL link, a Pavlovia webpage opened to the inform consent of the study. Participants chose if they wanted to complete this study or not after reading the inform consent. The access to the task was only granted if participants accepted the terms of the inform consent. (**Should I add in the supplementary material how the inform consent was displayed to the participant and was was written in it?**)
+On Prolific, participants who wished to take part in the experiment read the study information and selected an URL link to the Pavlovia (Open Science Tools, Nottingham, UK) platform. After selecting the URL link, a Pavlovia webpage opened to the inform consent of the study. Participants chose if they wanted to complete this study or not after reading the inform consent. The access to the task was only granted if participants accepted the terms of the inform consent.
 
 ```{r}
 #| label: rt-2-exp1
@@ -343,28 +347,7 @@ perc_rt_1 <- round((number_rt_1 / nrow(rt_exp_1)) *100, 3)
 
 Regarding the experimental procedure, it was almost identical to the one used in Experiment 1 (Method and Materials, Experiment 1, Procedure). A response time window was added in the recognition part of the experiment. Instead of removing trials with a response time higher than 2.5 seconds after data collection, we decided to implement a response time window of 2 seconds for each recognition trial. In Experiment 1, `r perc_rt_1`% of the trials were longer than 2 seconds. We expected participants to quickly get accustomed to the response time limit and that the average percentage of missed trials will be similar or lower than in Experiment 1. Response time \[s\] and accuracy were collected after each recognition trial.
 
-## Experiment 3: Famous faces
-
-### Pre-registration and open science
-
-The research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered. The preregistration as well as raw data, stimuli, data wrangling and analysis code as well as the evidence-accumulation models outputs are available on OSF (<https://osf.io/ut78f/overview>).
-
-```{r}
-#| label: load-demo-exp3
-#| include: false
-
-demo_exp3 <- read_xlsx(here("Exp_3", "data", "demo_exp_3.xlsx")) %>%
-    mutate(Index = as.factor(Index),
-         Gender = as.factor(Gender),
-         Age = as.numeric(Age))
-mean_age_exp3 = round(mean(demo_exp3$Age), digits = 2)
-sd_age_exp3 = round(sd(demo_exp3$Age), digits = 2)
-female_exp3 = sum(demo_exp3$Gender== "F")
-male_exp3 = sum(demo_exp3$Gender== "M")
-participant_n_exp3 = female_exp3 + male_exp3
-min_age_exp3 = min(demo_exp3$Age)
-max_age_exp3 = max(demo_exp3$Age)
-```
+## Experiment 3
 
 ```{r}
 #| label: exclusion-exp3
@@ -436,24 +419,45 @@ participant_analysis_3 <- data_exp_3 %>%
          !pid %in% under_55_id,
          !pid %in% ratings_only_id) 
 number_participant_3 <- length(unique(participant_analysis_3$pid))
+list_participant_analysis_3 <- unique(participant_analysis_3$pid)
+```
+
+```{r}
+#| label: load-demo-exp3
+#| include: false
+
+demo_exp3 <- read_xlsx(here("Exp_3", "data", "demo_exp_3.xlsx")) %>%
+    mutate(Index = as.factor(Index),
+         Gender = as.factor(Gender),
+         Age = as.numeric(Age),
+         pid = c(1:40),
+         pid = as.factor(pid))
+after_exclusion_demo_exp3 <- demo_exp3 %>%
+  filter(pid %in% list_participant_analysis_3)
+
+mean_age_exp3 = round(mean(after_exclusion_demo_exp3$Age), digits = 2)
+sd_age_exp3 = round(sd(after_exclusion_demo_exp3$Age), digits = 2)
+female_exp3 = sum(after_exclusion_demo_exp3$Gender== "F")
+male_exp3 = sum(after_exclusion_demo_exp3$Gender== "M")
+participant_n_exp3 = length(unique(demo_exp3$pid))
+min_age_exp3 = min(after_exclusion_demo_exp3$Age)
+max_age_exp3 = max(after_exclusion_demo_exp3$Age)
 ```
 
 ### Participants
 
-All participant were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. Sample size was determined in advance. Following previous suggestions from @heathcoteDynamicModelsChoice2019, a parameter recovery study was run to estimate if 30 usable participant data sets were sufficient to accurately recover the parameter estimates. The parameter recovery study included 30 participant data sets, each with 180 trials (90 trials "Famous" and 90 trials "Novel") and with our selected model parameterisation. The data-generated parameters were sufficiently well-recovered (See supplementary materials).
-
-`r participant_n_exp3` healthy participants took part in experiment 2 (`r male_exp3` men and `r female_exp3` women). Ages ranged from `r min_age_exp3` to `r max_age_exp3` years old ($M_{age} =$ `r mean_age_exp3`, $SD_{age} =$ `r sd_age_exp3`). All participants reported normal or corrected-to-normal vision and received payment (25 CHF) for participating in the experiment. Based on our preregistration criterion, 3 participants were excluded from the data analysis: `r over_95` of them had an overall recognition accuracy larger than 95% and `r under_55` of them had a overall accuracy lower than 55% (chance at 50%). We deviated from our preregistration in one way. Since this experiment was conducted to investigate how highly familiar faces affect the computational processes of face recognition, we had to remove `r ratings_only` more participants who did not show a level of familiarity high enough with the presented faces in the first part of the experiment. This scenario did not occur during the pilot experiments we conducted and thus was not part of our preregistration. This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study. In the end, the data of `r number_participant_3` participants was retained for the analysis and the LBA modeling.
+All participant were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. `r participant_n_exp3` healthy participants took part in Experiment 3. Based on our preregistration criterion, 3 participants were excluded from the data analysis: `r over_95` of them had an overall recognition accuracy larger than 95% and `r under_55` of them had a overall accuracy lower than 55% (chance at 50%). We deviated from our preregistration in one way. Since this experiment was conducted to investigate how highly familiar faces affect the computational processes of face recognition, we had to remove `r ratings_only` more participants who did not show a level of familiarity high enough with the presented faces in the first part of the experiment. This scenario did not occur during the pilot experiments we conducted and thus was not part of our preregistration. In the end, the data of `r number_participant_3` participants (`r male_exp3` men and `r female_exp3` women) was retained for the analysis and the LBA modeling. Ages ranged from `r min_age_exp3` to `r max_age_exp3` years old ($M_{age} =$ `r mean_age_exp3`, $SD_{age} =$ `r sd_age_exp3`). All participants reported normal or corrected-to-normal vision and received payment (25 CHF) for participating in the experiment. This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.
 
 ### Stimuli
 
-Two types of pictures were used for this experiment to create our within-subject stimuli conditions. Images used for the "Novel" condition were the same pictures used in Experiment 1: the data set of face images contained 378 images since only the set of three gray scaled face images for each of the 126 identities was used for this experiment. Pictures depicting celebrities ("Famous" condition) were taken from the internet. For each of the 60 preselected celebrities, 3 pictures depicting them from a similar angle to the "Novel" faces were chosen (3/4 left view, frontal view and 3/4 right vie). Moreover, 60 more pictures (one for each of the celebrities) was only used for the first part of the experiment. All of the "Famous" images processing was realized using the GNU Image Manipulation Program (@GIMP). Background was removed from the picture and replace by the same background used in the "Novel" images. The same gray scale filter used for the "Novel" faces was applied to the celebrities images used during the recognition part. In total, the data set of face images used in this experiment contained 618 images: 1 set of three gray scaled face images for each of the 126 novel identities, 1 set of three gray scaled face images for each of the 60 famous identities and 60 images of celebrities used in the first part of the experiment. Furthermore, to increase the task difficulty, a gray mask (**I don't have a better term for this**) was added on top of each pictures ("Novel" faces and "Learned" faces) during the recognition part. Each mask was composed of 10 grey rectangles which position differs in function of the face orientation (See @fig-mask-exp3 for an example of the mask in question).
+Two types of pictures were used for this experiment to create our within-subject stimuli conditions. Images used for the "Novel" condition were the same pictures used in Experiment 1: the data set of face images contained 378 images since only the set of three gray scaled face images for each of the 126 identities was used for this experiment. Pictures depicting celebrities ("Famous" condition) were taken from the internet. For each of the 60 preselected celebrities, 3 pictures depicting them from a similar angle to the "Novel" faces were chosen (3/4 left view, frontal view and 3/4 right vie). Moreover, 60 more pictures (one for each of the celebrities) was only used for the first part of the experiment. All of the "Famous" images processing was realized using the GNU Image Manipulation Program (@GIMP). Background was removed from the picture and replace by the same background used in the "Novel" images. The same gray scale filter used for the "Novel" faces was applied to the celebrities images used during the recognition part. In total, the data set of face images used in this experiment contained 618 images: 1 set of three gray scaled face images for each of the 126 novel identities, 1 set of three gray scaled face images for each of the 60 famous identities and 60 images of celebrities used in the first part of the experiment. Furthermore, a gray mask was added on top of each pictures ("Novel" faces and "Learned" faces) during the recognition part. Each mask was composed of 10 grey rectangles which position differs in function of the face orientation (See @fig-mask-exp3 for an example of the mask in question). The addition of a grey mask on top the face images decreased the overall accuracy of the recognition part during pilot work to a percentage of correct answer suited for the application of evidence-accumulation modeling. Without this addition, the overall accuracy would be too extreme.
 
 :::: {.place arguments="bottom, scope: \"parent\", float: true"}
 :::{#fig-mask-exp3 fig-cap = "Non-masked and masked images"}
 ![](figures/Mask_exp3.png)
 :::
 
-*a) Images showing faces used in Experiment 1 and 2 for the three different face orientation (3/4 left, frontal view, 3/4 right) b) Same faces with the gray mask added on top of the images. These images were used in the recognition part of Experiment 3. Each mask is composed of 10 gray rectangles which position was adapted in function of the face orientation.* 
+*a) Images showing faces used in Experiment 1 and 2 for the three different face orientation (3/4 left, frontal view, 3/4 right) b) Same faces with the gray mask added on top of the images. These images were used in the recognition part of Experiment 3. Each mask is composed of 10 gray rectangles which position was adapted in function of the face orientation.These faces were used in the "novel" condition of Experiment 3.* 
 ::::
 
 ### Material
@@ -473,10 +477,6 @@ The experimental task was divided into two distinct parts: a rating part and a r
 ::::
 
 ## Experiment 4
-
-### Pre-registration and open science
-
-The research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered. The preregistration as well as raw data, stimuli, data wrangling and analysis code as well as the evidence-accumulation models outputs are available on the OSF (<https://osf.io/vj2aq/overview>).
 
 ### Participants
 
@@ -564,15 +564,21 @@ participant_analysis_4 <- demo_exp4_completed %>%
          !`Participant id` %in% under_55_id_4,
          !`Participant id` %in% ratings_only_id_4)
 number_participant_analysis_4 <- length(participant_analysis_4$`Participant id`)
+
+mean_age_exp4 = round(mean(participant_analysis_4$Age), digits = 2)
+sd_age_exp4 = round(sd(participant_analysis_4$Age), digits = 2)
+female_exp4 = sum(participant_analysis_4$Sex== "Female")
+male_exp4 = sum(participant_analysis_4$Sex== "Male")
+participant_n_exp4 = female_exp4 + male_exp4
+min_age_exp4 = min(participant_analysis_4$Age)
+max_age_exp4 = max(participant_analysis_4$Age)
 ```
 
-All participant were recruited on the Prolific platform (<https://www.prolific.com>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. Furthermore, Prolific offers the option to chose the approval rate of the participants willing to take part in the study. The approval rate is the percentage for which participants has been approved in previous experiment. A approval rate between 95% and 100% was established in our study to ensure data quality. Following Prolific payment principles, each participant received 9 pound for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.
-
-`r total_number_part_4` participants started the experiment. After reading the inform consent, `r inform_consent_4` participants decided to not continue the experimental procedure and withdraw from the experiment. In the end, `r number_part_compl_4` participants completed the experiment (`r male_exp4` men and `r female_exp4` women) and gave their informed consent. Ages ranges from `r min_age_exp4` to `r max_age_exp4` ($M_{age} =$ `r mean_age_exp4`, $SD_{age} =$ `r sd_age_exp4`). Following our preregistration exclusion criterion, `r part_trial_25_4` participant was excluded because the percentage of missed trials was higher than 25% and `r part_acc_55_4` were removed because the overall accuracy was lower than 55%. Furthermore, `r ratings_only_4` did not show a level of familiarity high enough with the presented faces in the first part of the experiment. In the end, the data of `r number_participant_analysis_4` participants was retained for further analysis and the LBA modeling **Should I add the number of men and women after exclusion here as well?**.
+All participant were recruited on the Prolific platform (<https://www.prolific.com>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. An approval rate between 95% and 100% was established in our study to ensure data quality. `r total_number_part_4` participants started the experiment. After reading the inform consent, `r inform_consent_4` participants decided to not continue the experimental procedure and withdraw from the experiment. `r number_part_compl_4` participants completed the experiment. Following our preregistration exclusion criterion, `r part_trial_25_4` participant was excluded because the percentage of missed trials was higher than 25% and `r part_acc_55_4` were removed because the overall accuracy was lower than 55%. Furthermore, `r ratings_only_4` did not show a level of familiarity high enough with the presented faces in the first part of the experiment. In the end, the data of `r number_participant_analysis_4` participants (`r male_exp4` men and `r female_exp4` women) was retained for further analysis and the LBA modeling. Ages ranged from `r min_age_exp4` to `r max_age_exp4` ($M_{age} =$ `r mean_age_exp4`, $SD_{age} =$ `r sd_age_exp4`). Following Prolific payment principles, each participant received 9£ for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.
 
 ### Stimuli
 
-Initially, we planned to use the exact same stimuli as the one used in Experiment 3. However, during the pilot, it was noticed that the "Famous" faces and the "Novel" faces contained differences in low visual features such as brightness, luminosity angle and the resolution of the picture. These differences might have facilitate the categorization between "famous" and "novel" and affected the estimation of our parameters of interest. To avoid that decisions are based on visual features and not on familiarity, it was decided to completely change the face pictures data set for both conditions in Experiment 4. For the "Famous" condition, faces were all taken from <https:://commons.wikimedia.org>. For each of the famous identities (30 men, 30 women), four pictures were selected: one for the rating part of the experiment and three were used in the recognition part. The list of the attributions as well as the URL links to all the pictures can be found in the Supplementary Materials. For the "Novel" condition, face images were taken from the "10K US Adult Faces Database" [@bainbridgeIntrinsicMemorabilityFace2013]. These pictures depict faces in a natural environment, similar to the selected images of the celebrities. 103 faces were selected from this database and used in the recognition part of the experiment. To avoid recognition based on low visual features, we decided to not standardize the brightness and luminosity angle of the entire picture dataset. The rationale behind this decision was to avoid adding modifications to the original image that might facilitate the categorization between the stimuli conditions. The only low level visual feature that we standardized across all the images was the resolution. After cropping, every images was resized to have a 250 pixels (px) height, a height similar to the original picture's height of the images from "10K US Adult Faces Database".
+Initially, we planned to use the exact same stimuli as the one used in Experiment 3. However, during the pilot, it was noticed that the "Famous" faces and the "Novel" faces contained differences in low visual features such as brightness, luminosity angle and the resolution of the picture. These differences might have facilitate the categorization between "famous" and "novel" and affected the estimation of our parameters of interest. To avoid that decisions are based on visual features and not on familiarity, it was decided to completely change the face pictures data set for both conditions in Experiment 4. For the "Famous" condition, faces were all taken from <https:://commons.wikimedia.org>. For each of the famous identities (30 men, 30 women), four pictures were selected: one for the rating part of the experiment and three were used in the recognition part. The list of the attributions as well as the URL links to all the pictures can be found in the Supplementary Materials. For the "Novel" condition, face images were taken from the "10K US Adult Faces Database" [@bainbridgeIntrinsicMemorabilityFace2013]. These pictures depict faces in a natural environment, similar to the selected images of the celebrities. 103 faces were selected from this database and used in the recognition part of the experiment. To avoid recognition based on low visual features, we decided to not standardize the brightness and luminosity angle of the entire picture dataset. The rationale behind this decision was to avoid adding modifications to the original image that might facilitate the categorization between the stimuli conditions. The only low level visual feature that we standardized across all the images was the resolution. After cropping, every images was down sampled to a 250 pixels (px) height, a height similar to the original height of the images from "10K US Adult Faces Database", and grayscaled.
 
 ### Material
 
@@ -594,425 +600,15 @@ For every model, threshold was allowed to vary by response (Novel/Learned for Ex
 
 ### Model estimation
 
-We carried out a Bayesian model estimation using the EMC2 R package. Details about the priors of each model are provided in supplementary materials and the code required to run the analyses is available on OSF (**Do I ad the link to every project here or not?**). Priors were chosen to be non-informative meaning that they have little influence on the estimation. The parameter were estimated through two sampling steps. First, a separate estimation of the fixed effects for each participants was conducted. These estimations were used as the starting point for the full hierarchical model.
-
-### Parameter estimates
-
-In order to make inference about the magnitude of familiarity effects, differences in parameter estimates across conditions were compared. **Question here:**
+We carried out a Bayesian model estimation using the EMC2 R package. Details about the priors of each model are provided in supplementary materials and the code required to run the analyses is available on OSF. Priors were chosen to be weakly-informative meaning that they have little influence on the estimation. The parameter were estimated through two sampling steps. First, a separate estimation of the fixed effects for each participants was conducted. These estimations were used as the starting point for the full hierarchical model.
 
 ### Data analysis
 
-For every experiment, the separate analysis of response times and accuracy was conducted using Bayesian Multilevel Models with R Package brms [@brms]. The evidence-accumulation modelling analyses of the distributions of response times for the correct and wrong answers were realized using the EMC2 R package [@EMC2].
+For every experiment, the separate analysis of response times and accuracy was conducted using Bayesian Multilevel Models with R Package brms [@brms]. The evidence-accumulation modelling analyses of the distributions of response times for the correct and wrong answers were realized using the EMC2 R package [@EMC2]. In order to make inference about the magnitude of familiarity effects, differences in parameter estimates across conditions were compared. To summarize the distribution of parameters of interest, we report the median of the posterior distribution together with 95% quantile interval of the posterior distribution in square brackets in the following section.
 
 # Results
 
-## Analysis of manifest variables
-
-```{r}
-#| label: rt-acc-all
-#| include: false
- 
-
-#Load the RT and accuracy data for each experiment
-data_1 <- read_csv(here("Exp_1", "data", "data.csv"))
-data_2 <- read_csv(here("Exp_2", "data", "data_exp_2.csv"))
-data_3 <- read_csv(here("Exp_3", "data", "data_exp_3.csv"))
-data_4 <- read_csv(here("Exp_4", "data", "data_exp_4.csv")) %>%
-  mutate(cond = fct_recode(cond, Famous = "familiar", Novel = "novel"))
-
-#Create plots for accuracy for each experiment
-#Exp1
-acc_pid_1 <- data_1%>% 
-  group_by(pid, block, cond) %>% 
-  summarise(sum = sum(acc),
-            n = n(), 
-            perc = sum/n*100)
-
-acc_group_wblock_1 <- acc_pid_1 %>% 
-  group_by(cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc)
-
-acc_pid_wblock_1 <- acc_pid_1 %>% 
-  group_by(pid,cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc) %>%
-  left_join(acc_group_wblock_1, by = join_by(cond))
-
-p.1.1 <- ggplot(acc_pid_wblock_1, aes(x = factor(cond),y=perc.y, 
-                           fill=cond, colour=cond)) +
-   geom_col() +
-   geom_errorbar(aes(ymin = perc.y-sem.y, ymax = perc.y+sem.y), col = "black",
-                width=.2, position=pd2) +
-   geom_point(aes(y = perc.x),
-             colour = "black",
-             stat = "identity",
-             position=pd2,
-             alpha = .7)+
-   scale_fill_manual(values = myColors_1) +
-   scale_color_manual(values = myColors_1) +
-   xlab("Conditions") +
-   ylab("Proportion correct [%]") +
-   ylim(0,100)+
-   theme(legend.position = "none")
-
-#Exp2
-acc_pid_2 <- data_2 %>% 
-  group_by(pid, block, cond) %>% 
-  summarise(sum = sum(acc),
-            n = n(), 
-            perc = sum/n*100)
-
-acc_group_wblock_2 <- acc_pid_2 %>% 
-  group_by(cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc)
-
-acc_pid_wblock_2 <- acc_pid_2 %>% 
-  group_by(pid,cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc) %>%
-  left_join(acc_group_wblock_2, by = join_by(cond))
-
-p.1.2 <- ggplot(acc_pid_wblock_2, aes(x = factor(cond),y=perc.y, 
-                           fill=cond, colour=cond)) +
-   geom_col() +
-   geom_errorbar(aes(ymin = perc.y-sem.y, ymax = perc.y+sem.y), col = "black",
-                width=.2, position=pd2) +
-   geom_point(aes(y = perc.x),
-             colour = "black",
-             stat = "identity",
-             position=pd2,
-             alpha = .7)+
-   scale_fill_manual(values = myColors_1) +
-   scale_color_manual(values = myColors_1) +
-   xlab("Conditions") +
-   ylab("Proportion correct [%]") +
-   ylim(0,100)+
-   theme(legend.position = "none")
-
-#Exp3
-acc_pid_3 <- data_3 %>% 
-  group_by(pid, block, cond) %>% 
-  summarise(sum = sum(acc),
-            n = n(), 
-            perc = sum/n*100)
-
-acc_group_wblock_3 <- acc_pid_3 %>% 
-  group_by(cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc)
-
-acc_pid_wblock_3 <- acc_pid_3 %>% 
-  group_by(pid,cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc) %>%
-  left_join(acc_group_wblock_3, by = join_by(cond))
-
-p.1.3 <- ggplot(acc_pid_wblock_3, aes(x = factor(cond),y=perc.y, 
-                           fill=cond, colour=cond)) +
-   geom_col() +
-   geom_errorbar(aes(ymin = perc.y-sem.y, ymax = perc.y+sem.y), col = "black",
-                width=.2, position=pd2) +
-   geom_point(aes(y = perc.x),
-             colour = "black",
-             stat = "identity",
-             position=pd2,
-             alpha = .7)+
-   scale_fill_manual(values = myColors_2) +
-   scale_color_manual(values = myColors_2) +
-   xlab("Conditions") +
-   ylab("Proportion correct [%]") +
-   ylim(0,100)+
-   theme(legend.position = "none")
-
-#Exp4
-acc_pid_4 <- data_4 %>% 
-  group_by(pid, block, cond) %>% 
-  summarise(sum = sum(acc),
-            n = n(), 
-            perc = sum/n*100)
-
-acc_group_wblock_4 <- acc_pid_4 %>% 
-  group_by(cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc)
-
-acc_pid_wblock_4 <- acc_pid_4 %>% 
-  group_by(pid,cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc) %>%
-  left_join(acc_group_wblock_4, by = join_by(cond))
-
-p.1.4 <- ggplot(acc_pid_wblock_4, aes(x = factor(cond),y=perc.y, 
-                           fill=cond, colour=cond)) +
-   geom_col() +
-   geom_errorbar(aes(ymin = perc.y-sem.y, ymax = perc.y+sem.y), col = "black",
-                width=.2, position=pd2) +
-   geom_point(aes(y = perc.x),
-             colour = "black",
-             stat = "identity",
-             position=pd2,
-             alpha = .7)+
-   scale_fill_manual(values = myColors_2) +
-   scale_color_manual(values = myColors_2) +
-   xlab("Conditions") +
-   ylab("Proportion correct [%]") +
-   ylim(0,100)+
-   theme(legend.position = "none")
-
-#Create plots for RT for each experiment
-#Exp1
-rt_pid_1 <- data_1 %>% 
-  group_by(pid, block, cond) %>% 
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = n(), # n here is the total trials per grouping
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96)
-
-rt_group_wblock_1 <- data_1 %>% 
-  group_by(cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96)
-
-rt_pid_wblock_1 <- data_1 %>% 
-  group_by(pid,cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96) %>%
-  left_join(rt_group_wblock_1, by = join_by(cond))
-
-p.2.1 <- ggplot(rt_pid_wblock_1, aes(x = cond,y=mean.y, 
-                           fill=cond, colour=cond)) +
-   geom_col() +
-   geom_errorbar(aes(ymin = mean.y-sem.y, ymax = mean.y+sem.y), col = "black",
-                width=.2, position=pd2) +
-  geom_point(aes(y = mean.x),
-             colour = "black",
-             stat = "identity",
-             position=pd2,
-             alpha = .7)+
-   scale_fill_manual(values = myColors_1) +
-   scale_color_manual(values = myColors_1) +
-   xlab("Conditions") +
-   ylab("Mean Response Time [s]") +
-   ylim(0,2)+
-   theme(legend.position = "none")
-
-
-#Exp2
-rt_pid_2 <- data_2 %>% 
-  group_by(pid, block, cond) %>% 
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = n(), # n here is the total trials per grouping
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96)
-
-rt_group_wblock_2 <- data_2 %>% 
-  group_by(cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96)
-
-rt_pid_wblock_2 <- data_2 %>% 
-  group_by(pid,cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96) %>%
-  left_join(rt_group_wblock_2, by = join_by(cond))
-
-p.2.2 <- ggplot(rt_pid_wblock_2, aes(x = cond,y=mean.y, 
-                           fill=cond, colour=cond)) +
-   geom_col() +
-   geom_errorbar(aes(ymin = mean.y-sem.y, ymax = mean.y+sem.y), col = "black",
-                width=.2, position=pd2) +
-  geom_point(aes(y = mean.x),
-             colour = "black",
-             stat = "identity",
-             position=pd2,
-             alpha = .7)+
-   scale_fill_manual(values = myColors_1) +
-   scale_color_manual(values = myColors_1) +
-   xlab("Conditions") +
-   ylab("Mean Response Time [s]") +
-   ylim(0,2)+
-   theme(legend.position = "none")
-
-#Exp3
-rt_pid_3 <- data_3 %>% 
-  group_by(pid, block, cond) %>% 
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = n(), # n here is the total trials per grouping
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96)
-
-rt_group_wblock_3 <- data_3 %>% 
-  group_by(cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96)
-
-rt_pid_wblock_3 <- data_3 %>% 
-  group_by(pid,cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96) %>%
-  left_join(rt_group_wblock_3, by = join_by(cond))
-
-p.2.3 <- ggplot(rt_pid_wblock_3, aes(x = cond,y=mean.y, 
-                           fill=cond, colour=cond)) +
-   geom_col() +
-   ylim(0,1) +
-   geom_errorbar(aes(ymin = mean.y-sem.y, ymax = mean.y+sem.y), col = "black",
-                width=.2, position=pd2) +
-  geom_point(aes(y = mean.x),
-             colour = "black",
-             stat = "identity",
-             position=pd2,
-             alpha = .7)+
-   scale_fill_manual(values = myColors_2) +
-   scale_color_manual(values = myColors_2) +
-   xlab("Conditions") +
-   ylab("Mean Response Time [s]") +
-   theme(legend.position = "none")
-
-#Exp4
-rt_pid_4 <- data_4 %>% 
-  group_by(pid, block, cond) %>% 
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = n(), # n here is the total trials per grouping
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96)
-
-rt_group_wblock_4 <- data_4 %>% 
-  group_by(cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96)
-
-rt_pid_wblock_4 <- data_4 %>% 
-  group_by(pid,cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96) %>%
-  left_join(rt_group_wblock_4, by = join_by(cond))
-
-p.2.4 <- ggplot(rt_pid_wblock_4, aes(x = cond,y=mean.y, 
-                           fill=cond, colour=cond)) +
-   geom_col() +
-   ylim(0,1) +
-   geom_errorbar(aes(ymin = mean.y-sem.y, ymax = mean.y+sem.y), col = "black",
-                width=.2, position=pd2) +
-  geom_point(aes(y = mean.x),
-             colour = "black",
-             stat = "identity",
-             position=pd2,
-             alpha = .7)+
-   scale_fill_manual(values = myColors_2) +
-   scale_color_manual(values = myColors_2) +
-   xlab("Conditions") +
-   ylab("Mean Response Time [s]") +
-   theme(legend.position = "none")
-
-
-plot_1 <- p.1.1 | p.2.1
-plot_2 <- p.1.2 | p.2.2
-plot_3 <- p.1.3 | p.2.3
-plot_4 <- p.1.4 | p.2.4
-```
-
-Prior to the analysis of the evidence accumulation modeling, we separately analyzed the observed measures of the face memory task: accuracy and RT. These analysis were conducted using a Bayesian estimation approach to multilevel modeling (ref: McElreath, 2020). Raw data plots for the four experiments are shown in @fig-acc_rt.
-
-```{r}
-#| label: fig-acc_rt
-#| fig-cap: "Proportion of correct response [%] and Response times [s] across condition for the four experiments. (a) Barplots representing the mean proportion of correct reponse per condtition and the mean reponse times per condition of Experiment 1. (b) Barplots representing the mean proportion of correct reponse per condtition and the mean reponse times per condition of Experiment 2. (c) Barplots representing the mean proportion of correct reponse per condtition and the mean reponse times per condition of Experiment 3. (d) Barplots representing the mean proportion of correct reponse per condtition and the mean reponse times per condition of Experiment 4. In all graphs black points denote the subject means, and error bars represent within subjects standard error of the mean."
-#| fig-subcap: 
-#|  - "Experiment 1: Learned faces vs. Novel faces (Laboratory)"
-#|  - "Experiment 2: Learned faces vs. Novel faces (Online)"
-#|  - "Experiment 3: Famous faces vs. Novel faces (Laboratory)"
-#|  - "Experiment 4: Learned faces vs. Novel faces (Online)"
-#| fig-alt: "" 
-#| layout-ncol: 1
-#| warning: false
-#| fig-width: 6
-#| fig-height: 3
-
-plot_1
-plot_2
-plot_3
-plot_4
-```
-
-### Experiment 1
-
-**Question here: Do I add the results of the Bayesian Multilevel Models for the separate analysis of RT and ACC here or in the supplementary materials? Should I just show the RT and ACC data here?**
-
-### Experiment 2
-
-### Experiment 3
-
-### Experiment 4
+The raw data and separate analysis of the accuracy and response times of each experiment is available in the Supplementary materials. In this section, only the results from the LBA modeling will be presented.
 
 ## Evidence accumulation modeling results
 
@@ -1175,9 +771,7 @@ drift_acc_cond_diff_1_q <- drift_acc_cond_diff_1 %>%
 
 ```
 
-*Threshold:* We estimated the threshold parameter for both response options (Novel and Learned). Inspection of the posterior distribution of the effect of face familiarity on the threshold parameter shows that both posterior distributions overlap with zero: threshold for "Novel" faces (`r round(theta_group_1_q$value[theta_group_1_q$param == "B_lRNovel"], digits = 3)` \[`r round(theta_group_1_q$.lower[theta_group_1_q$param == "B_lRNovel"], digits =   3)`, `r round(theta_group_1_q$.upper[theta_group_1_q$param == "B_lRNovel"], digits = 3)`\]) and for "Learned" faces (`r round(theta_group_1_q$value[theta_group_1_q$param == "B_lRLearned"], digits = 3)` \[`r round(theta_group_1_q$.lower[theta_group_1_q$param == "B_lRLearned"], digits =   3)`, `r round(theta_group_1_q$.upper[theta_group_1_q$param == "B_lRLearned"], digits = 3)`\]; see @fig-thresh_exp1).
-
-**Question here: since both posterior distributions overlap with zero, do i still add the difference figure or not? Does not seem relevant to do it in my opinion.**
+*Threshold:* We estimated the threshold parameter for both response options (Novel and Learned). Inspection of the posterior distributions of the effect of face familiarity on the threshold parameter shows that while the threshold for Novel faces is greater that the one for "Learned" faces (`r round(thresh_diff_1_q$diff, digits = 3)` \[`r round(thresh_diff_1_q$.lower, digits = 3)`, `r round(thresh_diff_1_q$.upper, digits = 3)`\]), both posterior distributions overlap with zero: threshold for "Novel" faces (`r round(theta_group_1_q$value[theta_group_1_q$param == "B_lRNovel"], digits = 3)` \[`r round(theta_group_1_q$.lower[theta_group_1_q$param == "B_lRNovel"], digits =   3)`, `r round(theta_group_1_q$.upper[theta_group_1_q$param == "B_lRNovel"], digits = 3)`\]) and for "Learned" faces (`r round(theta_group_1_q$value[theta_group_1_q$param == "B_lRLearned"], digits = 3)` \[`r round(theta_group_1_q$.lower[theta_group_1_q$param == "B_lRLearned"], digits =   3)`, `r round(theta_group_1_q$.upper[theta_group_1_q$param == "B_lRLearned"], digits = 3)`\]; see @fig-thresh_exp1).
 
 ```{r}
 #| label: fig-thresh_exp1
@@ -1858,11 +1452,11 @@ ggplot(drift_acc_cond_diff_4, aes(x = diff, y = "")) +
 
 # General discussion
 
-Here we demonstrate that different computational processes support the recognition of different types of face. Whereas the signal-to-noise ratio provided by visual familiarity was poorer compared to novelty (Experiment 1 and 2), evidence is less clear when it comes to the combination of visual and semantic knowledge about the individual (Experiment 3 and 4). Nevertheless, these results suggest that the quality of the information processing varies as a function of the nature of the information. Such inference about the computational mechanisms involved in face recognition could not have been possible based on the commonly used separate analysis of response times and accuracy. Therefore, we suggest that further work uses evidence accumulation models (EAM) and other cognitive modelling approaches to build a richer computational understanding of face recognition and familiarity effects.
+Here we tried to demonstrate that different computational processes support the recognition of different types of face. Whereas the signal-to-noise ratio provided by visual familiarity was poorer compared to novelty (Experiment 1 and 2), evidence is not clear when it comes to the combination of visual and semantic knowledge about the individual (Experiment 3 and 4). The instability of the results observed in Experiment 3 and 4 is probably emerging from differences in the low-level visual features of the selected pictures. In the case of visual familiarity alone, these results suggest that the quality of the information processing varies as a function of the nature of the information. Such inference about the computational mechanisms involved in face recognition could not have been possible based on the commonly used separate analysis of response times and accuracy. Therefore, we suggest that further work uses EAM and other cognitive modelling approaches to build a richer computational understanding of face recognition and familiarity effects, more particularly regarding highly familiar faces.
 
-Accumulation of evidence for visually familiar faces was slower compared to novel faces in experiment 1 and 2. This would suggest that when only surface level visual features are available for recognition, the novelty of the information prevails. In the case of short prior exposure to visual stimuli, our findings are in agreement with other studies that reported a better recognition ability for novel faces than for visually familiar faces [@bindemannPerceivedAbilityActual2014; @readChangingPhotosFaces1990]. Visually familiar faces are processed in the core network of face recognition [@bruceUnderstandingFaceRecognition1986; @gobbiniNeuralResponseVisual2006]. This core network manages and synthesizes the visual analysis of low-level visual features to the construction of a detailed perceptual representation of the face. The next step requires the activation of face memory representations, giving rise to a feeling of familiarity proportionate to the degree of overlap between the presented face and the memory trace [@rapcsakFaceRecognition2019]. In the case of short prior visual exposure, these face memory traces might not be stable enough for the recognition process, leading to a slower evidence accumulation towards the "learned" decision. (**Should I add something related to novelty detection here?**)
+Accumulation of evidence for visually familiar faces was slower compared to novel faces in Experiment 1 and 2. This would suggest that when only surface level visual features are available for recognition, the novelty of the information prevails. In the case of short prior exposure to visual stimuli, our findings are in agreement with other studies that reported a better recognition ability for novel faces than for visually familiar faces [@bindemannPerceivedAbilityActual2014; @readChangingPhotosFaces1990]. Visually familiar faces are processed in the core network of face recognition [@bruceUnderstandingFaceRecognition1986; @gobbiniNeuralResponseVisual2006]. This core network manages and synthesizes the visual analysis of low-level visual features to the construction of a detailed perceptual representation of the face. The next step requires the activation of face memory representations, giving rise to a feeling of familiarity proportionate to the degree of overlap between the presented face and the memory trace [@rapcsakFaceRecognition2019]. In the case of short prior visual exposure, these face memory traces might not be stable enough for the recognition process. On the other hand, novel or totally unfamiliar stimuli are known to elicit strong behavioural control and attentional responses when presented in the context of expected or familiar stimuli ("pop-out effects";@johnstonAttentionCaptureNovel1990; @lev-ariEcologicalViewSelective2022; @lubowVisualSearchFunction1997). The combination of unstable memory traces for visually familiar faces and the pop-out effect of novel faces could explain the difference observed in the quality of the evidence accumulation for the "learned" and "novel" decisions.
 
-Given the difference observed between the observed results of experiment 3 and 4, it would be difficult to provide a clear interpretation of the results. While strong evidence from existing literature support a clear advantage in recognition performance for famous faces compared to novel ones (**add ref. here**), we cannot exclude the fact that, in experiment 3, the categorization between familiar faces and novel faces might have been facilitated by differences in low visual features in the two sets of pictures (e.g. slightly different orientation of the face, different overall picture quality...) leading to an enhanced quality of evidence accumulation for famous faces. By attempting to control for these visual features in experiment 4, the quality of the evidence accumulation became greater for novel faces. These inverse patterns in the estimated parameters highlight the importance of stimuli standardization, more specifically when applied to a specific stimuli category as famous faces images and how difference stimuli features, and not nature, can affect parameter estimation. (**Anything here to add? It feels like it is missing one more sentence but I don't really want to just add one sentence for the sake of adding one sentence.**)
+Given the difference observed between the drift rate results of Experiment 3 and 4, it would be difficult to provide a clear interpretation of the results. While strong evidence from existing literature support a clear advantage in recognition performance for famous faces compared to novel ones [@hancockRecognitionUnfamiliarFaces2000; @jenkins2011 ;@klatzkyRecognizingFamiliarUnfamiliar1984], we cannot exclude the fact that, in Experiment 3, the categorization between familiar faces and novel faces might have been facilitated by differences in low visual features in the two sets of pictures (e.g. slightly different orientation of the face, different overall picture quality...) leading to an enhanced quality of evidence accumulation for famous faces. By attempting to control for these visual features in Experiment 4, the quality of the evidence accumulation became greater for novel faces. These inverse patterns in the estimated parameters highlight the importance of stimuli standardization, more specifically when applied to a specific stimuli category as famous faces images and how differences in stimuli features, and not nature, can affect parameter estimation.
 
 There is no evidence to consider that the visual familiarity effects reported here are specific to faces. More specifically, we suggest that the observed effects of visual familiarity on the evidence accumulation process is generalizable to the processing of other visual stimuli like objects or scenes [@simonsConstraintsGeneralityCOG2017]. Regarding the potential effects of visual and semantic familiarity on the drift rate, these effects are probably more constrained to faces. It is indeed difficult to imagine a equivalent semantic knowledge for objects or scenes than the one we have with a highly familiar person. Certain specific and personal objects might provide a similar feeling of familiarity than highly familiar faces, but the amount of these personal objects is not comparable to the number of people that we have a rich semantic knowledge about.
 
@@ -1887,6 +1481,317 @@ To further investigate the effects of familiarity on the face recognition proces
 # Supplementary Materials
 
 -   Parameter recovery study
+
+## Separate analysis of response times and accuracy
+
+```{r}
+#| label: rt-acc-all
+#| include: false
+
+#Load the RT and accuracy data for each experiment
+data_1 <- read_csv(here("Exp_1", "data", "data.csv"))
+data_2 <- read_csv(here("Exp_2", "data", "data_exp_2.csv"))
+data_3 <- read_csv(here("Exp_3", "data", "data_exp_3.csv"))
+data_4 <- read_csv(here("Exp_4", "data", "data_exp_4.csv")) %>%
+  mutate(cond = fct_recode(cond, Famous = "familiar", Novel = "novel"))
+
+#Create plots for accuracy for each experiment
+#Exp1
+acc_pid_1 <- data_1%>% 
+  group_by(pid, block, cond) %>% 
+  summarise(sum = sum(acc),
+            n = n(), 
+            perc = sum/n*100)
+
+acc_group_wblock_1 <- acc_pid_1 %>% 
+  group_by(cond) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), 
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc)
+
+acc_pid_wblock_1 <- acc_pid_1 %>%
+  mutate(pid = as.character(as.factor(pid))) %>%
+  group_by(pid,cond) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), 
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc) %>%
+  left_join(acc_group_wblock_1, by = join_by(cond)) %>%
+  mutate(Experiment = "Experiment 1")
+
+#Exp2
+acc_pid_2 <- data_2 %>% 
+  group_by(pid, block, cond) %>% 
+  summarise(sum = sum(acc),
+            n = n(), 
+            perc = sum/n*100)
+
+acc_group_wblock_2 <- acc_pid_2 %>% 
+  group_by(cond) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), 
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc)
+
+acc_pid_wblock_2 <- acc_pid_2 %>% 
+  group_by(pid,cond) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), 
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc) %>%
+  left_join(acc_group_wblock_2, by = join_by(cond))%>%
+  mutate(Experiment = "Experiment 2")
+
+#Exp3
+acc_pid_3 <- data_3 %>% 
+  group_by(pid, block, cond) %>% 
+  summarise(sum = sum(acc),
+            n = n(), 
+            perc = sum/n*100)
+
+acc_group_wblock_3 <- acc_pid_3 %>% 
+  group_by(cond) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), 
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc)
+
+acc_pid_wblock_3 <- acc_pid_3 %>%
+  mutate(pid = as.character(as.factor(pid))) %>%
+  group_by(pid,cond) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), 
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc) %>%
+  left_join(acc_group_wblock_3, by = join_by(cond))%>%
+  mutate(Experiment = "Experiment 3")
+
+#Exp4
+acc_pid_4 <- data_4 %>% 
+  group_by(pid, block, cond) %>% 
+  summarise(sum = sum(acc),
+            n = n(), 
+            perc = sum/n*100)
+
+acc_group_wblock_4 <- acc_pid_4 %>% 
+  group_by(cond) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), 
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc)
+
+acc_pid_wblock_4 <- acc_pid_4 %>%
+  mutate(pid = as.character(as.factor(pid))) %>%
+  group_by(pid,cond) %>% 
+  summarise(mean_sum = mean(sum),
+            n = n(), 
+            mean_perc = mean(perc),
+            sd=sd(perc),
+            sem = (sd/sqrt(n))) %>% 
+  rename(sum=mean_sum, perc=mean_perc) %>%
+  left_join(acc_group_wblock_4, by = join_by(cond))%>%
+  mutate(Experiment = "Experiment 4")
+
+#Create plots for RT for each experiment
+#Exp1
+rt_group_wblock_1 <- data_1 %>% 
+  group_by(cond) %>% 
+  drop_na(rt) %>%
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = length(unique(pid)), # n here is the total subjs
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96)
+
+rt_pid_wblock_1 <- data_1 %>% 
+  mutate(pid = as.character(as.factor(pid))) %>%
+  group_by(pid,cond) %>% 
+  drop_na(rt) %>%
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = length(unique(pid)), # n here is the total subjs
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96) %>%
+  left_join(rt_group_wblock_1, by = join_by(cond)) %>%
+  mutate(Experiment = "Experiment 1")
+
+rt_density_1 <- data_1 %>%
+  select(cond, rt) %>%
+  mutate(Experiment = "Experiment 1")
+#Exp2
+rt_group_wblock_2 <- data_2 %>% 
+  group_by(cond) %>% 
+  drop_na(rt) %>%
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = length(unique(pid)), # n here is the total subjs
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96)
+
+rt_pid_wblock_2 <- data_2 %>% 
+  group_by(pid,cond) %>% 
+  drop_na(rt) %>%
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = length(unique(pid)), # n here is the total subjs
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96) %>%
+  left_join(rt_group_wblock_2, by = join_by(cond)) %>%
+  mutate(Experiment = "Experiment 2")
+
+rt_density_2 <- data_2 %>%
+  select(cond, rt) %>%
+  mutate(Experiment = "Experiment 2")
+#Exp3
+rt_group_wblock_3 <- data_3 %>% 
+  group_by(cond) %>% 
+  drop_na(rt) %>%
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = length(unique(pid)), # n here is the total subjs
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96)
+
+rt_pid_wblock_3 <- data_3 %>% 
+  mutate(pid = as.character(as.factor(pid))) %>%
+  group_by(pid,cond) %>% 
+  drop_na(rt) %>%
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = length(unique(pid)), # n here is the total subjs
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96) %>%
+  left_join(rt_group_wblock_3, by = join_by(cond)) %>%
+  mutate(Experiment = "Experiment 3")
+
+rt_density_3 <- data_3 %>%
+  select(cond, rt) %>%
+  mutate(Experiment = "Experiment 3")
+
+#Exp4
+rt_group_wblock_4 <- data_4 %>% 
+  group_by(cond) %>% 
+  drop_na(rt) %>%
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = length(unique(pid)), # n here is the total subjs
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96)
+
+rt_pid_wblock_4 <- data_4 %>% 
+  group_by(pid,cond) %>% 
+  drop_na(rt) %>%
+  summarise(mean = mean(rt),
+            sd = sd(rt),
+            n = length(unique(pid)), # n here is the total subjs
+            sem = (sd/sqrt(n)),
+            ci = sem*1.96) %>%
+  left_join(rt_group_wblock_4, by = join_by(cond)) %>%
+  mutate(Experiment = "Experiment 4")
+
+rt_density_4 <- data_4 %>%
+  select(cond, rt) %>%
+  mutate(Experiment = "Experiment 4")
+#Joining experiments data
+
+acc_all <- acc_pid_wblock_1 %>%
+  bind_rows(acc_pid_wblock_2) %>%
+  bind_rows(acc_pid_wblock_3) %>%
+  bind_rows(acc_pid_wblock_4)
+
+rt_all <- rt_pid_wblock_1 %>%
+  bind_rows(rt_pid_wblock_2) %>%
+  bind_rows(rt_pid_wblock_3) %>%
+  bind_rows(rt_pid_wblock_4)
+
+rt_density <- rt_density_1 %>%
+  bind_rows(rt_density_2) %>%
+  bind_rows(rt_density_3) %>%
+  bind_rows(rt_density_4)
+
+#plot acc by experiment
+plot_acc <- ggplot(acc_all, aes(x = factor(cond),y=perc.y, 
+                           fill=cond, colour=cond)) +
+   geom_col() +
+   geom_errorbar(aes(ymin = perc.y-sem.y, ymax = perc.y+sem.y), col = "black",
+                width=.2, position=pd2) +
+   geom_point(aes(y = perc.x),
+             colour = "black",
+             stat = "identity",
+             position=pd2,
+             alpha = .7)+
+   scale_fill_manual(values = myColors_3) +
+   scale_color_manual(values = myColors_3) +
+   xlab("Conditions") +
+   ylab("Proportion correct [%]") +
+   ylim(0,100) +
+   facet_grid(~Experiment, scales = "free_x") +
+   theme(legend.position = "none")
+
+plot_rt <- ggplot(rt_all, aes(x = cond,y=mean.y, 
+                           fill=cond, colour=cond)) +
+   geom_bar(stat="summary") +
+   geom_errorbar(aes(ymin = mean.y-sem.y, ymax = mean.y+sem.y), col = "black",
+                width=.2, position=pd2) +
+  geom_point(aes(y = mean.x),
+             colour = "black",
+             stat = "identity",
+             position=pd2,
+             alpha = .7)+
+   scale_fill_manual(values = myColors_3) +
+   scale_color_manual(values = myColors_3) +
+   xlab("Conditions") +
+   ylab("Mean response times [s]") +
+   ylim(0,1.75)+
+   theme(legend.position = "none") +
+   facet_grid(~Experiment, scales = "free_x")
+
+plot_rt_density_cond <- ggplot(rt_density, aes(x=rt, fill=cond, colour=cond)) +
+  geom_density(alpha=0.5) +
+  scale_fill_manual(values = myColors_3) +
+  scale_colour_manual(values = myColors_3)  +
+  facet_wrap(~block) +
+  labs(fill = "Conditions", colour = "Conditions") +
+  xlab("Response time [s]") +
+  ylab("Density") +
+  facet_grid(~Experiment, scales = "free_x") +
+  theme(legend.position = c(.92,.82),
+        legend.text = element_text(size = 7),
+        legend.title = element_text(size = 8))
+```
+
+```{r}
+#| label: fig-acc_rt
+#| fig-cap: "Proportion of correct response [%] and Response times [s] across condition for the four experiments. (a) Barplots representing the mean proportion of correct reponse per condtition and the mean reponse times per condition of Experiment 1. (b) Barplots representing the mean proportion of correct reponse per condtition and the mean reponse times per condition of Experiment 2. (c) Barplots representing the mean proportion of correct reponse per condtition and the mean reponse times per condition of Experiment 3. (d) Barplots representing the mean proportion of correct reponse per condtition and the mean reponse times per condition of Experiment 4. In all graphs black points denote the subject means, and error bars represent within subjects standard error of the mean."
+#| fig-subcap: 
+#|  - "Proportion of correct responses [%] accross experiments"
+#|  - "Mean response times [s] accross experiments"
+#|  - "Density of response times [s]"
+#| fig-alt: "" 
+#| layout-ncol: 1
+#| warning: false
+#| fig-width: 7
+#| fig-height: 4
+
+plot_acc
+plot_rt
+plot_rt_density_cond
+```
 
 -   Priors used for preregistered model
 
