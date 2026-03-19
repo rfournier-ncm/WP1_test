@@ -1,7 +1,6 @@
 ---
-title: Your Title Here
-subtitle: Optional Subtitle
-running-head: Short Title
+title: How does familiarity impact the computational processes that support face recognition?
+running-head: Decision models of face memory
 author:
   - name: Raphaël Fournier
     email: rfournier@ethz.ch
@@ -24,14 +23,15 @@ affiliations:
     name: Neural Control of Movement Laboratory
     department: Department of Health Sciences and Technology, ETH Zurich
   - id: 2
-    name: Name
-    department: department
+    name: 
+    department: School of Psychology and Sports Science, Bangor University
   - id: 3
     name: Social Brain Sciences Laboratory
     department: Department of Humanities, Social and Political Sciences, ETH Zurich
 abstract: |
-  Your abstract goes here. This will appear prominently at the top of your document.
-categories: [keyword1, keyword2, keyword3]
+  Recognising a familiar face is a fundamental social cognitive ability, yet the computational mechanisms that underlie this capacity remain poorly understood. Prior research has established that familiarity affects face recognition performance, but has relied primarily on manifest measures — accuracy and response time — that cannot distinguish between qualitatively different sources of performance change. Here, we used evidence accumulation modelling across four experiments to ask not merely whether familiarity affects face recognition, but how — specifically, which latent computational processes are modulated. Experiments 1 and 2 examined visual familiarity (briefly learned faces versus novel faces) and Experiments 3 and 4 examined person knowledge (famous versus novel faces). Fitting linear ballistic accumulator models to recognition data revealed a consistent computational signature across experiments: novel faces produced substantially higher drift rates than familiar faces, accompanied by a smaller but reliable increase in response caution. The dominance of the drift rate effect localises familiarity's primary influence to the quality of evidence accumulation — how cleanly the perceptual system extracts decision-relevant information — rather than to response bias. We interpret this as reflecting a novelty pop-out effect combined with unstable memory traces for familiar faces, alongside a conservative rejection bias in recognition memory. These findings demonstrate that computational modelling reveals dissociable mechanisms underlying face recognition that are invisible to manifest measures alone, and provide a foundation for understanding how familiarity shapes the decision processes that support social perception.
+
+categories: [face perception, memory, familiarity, person knowledge, decision models, evidence accumulation modelling]
 authornote: |
   Author notes go here.
 date: last-modified
@@ -76,7 +76,7 @@ knitr:
 
 ```{r load-pkg}
 #| include: false
-pkg <- c("tidyverse", "RColorBrewer", "patchwork", "gtsummary", "paletteer","readxl", "eeptools", "here", "gridExtra", "EMC2", "tidybayes")
+pkg <- c("tidyverse", "RColorBrewer", "patchwork", "gtsummary", "paletteer","readxl", "eeptools", "here", "gridExtra", "EMC2", "tidybayes", "styler")
 
 lapply(pkg, library, character.only = TRUE)
 ```
@@ -116,13 +116,13 @@ colScale_drift <- scale_fill_manual(name = "Accuracy", values = myColors_drift)
 
 # Introduction
 
-The ability to quickly and accurately recognise a familiar face is an important aspect of everyday life, as it guides social behaviour. The way that one might interact with a family member or friend is different to a stranger. Moreover, for familiar individuals, we not only know what they look like, but we also have access to person knowledge, such as their traits, attitudes, name and professional status. The same is true for famous individuals, such as movie stars, professional athletes and politicians. To date, most prior face recognition research has used manifest (observed) measures (i.e., response times and accuracy) to assess one's ability to recognise faces. As such, less is known about the latent computational processes that support face recognition [@phillipsStateModellingFace2025]. In the current project, we investigated how different types of familiarity, including visual feature familiarity and stored person knowledge, affected the latent processes that can be estimated by evidence accumulation models (EAMs; @ratcliffModelingResponseTimes1998). This computational approach has provided new insights on the dynamics of the decision process supporting face recognition.
+The ability to quickly and accurately recognise a familiar face is an important aspect of everyday life, as it guides social behaviour. The way that one might interact with a family member or friend is different to a stranger. Moreover, for familiar individuals, we not only know what they look like, but we also have access to person knowledge, such as their traits, attitudes, name and professional status. To date, most prior face recognition research has used manifest (observed) measures (i.e., response times and accuracy) to assess one's ability to recognise faces. As such, less is known about the latent computational processes that support face recognition [@phillipsStateModellingFace2025]. In the current project, we investigated how different types of familiarity, including visual feature familiarity and stored person knowledge, affected the latent processes that can be estimated by evidence accumulation models (EAMs; @ratcliffModelingResponseTimes1998). This computational approach has provided new insights on the dynamics of the decision process supporting face recognition.
 
-Face recognition processes have been intensely investigated over the last 50 years [@johnstonFamiliarUnfamiliarFace2009; @natuNeuralProcessingFamiliar2011]. One influential cognitive model of face recognition proposed a division between structural encoding of facial features, and more elaborate processes associated with identity recognition and person information [@bruceUnderstandingFaceRecognition1986]. Subsequent neuroscience research in humans and monkeys has enriched this model by relating different cognitive processes to different brain circuits [@landiFastLinkFace2021 @gobbiniNeuralResponseVisual2006; @gobbiniNeuralSystemsRecognition2007; @haxbyDistributedHumanNeural2000; @duchaineRevisedNeuralFramework2015]. The resulting model is a distributed neural network that incorporates two distinct systems: a core system and an extended system. The core system is dedicated to structural coding of facial features and spans fusiform gryi, as well as occipital and posterior temporal cortices. In contrast, the extended system is involved in more elaborate processes, such as those related to person knowledge, and is mediated by a broader network of brains areas spanning anterior temporal and frontal cortices [@duchaineRevisedNeuralFramework2015; @gobbiniNeuralSystemsRecognition2007; @haxbyDistributedHumanNeural2000; @ishaiLetsFaceIt2008; @kanwisher111FunctionalArchitecture2011]. By mediating the retrieval of identity-specific information from memory, the extended system is able to support the recognition of faces for which prior person knowledge information has been stored [@idagobbiniSocialEmotionalAttachment2004; @leibenluftMothersNeuralActivation2004].
+The structure of mental processes that support face recognition has been a topic of investigation over the last 50 years [@johnstonFamiliarUnfamiliarFace2009; @natuNeuralProcessingFamiliar2011]. One influential cognitive model of face recognition proposed a division between structural encoding of facial features, and more elaborate processes associated with identity recognition and person information [@bruceUnderstandingFaceRecognition1986]. Subsequent neuroscience research in humans and monkeys has enriched this model by relating different cognitive processes to different brain circuits [@landiFastLinkFace2021 @gobbiniNeuralResponseVisual2006; @gobbiniNeuralSystemsRecognition2007; @haxbyDistributedHumanNeural2000; @duchaineRevisedNeuralFramework2015]. The resulting model is a distributed neural network that incorporates two distinct systems: a core system and an extended system. The core system is dedicated to structural coding of facial features and spans fusiform gryi, as well as occipital and posterior temporal cortices. In contrast, the extended system is involved in more elaborate processes, such as those related to person knowledge, and is mediated by a broader network of brains areas spanning anterior temporal and frontal cortices [@duchaineRevisedNeuralFramework2015; @gobbiniNeuralSystemsRecognition2007; @haxbyDistributedHumanNeural2000; @ishaiLetsFaceIt2008; @kanwisher111FunctionalArchitecture2011]. By mediating the retrieval of identity-specific information from memory, the extended system is able to support the recognition of faces for which prior person knowledge information has been stored [@idagobbiniSocialEmotionalAttachment2004; @leibenluftMothersNeuralActivation2004].
 
 Given the importance of knowing who it is you are interacting with, the study of familiarity has been a key aspect of the face perception research [@youngAreWeFace2018]. Largely using manifest measures, such as reaction time and accuracy, research consistently shows that familiar faces, especially those imbued with person knowledge, facilitate a range of face recognition processes compared to previously unseen individuals or visually familiar faces [@ramonFamiliarityMattersReview2018; @youngAreWeFace2018]. It has been argued that person knowledge involves a qualitatively different and deeper level of processing than visual familiarity [@schwartzIndependentContributionPerceptual2019], which facilitates the accurate discrimination of familiar from unfamiliar faces [@akanHaventSeenYou2023; @schwartzRolesPerceptualConceptual2016; @akanHaventSeenYou2023; @birdEffectsPreexperimentalKnowledge2011; @klatzkyRecognizingFamiliarUnfamiliar1984; @schwaningerRoleFeaturalConfigural2002].
 
-Although manifest (observed) measures of performance have formed the bedrock of research findings on face perception, there have been many calls in recent years to embrace more computational approaches in social and cognitive neuroscience research [@charpentierApplicationComputationalModels2018; @forstmannIntroductionModelBasedCognitive2024a; @hackelComputationalNeuroscienceApproaches2018; @lockwoodComputationalModellingSocial2021; @parker2024; @phillipsStateModellingFace2025] (Cheong et al., 2017). The first benefit of adopting computational approaches is that relationships between parts of a system can be more explicitly specified [@yarkoniGeneralizabilityCrisis2022] (Hintzman, 1991), which aids the development of theory [@muthukrishnaProblemTheory2019; @oberauerAddressingTheoryCrisis2019; @proulxStatisticalRitualTheory2021]. On the other hand, latent (unobserved) parameters can be estimated, which can give rise to different interpretations of the cognitive processes involved in task performance [@ratcliffEffectsAgingReaction2001]. Moreover, there is currently almost no understanding of the computational processes that support face recognition processes when familiarity is based on visual exposure compared to stored person knowledge [@phillipsStateModellingFace2025].
+Although manifest (observed) measures of performance have formed the bedrock of research findings on face perception, there have been many calls in recent years to embrace more computational approaches in social and cognitive neuroscience research [@charpentierApplicationComputationalModels2018; @forstmannIntroductionModelBasedCognitive2024a; @hackelComputationalNeuroscienceApproaches2018; @lockwoodComputationalModellingSocial2021; @parker2024; @phillipsStateModellingFace2025] (Cheong et al., 2017). One benefit of adopting computational approaches is that relationships between parts of a system can be more explicitly specified [@yarkoniGeneralizabilityCrisis2022] (Hintzman, 1991), which aids the development of theory [@muthukrishnaProblemTheory2019; @oberauerAddressingTheoryCrisis2019; @proulxStatisticalRitualTheory2021]. A second benefit is that latent (unobserved) parameters can be estimated, which can give rise to different interpretations of the cognitive processes involved in task performance [@ratcliffEffectsAgingReaction2001]. And at present, there is almost no understanding of the computational processes that support face recognition processes when familiarity is based on visual exposure compared to stored person knowledge [@phillipsStateModellingFace2025].
 
 Evidence accumulation models (EAM) are one approach to investigate the computational processes that are involved in speeded decision tasks (for a review, see @ratcliffDiffusionDecisionModel2016). While a variety of different evidence accumulation models exists, they all share a similar set of assumptions: that evidence for each response option accumulates at different rates until one response option crosses a threshold and a response is triggered (see @fig-LBA for an example of the linear ballistic accumulator (LBA) model; @brownSimplestCompleteModel2008). These models work by translating the distribution of response times for correct and incorrect responses into estimates of latent variables assumed to underlie the decision-making process [@tbl-lba; @brownSimplestCompleteModel2008; @donkinDrawingConclusionsChoice2011]. These latent variables can then be mapped onto psychological constructs [@myersPracticalIntroductionUsing2022]. For example, drift rate is the rate at which evidence in favor of a decision accumulates over time, reflecting the signal-to-noise ratio provided by the stimulus. Threshold represents the amount of accumulated evidence needed to trigger the decision, reflecting the response caution towards a specific response. The starting point is the amount of evidence towards a response before the accumulation of evidence begins, reflecting the *a priori* bias towards a response. Finally, the non-decision time is an estimation of the time taken to complete processes that are not involved in the decision time, such as stimulus encoding and motor responses.
 
@@ -168,7 +168,7 @@ lba_params |>
   tt()
 ```
 
-In the present study, we used evidence accumulation modelling to ask new and different questions regarding the computational processes that support the recognition of familiar versus unfamiliar individuals. More specifically, we address how different types of familiarity (visual feature familiarity versus visual feature familiarity plus person knowledge) impact response caution and signal-to-noise ratio. Based on prior work in experimental psychology [@parker2024; @ratcliffDiffusionDecisionModel2016], we chose to primarily focus on drift rate and response caution as our primary parameters of interest because we could easily and intuitively see how performance advantages could emerge based on familiarity. For instance, based on conventional use of EAMs [@myersPracticalIntroductionUsing2022], increases in signal-to-noise ratio and/or reductions in response caution could be interpreted as the task setting becoming easier.
+In the present study, we used evidence accumulation modelling to ask new questions regarding the computational processes that support the recognition of familiar versus unfamiliar individuals. More specifically, we address how different types of familiarity (visual feature familiarity versus visual feature familiarity plus person knowledge) impact the threshold (response caution) and drift rate (signal-to-noise ratio) parameters. Based on prior work in experimental psychology [@parker2024; @ratcliffDiffusionDecisionModel2016], we chose to primarily focus on threshold and drift rate as our primary parameters of interest because we could easily and intuitively see how performance advantages could emerge based on familiarity. For instance, based on conventional use of EAMs [@myersPracticalIntroductionUsing2022], increases in signal-to-noise ratio and/or reductions in response caution could be interpreted as the task setting becoming easier.
 
 We, therefore, hypothesised that either drift rate and/or threshold would be affected by the face familiarity manipulation. However, given the general lack of prior evidence accumulation modelling in face recognition research, we were unsure *a priori* of the direction of the effects. For instance, we considered it plausible that novel compared to familiar stimuli could provide a benefit in some instances, by virtue of a pop-out or novelty detector [@glanzerMirrorEffectRecognition1985; @kormi-nouriNoveltyEffectSupport2005; @schomakerNoveltyEnhancesVisual2012; @tulvingNoveltyAssessmentBrain1995]. Likewise, we also considered it plausible that familiar compared to novel stimuli could providing a benefit based on the many advantages reported for recognising personally familiar or famous individuals [@ramonFamiliarityMattersReview2018; @youngAreWeFace2018]. Nonetheless, across a series of experiments, we used manipulations of familiarity that either only targeted the operation of core system only or the core and extended system of face perception (@tbl-exp), so that we could further understand the computational processes that underpin different types of familiar face recognition.
 
@@ -200,7 +200,7 @@ We report how we determined our sample size, all data exclusions (if any), all m
 
 ## Pre-registration and open science
 
-For every experiment, the research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered. The preregistration, raw data, stimuli, data wrangling and analysis code as well as the evidence-accumulation models outputs are available on the Open Science Framework: Experiment 1 (<https://osf.io/azyvu/overview>), Experiment 2 (<https://osf.io/tu2eh/overview>), Experiment 3 (<https://osf.io/ut78f/overview>) and Experiment 4 (<https://osf.io/vj2aq/overview>).
+For each experiment, the research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered. The preregistration, raw data, stimuli, data wrangling and analysis code as well as the evidence-accumulation models outputs are available on the Open Science Framework: Experiment 1 (<https://osf.io/azyvu/overview>), Experiment 2 (<https://osf.io/tu2eh/overview>), Experiment 3 (<https://osf.io/ut78f/overview>) and Experiment 4 (<https://osf.io/vj2aq/overview>).
 
 ## Experiment 1
 
@@ -630,22 +630,22 @@ array_theta_pid_1 <- array_theta_1 %>%
 
 #Average across participants
 theta_group_1 <- array_theta_pid_1 %>%
-  group_by(datapoint,param) %>% 
-  summarise(value = mean(value, na.rm = T)) %>% 
-  ungroup() %>% 
+  group_by(datapoint,param) %>%
+  summarise(value = mean(value, na.rm = T)) %>%
+  ungroup() %>%
   add_column(pid = "average") %>% ## add a column which makes clear it is the avg. not needed but useful for plotting later
   relocate(pid, .before = everything())
 
 
 #Quantile at the group level
 theta_group_1_q <- theta_group_1 %>%
-  group_by(param) %>% 
+  group_by(param) %>%
   median_qi(value)
 
 
 #And per pid
 theta_pid_1_q <- array_theta_pid_1 %>%
-  group_by(pid, param) %>% 
+  group_by(pid, param) %>%
   median_qi(value)
 
 ```
@@ -653,8 +653,8 @@ theta_pid_1_q <- array_theta_pid_1 %>%
 ```{r}
 #| label: thresh-pid
 #| include: false
-thresh_pid_1 <- array_theta_pid_1 %>% 
-  filter(str_detect(param, "B_")) %>% 
+thresh_pid_1 <- array_theta_pid_1 %>%
+  filter(str_detect(param, "B_")) %>%
   mutate(response = if_else(str_detect(param, "lRLearned"), "Learned", "Novel"),
          response = factor(response,
                             levels = c("Novel", "Learned")))
@@ -663,8 +663,8 @@ thresh_pid_1 <- array_theta_pid_1 %>%
 ```{r}
 #| label: thresh-group
 #| include: false
-thresh_group_1 <- theta_group_1 %>% 
-  filter(str_detect(param, "B_")) %>% 
+thresh_group_1 <- theta_group_1 %>%
+  filter(str_detect(param, "B_")) %>%
   mutate(response = if_else(str_detect(param, "lRLearned"), "Learned", "Novel"),
          response = factor(response,
                             levels = c("Novel", "Learned")))
@@ -676,12 +676,12 @@ thresh_group_1 <- theta_group_1 %>%
 thresh_diff_pid_1 <- thresh_pid_1 %>%
   pivot_wider(id_cols = -param,
               names_from = "response",
-              values_from = "value") %>% 
+              values_from = "value") %>%
   mutate(diff = Novel - Learned)
 
 #Quantiles
 thresh_diff_pid_1_q <- thresh_diff_pid_1 %>%
-  group_by(pid) %>% 
+  group_by(pid) %>%
   median_qi(diff)
 
 ```
@@ -692,7 +692,7 @@ thresh_diff_pid_1_q <- thresh_diff_pid_1 %>%
 thresh_diff_1 <- thresh_group_1 %>%
   pivot_wider(id_cols = -param,
               names_from = "response",
-              values_from = "value") %>% 
+              values_from = "value") %>%
   mutate(diff = Novel - Learned)
 
 #Quantiles
@@ -705,8 +705,8 @@ thresh_diff_1_q <- thresh_diff_1 %>%
 ```{r}
 #| label: drift-pid
 #| include: false
-drift_rate_pid_1 <- array_theta_pid_1 %>% 
-  filter(str_detect(param, "v_S")) %>% 
+drift_rate_pid_1 <- array_theta_pid_1 %>%
+  filter(str_detect(param, "v_S")) %>%
   mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Learned"),
          accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
          condition = factor(condition,
@@ -724,7 +724,7 @@ drift_acc_diff_pid_1 <- drift_rate_pid_1 %>%
 
 ## Novel > Learned differences
 drift_acc_cond_diff_pid_1 <- drift_acc_diff_pid_1 %>%
-  pivot_wider(id_cols = -c("True", "False"), 
+  pivot_wider(id_cols = -c("True", "False"),
               names_from = condition,
               values_from = diff) %>%
   mutate(diff = Novel - Learned)
@@ -734,8 +734,8 @@ drift_acc_cond_diff_pid_1 <- drift_acc_diff_pid_1 %>%
 ```{r}
 #| label: drift-group
 #| include: false
-drift_rate_group_1 <- theta_group_1 %>% 
-  filter(str_detect(param, "v_S")) %>% 
+drift_rate_group_1 <- theta_group_1 %>%
+  filter(str_detect(param, "v_S")) %>%
   mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Learned"),
          accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
          condition = factor(condition,
@@ -753,7 +753,7 @@ drift_acc_diff_1 <- drift_rate_group_1 %>%
 
 ## Novel > Learned differences
 drift_acc_cond_diff_1 <- drift_acc_diff_1 %>%
-  pivot_wider(id_cols = -c("True", "False"), 
+  pivot_wider(id_cols = -c("True", "False"),
               names_from = condition,
               values_from = diff) %>%
   mutate(diff = Novel - Learned)
@@ -761,7 +761,7 @@ drift_acc_cond_diff_1
 
 #Quantiles per condition
 drift_acc_diff_1_q <- drift_acc_diff_1 %>%
-  group_by(condition) %>% 
+  group_by(condition) %>%
   median_qi(diff)
 
 
@@ -776,7 +776,7 @@ drift_acc_cond_diff_1_q <- drift_acc_cond_diff_1 %>%
 ```{r}
 #| label: fig-thresh_exp1
 #| fig-cap: "Threshold estimates for Experiment 1: (a) Posterior distribution of the average threshold parameter by response option (Novel / Learned). (b) Difference between the posterior distribution of the average threshold parameter for the Novel response option and the Learned response option. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
-#| fig-subcap: 
+#| fig-subcap:
 #|  - "Threshold by response"
 #|  - "Threshold difference (Novel > Learned)"
 #| layout-ncol: 2
@@ -790,11 +790,11 @@ ggplot(thresh_group_1, aes(x = value, y = fct_rev(response))) +
   labs(fill = "Response") +
   theme(legend.position = "none")
 
-ggplot(thresh_diff_1, aes(x = diff, y = "")) +  
+ggplot(thresh_diff_1, aes(x = diff, y = "")) +
   stat_halfeye(alpha = 0.9, fill="firebrick") +
   geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(x = "Threshold", y="Density") 
- 
+  labs(x = "Threshold", y="Density")
+
 ```
 
 *Drift rate:* To quantify the contribution of face familiarity on the drift rate, we computed the difference between the TRUE and FALSE drift rate for each familiarity condition as our main dependent measure. To estimate the familiarity effect, we then subtracted the drift rate difference on learned trials from novel trials. Inspection of the posterior distribution shows that there is a novelty effect in drift rate difference in Experiment 1 (`r round(drift_acc_cond_diff_1_q$diff, digits = 3)` \[`r round(drift_acc_cond_diff_1_q$.lower, digits = 3)`, `r round(drift_acc_cond_diff_1_q$.upper, digits = 3)`\]). The quality of the evidence accumulation was greater for "Novel" faces (`r round(drift_acc_diff_1_q$diff[drift_acc_diff_1_q$condition == "Novel"], digits = 3)` \[`r round(drift_acc_diff_1_q$.lower[drift_acc_diff_1_q$condition == "Novel"], digits = 3)`, `r round(drift_acc_diff_1_q$.upper[drift_acc_diff_1_q$condition == "Novel"], digits = 3)`\]) compared to "Learned" faces (`r round(drift_acc_diff_1_q$diff[drift_acc_diff_1_q$condition == "Learned"], digits = 3)` \[`r round(drift_acc_diff_1_q$.lower[drift_acc_diff_1_q$condition == "Learned"], digits = 3)`, `r round(drift_acc_diff_1_q$.upper[drift_acc_diff_1_q$condition == "Learned"], digits = 3)`\]; see @fig-drift_exp1).
@@ -802,7 +802,7 @@ ggplot(thresh_diff_1, aes(x = diff, y = "")) +
 ```{r}
 #| label: fig-drift_exp1
 #| fig-cap: "Drift rate estimates for Experiment 1. (a) Posterior distribution of the average drift rate difference (TRUE - FALSE) by stimulus familiarity condition (Novel / Learned). (b) Difference between the posterior distribution of the average drift rate parameter (TRUE - FALSE) of the Novel condition and the Learned condition. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
-#| fig-subcap: 
+#| fig-subcap:
 #|  - "Drift rate (TRUE - FALSE) by familiarity condition"
 #|  - "Drift rate difference (Novel > Learned)"
 #| layout-ncol: 2
@@ -814,7 +814,7 @@ ggplot(drift_acc_diff_1, aes(x = diff, y = fct_rev(condition))) +
   scale_colour_paletteer_d("rcartocolor::Safe")  +
   geom_vline(xintercept = 0, color = "darkgrey") +
   theme(legend.position = "none") +
-  labs(x="Drift rate", y="Familiarity") 
+  labs(x="Drift rate", y="Familiarity")
 
 ggplot(drift_acc_cond_diff_1, aes(x = diff, y = "")) +
   stat_halfeye(fill = "firebrick", alpha = 0.9) +
@@ -842,22 +842,22 @@ array_theta_pid_2 <- array_theta_2 %>%
 
 #Average across participants
 theta_group_2 <- array_theta_pid_2 %>%
-  group_by(datapoint,param) %>% 
-  summarise(value = mean(value, na.rm = T)) %>% 
-  ungroup() %>% 
+  group_by(datapoint,param) %>%
+  summarise(value = mean(value, na.rm = T)) %>%
+  ungroup() %>%
   add_column(pid = "average") %>% ## add a column which makes clear it is the avg. not needed but useful for plotting later
   relocate(pid, .before = everything())
 
 
 #Quantile at the group level
 theta_group_2_q <- theta_group_2 %>%
-  group_by(param) %>% 
+  group_by(param) %>%
   median_qi(value)
 
 
 #And per pid
 theta_pid_2_q <- array_theta_pid_2 %>%
-  group_by(pid, param) %>% 
+  group_by(pid, param) %>%
   median_qi(value)
 
 ```
@@ -865,8 +865,8 @@ theta_pid_2_q <- array_theta_pid_2 %>%
 ```{r}
 #| label: thresh-pid-exp2
 #| include: false
-thresh_pid_2 <- array_theta_pid_2 %>% 
-  filter(str_detect(param, "B_")) %>% 
+thresh_pid_2 <- array_theta_pid_2 %>%
+  filter(str_detect(param, "B_")) %>%
   mutate(response = if_else(str_detect(param, "lRLearned"), "Learned", "Novel"),
          response = factor(response,
                             levels = c("Novel", "Learned")))
@@ -875,8 +875,8 @@ thresh_pid_2 <- array_theta_pid_2 %>%
 ```{r}
 #| label: thresh-group-exp2
 #| include: false
-thresh_group_2 <- theta_group_2 %>% 
-  filter(str_detect(param, "B_")) %>% 
+thresh_group_2 <- theta_group_2 %>%
+  filter(str_detect(param, "B_")) %>%
   mutate(response = if_else(str_detect(param, "lRLearned"), "Learned", "Novel"),
          response = factor(response,
                             levels = c("Novel", "Learned")))
@@ -888,12 +888,12 @@ thresh_group_2 <- theta_group_2 %>%
 thresh_diff_pid_2 <- thresh_pid_2 %>%
   pivot_wider(id_cols = -param,
               names_from = "response",
-              values_from = "value") %>% 
+              values_from = "value") %>%
   mutate(diff = Novel - Learned)
 
 #Quantiles
 thresh_diff_pid_2_q <- thresh_diff_pid_2 %>%
-  group_by(pid) %>% 
+  group_by(pid) %>%
   median_qi(diff)
 
 ```
@@ -904,7 +904,7 @@ thresh_diff_pid_2_q <- thresh_diff_pid_2 %>%
 thresh_diff_2 <- thresh_group_2 %>%
   pivot_wider(id_cols = -param,
               names_from = "response",
-              values_from = "value") %>% 
+              values_from = "value") %>%
   mutate(diff = Novel - Learned)
 
 #Quantiles
@@ -917,8 +917,8 @@ thresh_diff_2_q <- thresh_diff_2 %>%
 ```{r}
 #| label: drift-pid-exp2
 #| include: false
-drift_rate_pid_2 <- array_theta_pid_2 %>% 
-  filter(str_detect(param, "v_S")) %>% 
+drift_rate_pid_2 <- array_theta_pid_2 %>%
+  filter(str_detect(param, "v_S")) %>%
   mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Learned"),
          accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
          condition = factor(condition,
@@ -936,7 +936,7 @@ drift_acc_diff_pid_2 <- drift_rate_pid_2 %>%
 
 ## Novel > Learned differences
 drift_acc_cond_diff_pid_2 <- drift_acc_diff_pid_2 %>%
-  pivot_wider(id_cols = -c("True", "False"), 
+  pivot_wider(id_cols = -c("True", "False"),
               names_from = condition,
               values_from = diff) %>%
   mutate(diff = Novel - Learned)
@@ -946,8 +946,8 @@ drift_acc_cond_diff_pid_2 <- drift_acc_diff_pid_2 %>%
 ```{r}
 #| label: drift-group-exp2
 #| include: false
-drift_rate_group_2 <- theta_group_2 %>% 
-  filter(str_detect(param, "v_S")) %>% 
+drift_rate_group_2 <- theta_group_2 %>%
+  filter(str_detect(param, "v_S")) %>%
   mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Learned"),
          accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
          condition = factor(condition,
@@ -965,7 +965,7 @@ drift_acc_diff_2 <- drift_rate_group_2 %>%
 
 ## Novel > Learned differences
 drift_acc_cond_diff_2 <- drift_acc_diff_2 %>%
-  pivot_wider(id_cols = -c("True", "False"), 
+  pivot_wider(id_cols = -c("True", "False"),
               names_from = condition,
               values_from = diff) %>%
   mutate(diff = Novel - Learned)
@@ -973,7 +973,7 @@ drift_acc_cond_diff_2 <- drift_acc_diff_2 %>%
 
 #Quantiles per condition
 drift_acc_diff_2_q <- drift_acc_diff_2 %>%
-  group_by(condition) %>% 
+  group_by(condition) %>%
   median_qi(diff)
 
 
@@ -988,7 +988,7 @@ drift_acc_cond_diff_2_q <- drift_acc_cond_diff_2 %>%
 ```{r}
 #| label: fig-thresh_exp2
 #| fig-cap: "Threshold estimates for Experiment 2: (a) Posterior distribution of the average threshold parameter by response option (Novel / Learned). (b) Difference between the posterior distribution of the average threshold parameter for the Novel response option and the Learned response option. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
-#| fig-subcap: 
+#| fig-subcap:
 #|  - "Group level: Threshold by response"
 #|  - "Group level: Threshold difference (Novel > Learned)"
 #| layout-ncol: 2
@@ -1002,11 +1002,11 @@ ggplot(thresh_group_2, aes(x = value, y = fct_rev(response))) +
   labs(fill = "Response") +
   theme(legend.position = "none")
 
-ggplot(thresh_diff_2, aes(x = diff, y = "")) +  
+ggplot(thresh_diff_2, aes(x = diff, y = "")) +
   stat_halfeye(alpha = 0.9, fill="firebrick") +
   geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(x = "Threshold", y="Density") 
- 
+  labs(x = "Threshold", y="Density")
+
 ```
 
 *Drift rate:* Inspection of the posterior distribution shows that there is a similar familiarity effect in drift rate difference as in Experiment 1 (`r round(drift_acc_cond_diff_2_q$diff, digits = 3)` \[`r round(drift_acc_cond_diff_2_q$.lower, digits = 3)`, `r round(drift_acc_cond_diff_2_q$.upper, digits = 3)`\]). The quality of the evidence accumulation was greater for "Novel" faces (`r round(drift_acc_diff_2_q$diff[drift_acc_diff_2_q$condition == "Novel"], digits = 3)` \[`r round(drift_acc_diff_2_q$.lower[drift_acc_diff_2_q$condition == "Novel"], digits = 3)`, `r round(drift_acc_diff_2_q$.upper[drift_acc_diff_2_q$condition == "Novel"], digits = 3)`\]) compared to "Learned" faces (`r round(drift_acc_diff_2_q$diff[drift_acc_diff_2_q$condition == "Learned"], digits = 3)` \[`r round(drift_acc_diff_2_q$.lower[drift_acc_diff_2_q$condition == "Learned"], digits = 3)`, `r round(drift_acc_diff_2_q$.upper[drift_acc_diff_2_q$condition == "Learned"], digits = 3)`\]; see @fig-drift_exp2).
@@ -1014,7 +1014,7 @@ ggplot(thresh_diff_2, aes(x = diff, y = "")) +
 ```{r}
 #| label: fig-drift_exp2
 #| fig-cap: "Drift rate estimates for Experiment 2. (a) Posterior distribution of the average drift rate difference (TRUE - FALSE) by stimulus familiarity condition (Novel / Learned). (b) Difference between the posterior distribution of the average drift rate parameter (TRUE - FALSE) of the Novel condition and the Learned condition. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
-#| fig-subcap: 
+#| fig-subcap:
 #|  - "Group level: Drift rate (TRUE - FALSE) by familiarity condition"
 #|  - "Group level: Drift rate difference (Novel > Learned)"
 #| layout-ncol: 2
@@ -1026,7 +1026,7 @@ ggplot(drift_acc_diff_2, aes(x = diff, y = fct_rev(condition))) +
   scale_colour_paletteer_d("rcartocolor::Safe")  +
   geom_vline(xintercept = 0, color = "darkgrey") +
   theme(legend.position = "none") +
-  labs(x="Drift rate", y="Familiarity") 
+  labs(x="Drift rate", y="Familiarity")
 
 ggplot(drift_acc_cond_diff_2, aes(x = diff, y = "")) +
   stat_halfeye(fill = "firebrick", alpha = 0.9) +
@@ -1054,22 +1054,22 @@ array_theta_pid_3 <- array_theta_3 %>%
 
 #Average across participants
 theta_group_3 <- array_theta_pid_3 %>%
-  group_by(datapoint,param) %>% 
-  summarise(value = mean(value, na.rm = T)) %>% 
-  ungroup() %>% 
+  group_by(datapoint,param) %>%
+  summarise(value = mean(value, na.rm = T)) %>%
+  ungroup() %>%
   add_column(pid = "average") %>% ## add a column which makes clear it is the avg. not needed but useful for plotting later
   relocate(pid, .before = everything())
 
 
 #Quantile at the group level
 theta_group_3_q <- theta_group_3 %>%
-  group_by(param) %>% 
+  group_by(param) %>%
   median_qi(value)
 
 
 #And per pid
 theta_pid_3_q <- array_theta_pid_3 %>%
-  group_by(pid, param) %>% 
+  group_by(pid, param) %>%
   median_qi(value)
 
 ```
@@ -1077,8 +1077,8 @@ theta_pid_3_q <- array_theta_pid_3 %>%
 ```{r}
 #| label: thresh-pid-exp3
 #| include: false
-thresh_pid_3 <- array_theta_pid_3 %>% 
-  filter(str_detect(param, "B_")) %>% 
+thresh_pid_3 <- array_theta_pid_3 %>%
+  filter(str_detect(param, "B_")) %>%
   mutate(response = if_else(str_detect(param, "lRFamous"), "Famous", "Novel"),
          response = factor(response,
                             levels = c("Novel", "Famous")))
@@ -1087,8 +1087,8 @@ thresh_pid_3 <- array_theta_pid_3 %>%
 ```{r}
 #| label: thresh-group-exp3
 #| include: false
-thresh_group_3 <- theta_group_3 %>% 
-  filter(str_detect(param, "B_")) %>% 
+thresh_group_3 <- theta_group_3 %>%
+  filter(str_detect(param, "B_")) %>%
   mutate(response = if_else(str_detect(param, "lRFamous"), "Famous", "Novel"),
          response = factor(response,
                             levels = c("Novel", "Famous")))
@@ -1100,12 +1100,12 @@ thresh_group_3 <- theta_group_3 %>%
 thresh_diff_pid_3 <- thresh_pid_3 %>%
   pivot_wider(id_cols = -param,
               names_from = "response",
-              values_from = "value") %>% 
+              values_from = "value") %>%
   mutate(diff = Famous - Novel)
 
 #Quantiles
 thresh_diff_pid_3_q <- thresh_diff_pid_3 %>%
-  group_by(pid) %>% 
+  group_by(pid) %>%
   median_qi(diff)
 
 ```
@@ -1116,7 +1116,7 @@ thresh_diff_pid_3_q <- thresh_diff_pid_3 %>%
 thresh_diff_3 <- thresh_group_3 %>%
   pivot_wider(id_cols = -param,
               names_from = "response",
-              values_from = "value") %>% 
+              values_from = "value") %>%
   mutate(diff = Famous - Novel)
 
 #Quantiles
@@ -1129,8 +1129,8 @@ thresh_diff_3_q <- thresh_diff_3 %>%
 ```{r}
 #| label: drift-pid-exp3
 #| include: false
-drift_rate_pid_3 <- array_theta_pid_3 %>% 
-  filter(str_detect(param, "v_S")) %>% 
+drift_rate_pid_3 <- array_theta_pid_3 %>%
+  filter(str_detect(param, "v_S")) %>%
   mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Famous"),
          accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
          condition = factor(condition,
@@ -1148,7 +1148,7 @@ drift_acc_diff_pid_3 <- drift_rate_pid_3 %>%
 
 ## Novel > Learned differences
 drift_acc_cond_diff_pid_3 <- drift_acc_diff_pid_3 %>%
-  pivot_wider(id_cols = -c("True", "False"), 
+  pivot_wider(id_cols = -c("True", "False"),
               names_from = condition,
               values_from = diff) %>%
   mutate(diff = Famous - Novel)
@@ -1158,8 +1158,8 @@ drift_acc_cond_diff_pid_3 <- drift_acc_diff_pid_3 %>%
 ```{r}
 #| label: drift-group-exp3
 #| include: false
-drift_rate_group_3 <- theta_group_3 %>% 
-  filter(str_detect(param, "v_S")) %>% 
+drift_rate_group_3 <- theta_group_3 %>%
+  filter(str_detect(param, "v_S")) %>%
   mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Famous"),
          accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
          condition = factor(condition,
@@ -1177,7 +1177,7 @@ drift_acc_diff_3 <- drift_rate_group_3 %>%
 
 ## Novel > Learned differences
 drift_acc_cond_diff_3 <- drift_acc_diff_3 %>%
-  pivot_wider(id_cols = -c("True", "False"), 
+  pivot_wider(id_cols = -c("True", "False"),
               names_from = condition,
               values_from = diff) %>%
   mutate(diff = Famous - Novel)
@@ -1185,7 +1185,7 @@ drift_acc_cond_diff_3 <- drift_acc_diff_3 %>%
 
 #Quantiles per condition
 drift_acc_diff_3_q <- drift_acc_diff_3 %>%
-  group_by(condition) %>% 
+  group_by(condition) %>%
   median_qi(diff)
 
 
@@ -1199,7 +1199,7 @@ drift_acc_cond_diff_3_q <- drift_acc_cond_diff_3 %>%
 ```{r}
 #| label: fig-thresh_exp3
 #| fig-cap: "Threshold estimates for Experiment 3: (a) Posterior distribution of the average threshold parameter by response option (Novel / Learned). (b) Difference between the posterior distribution of the average threshold parameter for the Novel response option and the Learned response option. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
-#| fig-subcap: 
+#| fig-subcap:
 #|  - "Group level: Threshold by response"
 #|  - "Group level: Threshold difference (Famous > Novel)"
 #| layout-ncol: 2
@@ -1212,11 +1212,11 @@ ggplot(thresh_group_3, aes(x = value, y = fct_rev(response))) +
   labs(fill = "Response") +
   theme(legend.position = "none")
 
-ggplot(thresh_diff_3, aes(x = diff, y = "")) +  
+ggplot(thresh_diff_3, aes(x = diff, y = "")) +
   stat_halfeye(alpha = 0.9, fill="firebrick") +
   geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(x = "Threshold", y="Density") 
- 
+  labs(x = "Threshold", y="Density")
+
 ```
 
 *Drift rate:* Inspection of the posterior distribution shows that there is a familiarity effect in drift rate difference (`r round(drift_acc_cond_diff_3_q$diff, digits = 3)` \[`r round(drift_acc_cond_diff_3_q$.lower, digits = 3)`, `r round(drift_acc_cond_diff_3_q$.upper, digits = 3)`\]). The quality of the evidence accumulation was greater for "Famous" faces (`r round(drift_acc_diff_3_q$diff[drift_acc_diff_3_q$condition == "Famous"], digits = 3)` \[`r round(drift_acc_diff_3_q$.lower[drift_acc_diff_3_q$condition == "Famous"], digits = 3)`, `r round(drift_acc_diff_3_q$.upper[drift_acc_diff_3_q$condition == "Famous"], digits = 3)`\]) compared to "Novel" faces (`r round(drift_acc_diff_3_q$diff[drift_acc_diff_3_q$condition == "Novel"], digits = 3)` \[`r round(drift_acc_diff_3_q$.lower[drift_acc_diff_3_q$condition == "Novel"], digits = 3)`, `r round(drift_acc_diff_3_q$.upper[drift_acc_diff_3_q$condition == "Novel"], digits = 3)`\]; see @fig-drift_exp3).
@@ -1224,7 +1224,7 @@ ggplot(thresh_diff_3, aes(x = diff, y = "")) +
 ```{r}
 #| label: fig-drift_exp3
 #| fig-cap: "Drift rate estimates for Experiment 3. (a) Posterior distribution of the average drift rate difference (TRUE - FALSE) by stimulus familiarity condition (Novel / Famous). (b) Difference between the posterior distribution of the average drift rate parameter (TRUE - FALSE) of the Famous condition and the Novel condition. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
-#| fig-subcap: 
+#| fig-subcap:
 #|  - "Group level: Drift rate (TRUE - FALSE) by familiarity condition"
 #|  - "Group level: Drift rate difference (Famous > Novel)"
 #| layout-ncol: 2
@@ -1235,7 +1235,7 @@ ggplot(drift_acc_diff_3, aes(x = diff, y = fct_rev(condition))) +
   scale_fill_manual(values = myColors_2) +
   geom_vline(xintercept = 0, color = "darkgrey") +
   theme(legend.position = "none") +
-  labs(x="Drift rate", y="Familiarity") 
+  labs(x="Drift rate", y="Familiarity")
 
 ggplot(drift_acc_cond_diff_3, aes(x = diff, y = "")) +
   stat_halfeye(fill = "firebrick", alpha = 0.9) +
@@ -1263,21 +1263,21 @@ array_theta_pid_4 <- array_theta_4 %>%
 
 #Average across participants
 theta_group_4 <- array_theta_pid_4 %>%
-  group_by(datapoint,param) %>% 
-  summarise(value = mean(value, na.rm = T)) %>% 
-  ungroup() %>% 
+  group_by(datapoint,param) %>%
+  summarise(value = mean(value, na.rm = T)) %>%
+  ungroup() %>%
   add_column(pid = "average") %>% ## add a column which makes clear it is the avg. not needed but useful for plotting later
   relocate(pid, .before = everything())
 
 
 #Quantile at the group level
 theta_group_4_q <- theta_group_4 %>%
-  group_by(param) %>% 
+  group_by(param) %>%
   median_qi(value)
 
 #And per pid
 theta_pid_4_q <- array_theta_pid_4 %>%
-  group_by(pid, param) %>% 
+  group_by(pid, param) %>%
   median_qi(value)
 
 ```
@@ -1285,8 +1285,8 @@ theta_pid_4_q <- array_theta_pid_4 %>%
 ```{r}
 #| label: thresh-pid-exp4
 #| include: false
-thresh_pid_4 <- array_theta_pid_4 %>% 
-  filter(str_detect(param, "B_")) %>% 
+thresh_pid_4 <- array_theta_pid_4 %>%
+  filter(str_detect(param, "B_")) %>%
   mutate(response = if_else(str_detect(param, "lRFamous"), "Famous", "Novel"),
          response = factor(response,
                             levels = c("Novel", "Famous")))
@@ -1295,8 +1295,8 @@ thresh_pid_4 <- array_theta_pid_4 %>%
 ```{r}
 #| label: thresh-group-exp4
 #| include: false
-thresh_group_4 <- theta_group_4 %>% 
-  filter(str_detect(param, "B_")) %>% 
+thresh_group_4 <- theta_group_4 %>%
+  filter(str_detect(param, "B_")) %>%
   mutate(response = if_else(str_detect(param, "lRFamous"), "Famous", "Novel"),
          response = factor(response,
                             levels = c("Novel", "Famous")))
@@ -1308,12 +1308,12 @@ thresh_group_4 <- theta_group_4 %>%
 thresh_diff_pid_4 <- thresh_pid_4 %>%
   pivot_wider(id_cols = -param,
               names_from = "response",
-              values_from = "value") %>% 
+              values_from = "value") %>%
   mutate(diff = Novel - Famous)
 
 #Quantiles
 thresh_diff_pid_4_q <- thresh_diff_pid_4 %>%
-  group_by(pid) %>% 
+  group_by(pid) %>%
   median_qi(diff)
 ```
 
@@ -1323,7 +1323,7 @@ thresh_diff_pid_4_q <- thresh_diff_pid_4 %>%
 thresh_diff_4 <- thresh_group_4 %>%
   pivot_wider(id_cols = -param,
               names_from = "response",
-              values_from = "value") %>% 
+              values_from = "value") %>%
   mutate(diff = Novel - Famous)
 
 #Quantiles
@@ -1335,8 +1335,8 @@ thresh_diff_4_q <- thresh_diff_4 %>%
 ```{r}
 #| label: drift-pid-exp4
 #| include: false
-drift_rate_pid_4 <- array_theta_pid_4 %>% 
-  filter(str_detect(param, "v_S")) %>% 
+drift_rate_pid_4 <- array_theta_pid_4 %>%
+  filter(str_detect(param, "v_S")) %>%
   mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Famous"),
          accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
          condition = factor(condition,
@@ -1354,7 +1354,7 @@ drift_acc_diff_pid_4 <- drift_rate_pid_4 %>%
 
 ## Novel > Learned differences
 drift_acc_cond_diff_pid_4 <- drift_acc_diff_pid_4 %>%
-  pivot_wider(id_cols = -c("True", "False"), 
+  pivot_wider(id_cols = -c("True", "False"),
               names_from = condition,
               values_from = diff) %>%
   mutate(diff = Novel - Famous)
@@ -1364,8 +1364,8 @@ drift_acc_cond_diff_pid_4 <- drift_acc_diff_pid_4 %>%
 ```{r}
 #| label: drift-group-exp4
 #| include: false
-drift_rate_group_4 <- theta_group_4 %>% 
-  filter(str_detect(param, "v_S")) %>% 
+drift_rate_group_4 <- theta_group_4 %>%
+  filter(str_detect(param, "v_S")) %>%
   mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Famous"),
          accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
          condition = factor(condition,
@@ -1383,7 +1383,7 @@ drift_acc_diff_4 <- drift_rate_group_4 %>%
 
 ## Novel > Learned differences
 drift_acc_cond_diff_4 <- drift_acc_diff_4 %>%
-  pivot_wider(id_cols = -c("True", "False"), 
+  pivot_wider(id_cols = -c("True", "False"),
               names_from = condition,
               values_from = diff) %>%
   mutate(diff = Novel - Famous)
@@ -1391,7 +1391,7 @@ drift_acc_cond_diff_4 <- drift_acc_diff_4 %>%
 
 #Quantiles per condition
 drift_acc_diff_4_q <- drift_acc_diff_4 %>%
-  group_by(condition) %>% 
+  group_by(condition) %>%
   median_qi(diff)
 
 #Quantiles difference
@@ -1404,7 +1404,7 @@ drift_acc_cond_diff_4_q <- drift_acc_cond_diff_4 %>%
 ```{r}
 #| label: fig-thresh_exp4
 #| fig-cap: "Threshold estimates for Experiment 4: (a) Posterior distribution of the average threshold parameter by response option (Novel / Learned). (b) Difference between the posterior distribution of the average threshold parameter for the Novel response option and the Learned response option. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
-#| fig-subcap: 
+#| fig-subcap:
 #|  - "Group level: Threshold by response"
 #|  - "Group level: Threshold difference (Novel > Famous)"
 #| layout-ncol: 2
@@ -1417,11 +1417,11 @@ ggplot(thresh_group_4, aes(x = value, y = fct_rev(response))) +
   labs(fill = "Response") +
   theme(legend.position = "none")
 
-ggplot(thresh_diff_4, aes(x = diff, y = "")) +  
+ggplot(thresh_diff_4, aes(x = diff, y = "")) +
   stat_halfeye(alpha = 0.9, fill="firebrick") +
   geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(x = "Threshold", y="Density") 
- 
+  labs(x = "Threshold", y="Density")
+
 ```
 
 *Drift rate:* Inspection of the posterior distribution shows that there is a familiarity effect in drift rate difference (`r round(drift_acc_cond_diff_4_q$diff, digits = 3)` \[`r round(drift_acc_cond_diff_3_q$.lower, digits = 3)`, `r round(drift_acc_cond_diff_4_q$.upper, digits = 3)`\]). The quality of the evidence accumulation was greater for "Novel" faces (`r round(drift_acc_diff_4_q$diff[drift_acc_diff_4_q$condition == "Novel"], digits = 3)` \[`r round(drift_acc_diff_4_q$.lower[drift_acc_diff_4_q$condition == "Novel"], digits = 3)`, `r round(drift_acc_diff_4_q$.upper[drift_acc_diff_4_q$condition == "Novel"], digits = 3)`\]) compared to "Famous" faces (`r round(drift_acc_diff_4_q$diff[drift_acc_diff_4_q$condition == "Famous"], digits = 3)` \[`r round(drift_acc_diff_4_q$.lower[drift_acc_diff_4_q$condition == "Famous"], digits = 3)`, `r round(drift_acc_diff_4_q$.upper[drift_acc_diff_4_q$condition == "Famous"], digits = 3)`\]; see @fig-drift_exp4).
@@ -1429,7 +1429,7 @@ ggplot(thresh_diff_4, aes(x = diff, y = "")) +
 ```{r}
 #| label: fig-drift_exp4
 #| fig-cap: "Drift rate estimates for Experiment 4. (a) Posterior distribution of the average drift rate difference (TRUE - FALSE) by stimulus familiarity condition (Novel / Famous). (b) Difference between the posterior distribution of the average drift rate parameter (TRUE - FALSE) of the Novel condition and the Famous condition. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
-#| fig-subcap: 
+#| fig-subcap:
 #|  - "Group level: Drift rate (TRUE - FALSE) by familiarity condition"
 #|  - "Group level: Drift rate difference (Novel > Famous)"
 #| layout-ncol: 2
@@ -1440,7 +1440,7 @@ ggplot(drift_acc_diff_4, aes(x = diff, y = fct_rev(condition))) +
   scale_fill_manual(values = myColors_2) +
   geom_vline(xintercept = 0, color = "darkgrey") +
   theme(legend.position = "none") +
-  labs(x="Drift rate", y="Familiarity") 
+  labs(x="Drift rate", y="Familiarity")
 
 ggplot(drift_acc_cond_diff_4, aes(x = diff, y = "")) +
   stat_halfeye(fill = "firebrick", alpha = 0.9) +
@@ -1452,19 +1452,32 @@ ggplot(drift_acc_cond_diff_4, aes(x = diff, y = "")) +
 
 # General discussion
 
-Here we tried to demonstrate that different computational processes support the recognition of different types of face. Whereas the signal-to-noise ratio provided by visual familiarity was poorer compared to novelty (Experiment 1 and 2), evidence is not clear when it comes to the combination of visual and semantic knowledge about the individual (Experiment 3 and 4). The instability of the results observed in Experiment 3 and 4 is probably emerging from differences in the low-level visual features of the selected pictures. In the case of visual familiarity alone, these results suggest that the quality of the information processing varies as a function of the nature of the information. Such inference about the computational mechanisms involved in face recognition could not have been possible based on the commonly used separate analysis of response times and accuracy. Therefore, we suggest that further work uses EAM and other cognitive modelling approaches to build a richer computational understanding of face recognition and familiarity effects, more particularly regarding highly familiar faces.
+We set out to understand not merely *that* familiarity affects face recognition, but *how* — specifically, which latent computational processes are modulated when a face is familiar versus novel. By fitting linear ballistic accumulator models to recognition data across a series of experiments, we show that familiarity primarily affects the quality of evidence accumulation, with a secondary and smaller effect on response caution. This computational signature — a novelty advantage in drift rate, accompanied by a modest novelty advantage in threshold — replicates across visual familiarity (Experiments 1 and 2) and, tentatively, visual familiarity and person knowledge (Experiment 4). These findings move beyond manifest measures of accuracy and response time to characterise the decision-level mechanisms that underpin familiar face recognition [@phillipsStateModellingFace2025].
 
-Accumulation of evidence for visually familiar faces was slower compared to novel faces in Experiment 1 and 2. This would suggest that when only surface level visual features are available for recognition, the novelty of the information prevails. In the case of short prior exposure to visual stimuli, our findings are in agreement with other studies that reported a better recognition ability for novel faces than for visually familiar faces [@bindemannPerceivedAbilityActual2014; @readChangingPhotosFaces1990]. Visually familiar faces are processed in the core network of face recognition [@bruceUnderstandingFaceRecognition1986; @gobbiniNeuralResponseVisual2006]. This core network manages and synthesizes the visual analysis of low-level visual features to the construction of a detailed perceptual representation of the face. The next step requires the activation of face memory representations, giving rise to a feeling of familiarity proportionate to the degree of overlap between the presented face and the memory trace [@rapcsakFaceRecognition2019]. In the case of short prior visual exposure, these face memory traces might not be stable enough for the recognition process. On the other hand, novel or totally unfamiliar stimuli are known to elicit strong behavioural control and attentional responses when presented in the context of expected or familiar stimuli ("pop-out effects";@johnstonAttentionCaptureNovel1990; @lev-ariEcologicalViewSelective2022; @lubowVisualSearchFunction1997). The combination of unstable memory traces for visually familiar faces and the pop-out effect of novel faces could explain the difference observed in the quality of the evidence accumulation for the "learned" and "novel" decisions.
+## The impact of visual familiarity  
 
-Given the difference observed between the drift rate results of Experiment 3 and 4, it would be difficult to provide a clear interpretation of the results. While strong evidence from existing literature support a clear advantage in recognition performance for famous faces compared to novel ones [@hancockRecognitionUnfamiliarFaces2000; @jenkins2011 ;@klatzkyRecognizingFamiliarUnfamiliar1984], we cannot exclude the fact that, in Experiment 3, the categorization between familiar faces and novel faces might have been facilitated by differences in low visual features in the two sets of pictures (e.g. slightly different orientation of the face, different overall picture quality...) leading to an enhanced quality of evidence accumulation for famous faces. By attempting to control for these visual features in Experiment 4, the quality of the evidence accumulation became greater for novel faces. These inverse patterns in the estimated parameters highlight the importance of stimuli standardization, more specifically when applied to a specific stimuli category as famous faces images and how differences in stimuli features, and not nature, can affect parameter estimation.
+The most theoretically important finding is the combination of drift rate and threshold effects. Across Experiments 1 and 2, the novelty advantage in drift rate was substantially larger than the novelty advantage in threshold. This dissociation matters because the two parameters reflect qualitatively different aspects of the decision process. Drift rate indexes the quality of evidence accumulation — how cleanly and rapidly perceptual and cogntive systems extract decision-relevant information from a face. Threshold indexes how much accumulated evidence is required before a decision is triggered. The dominance of the drift rate effect localises familiarity's influence to the quality of signal from the image more so than as a function of response bias between novel and familiar key presses.
 
-There is no evidence to consider that the visual familiarity effects reported here are specific to faces. More specifically, we suggest that the observed effects of visual familiarity on the evidence accumulation process is generalizable to the processing of other visual stimuli like objects or scenes [@simonsConstraintsGeneralityCOG2017]. Regarding the potential effects of visual and semantic familiarity on the drift rate, these effects are probably more constrained to faces. It is indeed difficult to imagine a equivalent semantic knowledge for objects or scenes than the one we have with a highly familiar person. Certain specific and personal objects might provide a similar feeling of familiarity than highly familiar faces, but the amount of these personal objects is not comparable to the number of people that we have a rich semantic knowledge about.
+Set within the Bruce and Young framework of face perception [@bruceUnderstandingFaceRecognition1986], visual familiarity modulates the quality of structural encoding and feature matching within the core face processing system [@bruceUnderstandingFaceRecognition1986; @gobbiniNeuralResponseVisual2006], thus generating a stronger perceptual signal that feeds into the decision process. Novel faces, by this account, provide a cleaner and less ambiguous perceptual signal than visually familiar faces — consistent with "pop-out" and attentional capture accounts [@johnstonAttentionCaptureNovel1990; @lev-ariEcologicalViewSelective2022; @lubowVisualSearchFunction1997]. In contrast, visually familiar faces may generate noisier representations due to interference from accumulated but imperfectly consolidated memory traces [@rapcsakFaceRecognition2019].
 
-We do not exclude that our parameter estimation might have been affected by our restricted number of trials. Previous studies have investigated how a low number of trials have influenced the model fitting, leading to inconsistent parameter estimation [@alexandrowiczComparingEightParameter2020; @lercheHowManyTrials2017; @wagenmakersEZdiffusionModelResponse2007]. While our design (180 recognition trials with equal number of trials for our two stimuli conditions) and our error rates followed the recommendations to apply EAM, adding more trials could have increased parameter identifiability [@lukenParameterIdentifiabilityEvidenceaccumulation2025]. Our decision of using 90 trials for each condition was motivated by the fact that it is especially challenging to find or create a face pictures dataset with standardized low-level visual features and that includes a large number of identities.
+The smaller but reliable threshold effect reflects a qualitatively different influence on performance. In a yes/no recognition task, participants must set separate response criteria for the "familiar" and "novel" responses, and the higher threshold for the novel response is consistent with a well-documented conservative rejection bias in recognition memory [@glanzerMirrorEffectRecognition1985; @stretchWixtedWhyPositive1998]: participants are more willing to endorse familiarity than to endorse novelty, requiring more evidence before committing to a rejection. Because the drift rate advantage is substantially larger, the net behavioural outcome remains a novel face advantage in speed and accuracy — the signal quality benefit outweighs the response caution cost.
 
-To further investigate the effects of familiarity on the face recognition process, future research might use a joint-modelling approach [@palestroTutorialJointModels2018; @voDeepLatentVariable2024]. Joint-modelling designates the particularity of modelling two different source of data (e.g. choice-response data and fMRI data) at the same time. This approach could provide precious insights about the relationship between latent variables and brain areas activity involved in face recognition, like the occipital face area (OFA), the fusiform face area (FFA) or more temporal regions. Another direction for future studies would be to investigate how variability in the face recognition ability in the general population accounts for these latent variables' estimation. Considering this approach would provide meaningful insights about the relationship between these parameters and one individual's ability to recognize faces or if they reflect a general ability to accumulate evidence, unrelated to face recognition ability.
+## The impact of person knowledge 
 
-# Conclusion
+Extending these findings to person knowledge is theoretically important because famous faces engage not only the core face processing system but also the extended system, which mediates retrieval of identity-specific person knowledge [@gobbiniNeuralSystemsRecognition2007; @duchaineRevisedNeuralFramework2015]. However, our conclusions here must remain tentative since we only have evidence from a single experiment (Experiment 4) due to technical issues in data collection during Experiment 3. Experiment 4 showed a pattern broadly consistent with Experiments 1 and 2: novel faces produced higher drift rates and slightly higher response caution than famous faces. This raises the possibility that the computational signature of novelty generalises beyond visual familiarity to person knowledge contexts. Moreover, the effects were larger for drift rate and threshold compared to Experiments 1 and 2, which might suggest that the more stable memory traces for famous people based on the added person knowledge could exaggerate the novelty or "pop-out" effect. 
+
+At this stage, however, we remain cautious in our conclusion here and suggest that person knowledge effects on drift rate and threshold remain a largely open empirical question, which requires careful further investigation using improved and/or different stimuli, such as personally familiar people (e.g., family, friends or partners). More generally, our findings underscore that although the study of true familiarity - where person knowledge is available - is more akin to our real-world experiences of interacting with familiar people, it is inherently more difficult to study with tight experimental control (REF Burton, 2024 Encyclopedia chapter).
+
+## Limitations
+
+A novelty advantage in drift rate is in conceptual agreement with studies that reported a better recognition ability for novel faces than for visually familiar faces [@bindemannPerceivedAbilityActual2014; @readChangingPhotosFaces1990], whist being in apparent tension with prior work reporting better recognition performance for famous or personally familiar faces [@hancockRecognitionUnfamiliarFaces2000; @jenkins2011; @klatzkyRecognizingFamiliarUnfamiliar1984]. We suggest two factors may contribute to this discrepancy. First, prior studies used manifest measures that conflate signal quality with response bias, which makes interpretation more difficult [@wagenmakersEZdiffusionModelResponse2007]. Second, the yes/no recognition task used here creates an inherent asymmetry: a correct novel response requires only the absence of a recognition signal, whereas a correct famous response requires the presence of one. Novel faces may therefore benefit from a processing advantage that is specific to this task structure, and which would not generalise to tasks requiring positive identification of unfamiliar faces. Whether the novelty advantage in drift rate reflects a genuine signal quality effect, a task asymmetry, or both, remains an open question that future work should address by comparing LBA parameters across paradigms that vary the demands placed on novel versus familiar face processing.
+
+Previous evidence accumulation model development studies have emphasised how the number of trials per cell of the design can influence model fitting and parameter estimation [@alexandrowiczComparingEightParameter2020; @lercheHowManyTrials2017; @wagenmakersEZdiffusionModelResponse2007]. Our design (90 trials per condition) and control of error rates followed the minimum recommendations to apply EAM [@lukenParameterIdentifiabilityEvidenceaccumulation2025], as well as a parameter recovery study that showed 90 trials per condition was sufficient to recover simulated parameters. Practical considerations were also incorporated, including the challenge of finding face stimuli with standardized low-level visual features that includes a large number of identities. Nonetheless, adding more trials per condition (e.g., 200 per condition; REF Boag et al 2025) would have increased the robustness of our parameter estimates. 
+
+## Future directions
+
+We can think of several relevant future directions in addition to the ones already mentioned. First, a learning curve design that tracks LBA parameters across repeated exposure sessions would address at which stage of familiarity drift rate changes occur, and would provide a more dynamic account of how computational processes change as familiarity is acquired [@ramonFamiliarityMattersReview2018]. Second, to more directly link together computational processes and neural architectures, future research might use a joint-modelling approach [@palestroTutorialJointModels2018; @voDeepLatentVariable2024]. Joint-modelling integrates different sources of data (e.g. behavioural and neuroimaging data) to estimate the relationship between responses in particular brain regions, such as core and extended face networks, and latent computational parameters. Third, individual differences in face recognition ability represent a natural and important extension. Super-recognisers and individuals with developmental prosopagnosia differ dramatically in recognition performance [@duchaine2006], and drift rate — as the primary carrier of familiarity effects here — may be the parameter that most cleanly differentiates these groups. Fourth, testing the domain-specificity of these effects would be valuable to determine whether the effects of visual familiarity apply to other categories of visual stimuli, such as objects or scenes.
+
 
 {{< pagebreak >}}
 
