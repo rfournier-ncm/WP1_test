@@ -125,3 +125,31 @@ And once we have the results for the last online experiment it will shape how we
 - I added the accuracy, rt and rt density plots in the supplementary materials. Density plot of the 3rd experiment look really weird and that may contribute to the observed results as well. 
 - I added the missing refs in the discussion and make the first paragraph of the discussion clearer. 
 I think that at this point, a good "stab" in the discussion from your part would be great so I can work on your ideas/advices as well. 
+
+# March 17th-19th 2026 #
+
+- The raw data plots look really nice. In fact, all the figures and tables look very professional. Nice work.
+- I would definitely include the raw data figures in the main text, rather than supps. These are foundational in terms of descriptive statistics in general and especially in the context of decision modelling.
+- I might suggest a change in format to the raw data plots though. No need to rush to do this and I can supply some code to help. But it might be more efficient to use half_eye plots. e.g., half raw data dots and half a density distribution. And then get rid of the bar plot, as it isn't really adding much. Or you could use paired plots with a line between each PID and the PID dots jittered. I can share code for this.
+- Also, might want to make the axes more consistent, so that RT differences/similarities are easier to compare.
+- The RT density plots for the 3rd experiment look very strange indeed. Yikes, that is weird. We need to dig into that some more. Maybe plot rt density and facet by PID. Is there an add PID in there? Or is there a bug in the code? It just seems really, very odd.
+- One minor thing. Are you still doing "quarto render" after making edits. It seems that the rendered version is dated as January 7th.
+- The Cheong et al., 2017 and (Hintzman, 1991) REFs in paragraph 4 of the intro need adding in properly. 
+- Figures in the main text. I would facet_wrap threshold and drift rate OR just use patchwork to combine the figures into one plot per experiment. e.g., For Exp 1, combine Figures 5 and 6 into one figure. And use patchwork labelling tool to put panel labels on A, B etc. Or, an even more compact version would be to present all thresholds plots in one figure with one row per experiment. And then all drift rate plots in another figure with one row per experiment. That will make it easier to see how the effects play out across experiments. And when you make this figure, you need tom think carefully about the axes. AT the moment, the scale of the axes changes and that makes comparisons more difficult to make.
+- I can't render the manuscript file, since some files are not available. e.g., some .RData files do not exist. But why are you using .RData files anyway? e.g., file missing : load(here("Exp_1", "models", "LBA_exp1_v1.RData")). In fact, there are no models folders at all.
+- I would strongly encourage renaming things to lower case. And maybe a general refactoring of the code. I can do this, as you work on other things. I can provide examples with the plots. There is a lot of repetition and redundancy e.g., we could load in all data from all exps and go from there instead of repeating that. Again, I am happy to do this, not a problem. And maybe, as I said before, a new name for the project instead of "WP1_test". Something like face-familiarity-eam or something else, which explains the basic theme. This is important because this will be the name of the github repo.
+
+## some notes based on a lit review via Claude on recongition memory and response bias ##
+
+This might be relevant for interpreting the threshold effects for novel > learned/famous.
+
+In a yes/no recognition task, participants systematically set a more liberal criterion for "old" (familiar) responses than for "new" (novel) responses — they are more willing to say "yes, I've seen this" than "no, I haven't". This is the mirror effect in recognition memory: hits and correct rejections trade off asymmetrically because the decision criteria for the two responses are not equal.
+Relevant references:
+
+Glanzer & Adams (1985) — the original mirror effect paper, showing that easier items produce both more hits and fewer false alarms, creating asymmetric response criteria
+Stretch & Wixted (1998) — signal detection analysis of the mirror effect, directly relevant to criterion placement for old vs new responses
+Rotello, Macmillan & Reeder (2004) — demonstrates that old/new recognition involves asymmetric criteria even when controlling for item difficulty
+Ratcliff, Sheu & Gronlund (1992) — specifically links diffusion model parameters to recognition memory criteria, bridging EAM and recognition memory literatures
+Verde & Rotello (2007) — shows that the criterion for "new" responses is systematically higher than for "old" responses across a range of conditions
+
+The Ratcliff et al. (1992) paper is probably the most directly relevant given your EAM framing — it explicitly discusses how threshold asymmetries emerge in recognition memory tasks using a drift diffusion framework, which maps directly onto your LBA threshold results.
