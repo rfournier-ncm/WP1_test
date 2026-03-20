@@ -1,0 +1,63 @@
+---
+title: "Supplementary Materials"
+subtitle: "How does familiarity impact the computational processes that support face recognition?"
+running-head: "Decision models of face memory"
+author:
+  - name: Raphaël Fournier
+    email: rfournier@ethz.ch
+    orcid: 0000-0002-5135-4066
+    affiliation:
+      - ref: 1
+  - name: Paul Downing
+    affiliation: 
+      - ref: 2
+  - name: Richard Ramsey
+    email: rramsey@ethz.ch
+    orcid: 0000-0002-0329-2112
+    corresponding: true
+    affiliation:
+      - ref: 1
+      - ref: 3
+affiliations:
+  - id: 1
+    name: Neural Control of Movement Laboratory
+    department: Department of Health Sciences and Technology, ETH Zurich
+  - id: 2
+    name: 
+    department: School of Psychology and Sports Science, Bangor University
+  - id: 3
+    name: Social Brain Sciences Laboratory
+    department: Department of Humanities, Social and Political Sciences, ETH Zurich
+keywords: [face perception, memory, familiarity, person knowledge, decision models, evidence accumulation modelling]
+bibliography: bibliography.bib
+functions: [place, appendix]
+format:
+  preprint-typst:
+    output-file: supplementary.pdf
+    fontsize: 11pt
+    mainfont: Libertinus Serif
+    toc: true
+    toc-depth: 3
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+
+```
+
+
+::: {.appendix}
+
+# Appendix A: Supplementary Materials {.appendix}
+
+## Parameter recovery study
+
+## Priors
+
+## Exploratory models
+
+:::

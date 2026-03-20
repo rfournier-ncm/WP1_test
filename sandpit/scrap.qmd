@@ -1,0 +1,649 @@
+---
+title: "scrap"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+Scrap.
+
+## from Rich
+
+```{r}
+#| label: tbl-participants
+#| tbl-cap: "Participant summary across experiments. RT = response time; — = criterion not applicable."
+
+participant_summary <- bind_rows(
+  # Exp 1
+  demo_exp1 |>
+    filter(Index != "1.1-RF-01") |>
+    mutate(gender = if_else(Gender == "F", "Female", "Male")) |>
+    summarise(
+      Experiment               = "Experiment 1",
+      Setting                  = "Lab",
+      Started                  = nrow(demo_exp1),
+      Withdrew                 = 0,
+      Completed                = nrow(demo_exp1) - 1L,  # 1 excluded for RT
+      `RT exclusions`          = 1,
+      `Accuracy exclusions`    = 0,
+      `Familiarity exclusions` = "—",
+      `Final n`                = n(),
+      Female                    = sum(gender == "Female"),
+      Male                      = sum(gender == "Male"),
+      `Mean age (SD)`          = paste0(round(mean(Age), 1), " (", round(sd(Age), 1), ")")
+    ),
+
+  # Exp 2
+  demo_exp2 |>
+    filter(Status != "RETURNED",
+           `Participant id` %in% list_participant_analysis_2) |>
+    summarise(
+      Experiment               = "Experiment 2",
+      Setting                  = "Online",
+      Started                  = nrow(demo_exp2),
+      Withdrew                 = sum(demo_exp2$Status == "RETURNED"),
+      Completed                = sum(demo_exp2$Status != "RETURNED"),
+      `RT exclusions`          = length(exclude_rt_exp2),
+      `Accuracy exclusions`    = length(exclude_acc_exp2),
+      `Familiarity exclusions` = "—",
+      `Final n`                = n(),
+      Female                   = sum(Sex == "Female"),
+      Male                     = sum(Sex == "Male"),
+      `Mean age (SD)`          = paste0(round(mean(Age), 1), " (", round(sd(Age), 1), ")")
+    ),
+
+  # Exp 3
+  demo_exp3 |>
+    filter(pid %in% list_participant_analysis_3) |>
+    mutate(gender = if_else(Gender == "F", "Female", "Male")) |>
+    summarise(
+      Experiment               = "Experiment 3",
+      Setting                  = "Lab",
+      Started                  = nrow(demo_exp3),
+      Withdrew                 = 0,
+      Completed                = nrow(demo_exp3),
+      `RT exclusions`          = 0,
+      `Accuracy exclusions`    = length(over_95_pid) + length(under_55_pid),
+      `Familiarity exclusions` = as.character(length(exclude_ratings_exp3)),
+      `Final n`                = n(),
+      Female                   = sum(gender == "Female"),
+      Male                     = sum(gender == "Male"),
+      `Mean age (SD)`          = paste0(round(mean(Age), 1), " (", round(sd(Age), 1), ")")
+    ),
+
+  # Exp 4
+  demo_exp4 |>
+    filter(Status != "RETURNED",
+           `Participant id` %in% list_participant_analysis_4) |>
+    summarise(
+      Experiment               = "Experiment 4",
+      Setting                  = "Online",
+      Started                  = nrow(demo_exp4),
+      Withdrew                 = sum(demo_exp4$Status == "RETURNED"),
+      Completed                = sum(demo_exp4$Status != "RETURNED"),
+      `RT exclusions`          = length(exclude_rt_exp4),
+      `Accuracy exclusions`    = length(exclude_acc_exp4),
+      `Familiarity exclusions` = as.character(length(exclude_ratings_exp4)),
+      `Final n`                = n(),
+      Female                   = sum(Sex == "Female"),
+      Male                     = sum(Sex == "Male"),
+      `Mean age (SD)`          = paste0(round(mean(Age), 1), " (", round(sd(Age), 1), ")")
+    )
+)
+
+participant_summary |>
+  tt() |>
+  style_tt(fontsize = 0.85)
+```
+
+```{r}
+#| label: fig-acc_rt
+#| fig-cap: "Proportion of correct response [%] and Response times [s] across condition for the four experiments. In the top two rows, coloured points represent individual participant averages, black points denote the mean average and error bars represent 95% confidence intervals. On the third row, the density plots for RT in Experiment 3 clearly show the coding error that occured during data collection, where keypress responses were recorded in ~80ms bins, rather than every frame."
+#| fig-subcap: 
+#|  - "Proportion of correct responses [%] accross experiments"
+#|  - "Mean response times [s] accross experiments"
+#|  - "Density of response times [s]"
+#| fig-alt: "" 
+#| layout-ncol: 1
+#| warning: false
+#| fig-width: 7
+#| fig-height: 4
+
+acc_paired
+rt_paired
+rt_density
+```
+
+
+```{r}
+#| label: demo-exp1
+#| include: false
+
+## read in demographic data
+demo_exp1 <- read_csv(here("exp_1", "data", "demo_exp_1.csv")) |>
+  mutate(
+    Index            = as.factor(Index),
+    Gender           = as.factor(Gender),
+    Date_of_birth    = lubridate::my(Date_of_birth),
+    Date_of_testing  = lubridate::dmy(`Date of testing`),
+    Age              = floor(age_calc(Date_of_birth, 
+                                      enddate = Date_of_testing,
+                                      units = "years"))
+  )
+
+# Summary stats 
+exp1_demo_stats <- demo_exp1 |>
+  filter(Index != "1.1-RF-01") |>
+  summarise(
+    n       = n(),
+    n_male  = sum(Gender == "M"),
+    n_female = sum(Gender == "F"),
+    mean_age = round(mean(Age), 2),
+    sd_age   = round(sd(Age), 2),
+    min_age  = min(Age),
+    max_age  = max(Age)
+  )
+
+participant_n_exp1  <- nrow(demo_exp1)
+total_part_exp1     <- exp1_demo_stats$n
+male_exp1           <- exp1_demo_stats$n_male
+female_exp1         <- exp1_demo_stats$n_female
+mean_age_exp1       <- exp1_demo_stats$mean_age
+sd_age_exp1         <- exp1_demo_stats$sd_age
+min_age_exp1        <- exp1_demo_stats$min_age
+max_age_exp1        <- exp1_demo_stats$max_age
+```
+
+```{r}
+#| label: exclusion-exp2
+#| include: false
+
+data_exp2 <- read_csv(here(
+  "exp_2",
+  "data",
+  "data_exp_2",
+  "wrangle_data_exp_2.csv"
+)) |>
+  mutate(rt_excluded = is.na(rt) | rt > 2.0)
+
+# RT exclusion — participants with >25% missed/out-of-range trials
+exclude_rt_exp2 <- data_exp2 |>
+  group_by(pid) |>
+  summarise(perc_excluded = mean(rt_excluded) * 100) |>
+  filter(perc_excluded > 25) |>
+  pull(pid)
+
+# Accuracy exclusion — participants with <55% accuracy on responded trials
+exclude_acc_exp2 <- data_exp2 |>
+  filter(!pid %in% exclude_rt_exp2) |>
+  group_by(pid) |>
+  summarise(perc_acc = mean(acc, na.rm = TRUE) * 100) |>
+  filter(perc_acc < 55) |>
+  pull(pid)
+
+# Final retained participant list
+list_participant_analysis_2 <- data_exp2 |>
+  filter(
+    !pid %in% exclude_rt_exp2,
+    !pid %in% exclude_acc_exp2
+  ) |>
+  distinct(pid) |>
+  pull(pid)
+
+# Scalar counts for inline text
+part_trial_25                 <- length(exclude_rt_exp2)
+part_acc_55                   <- length(exclude_acc_exp2)
+number_participant_analysis_2 <- length(list_participant_analysis_2)
+```
+
+```{r}
+#| label: demo-exp2
+#| include: false
+
+demo_exp2 <- read_csv(here("exp_2", "data", "demo_exp_2.csv")) |>
+  mutate(
+    `Participant id` = as.factor(`Participant id`),
+    Sex              = as.factor(Sex),
+    Age              = as.numeric(Age)
+  )
+
+# Summary stats
+exp2_demo_stats <- demo_exp2 |>
+  filter(
+    Status != "RETURNED",
+    `Participant id` %in% list_participant_analysis_2
+  ) |>
+  summarise(
+    n        = n(),
+    n_male   = sum(Sex == "Male"),
+    n_female = sum(Sex == "Female"),
+    mean_age = round(mean(Age), 2),
+    sd_age   = round(sd(Age), 2),
+    min_age  = min(Age),
+    max_age  = max(Age)
+  )
+
+total_number_part   <- nrow(demo_exp2)
+inform_consent      <- sum(demo_exp2$Status == "RETURNED")
+number_part_compl   <- sum(demo_exp2$Status != "RETURNED")
+total_part_exp2     <- exp2_demo_stats$n
+male_exp2           <- exp2_demo_stats$n_male
+female_exp2         <- exp2_demo_stats$n_female
+participant_n_exp2  <- male_exp2 + female_exp2  # fixed bug from original
+mean_age_exp2       <- exp2_demo_stats$mean_age
+sd_age_exp2         <- exp2_demo_stats$sd_age
+min_age_exp2        <- exp2_demo_stats$min_age
+max_age_exp2        <- exp2_demo_stats$max_age
+```
+
+```{r}
+#| label: rt-2-exp1
+#| include: false
+
+rt_exp_1 <- read_csv(here("exp_1", "data", "raw_data_exp_1.csv"))
+
+perc_rt_1 <- rt_exp_1 |>
+  filter(pid != "1") |>
+  summarise(perc = round(mean(rt > 2, na.rm = TRUE) * 100, 3)) |>
+  pull(perc)
+```
+
+```{r}
+#| label: exclusion-exp3
+#| include: false
+
+# Load raw data
+data_exp3 <- read_csv(here("exp_3", "data", "raw_data_exp_3.csv"))
+
+# Accuracy check — recode condition and accuracy from raw columns
+acc_check_exp3 <- data_exp3 |>
+  mutate(
+    cond = if_else(fam == 1, "famous", "novel"),
+    acc  = case_when(
+      cond == "famous" & keypress == "q" ~ 1,
+      cond == "novel"  & keypress == "p" ~ 1,
+      TRUE                               ~ 0
+    )
+  ) |>
+  drop_na(rt) |>
+  group_by(pid) |>
+  summarise(perc_acc = mean(acc) * 100)
+
+# Over 95% accuracy
+over_95_pid <- acc_check_exp3 |>
+  filter(perc_acc > 95) |>
+  pull(pid)
+
+# Under 55% accuracy
+under_55_pid <- acc_check_exp3 |>
+  filter(perc_acc < 55) |>
+  pull(pid)
+
+# Ratings check — load all ratings files and assign pid
+data_ratings_exp3 <- list.files(
+  here("exp_3", "data"),
+  pattern      = "Ratings.*csv",
+  full.names   = TRUE,
+  recursive    = TRUE
+) |>
+  set_names() |>
+  map(read_csv, col_names = c("Image_ID", "Fam_ratings", "Val_ratings", "Chosen_name")) |>
+  list_rbind(names_to = "file") |>
+  mutate(pid = rep(1:40, each = 60)) |>
+  select(-file)
+
+# Participants with fewer than 30 familiarity ratings >= 7
+exclude_ratings_exp3 <- data_ratings_exp3 |>
+  group_by(pid) |>
+  summarise(n_fam = sum(Fam_ratings > 6)) |>
+  filter(n_fam < 30, !pid %in% under_55_pid) |>
+  pull(pid)
+
+# Final retained participant list
+list_participant_analysis_3 <- data_exp3 |>
+  filter(
+    !pid %in% over_95_pid,
+    !pid %in% under_55_pid,
+    !pid %in% exclude_ratings_exp3
+  ) |>
+  distinct(pid) |>
+  pull(pid)
+
+# Scalar counts for inline text
+over_95               <- length(over_95_pid)
+under_55              <- length(under_55_pid)
+ratings_only          <- length(exclude_ratings_exp3)
+number_participant_3  <- length(list_participant_analysis_3)
+```
+
+```{r}
+#| label: demo-exp3
+#| include: false
+
+demo_exp3 <- read_csv(here("exp_3", "data", "demo_exp_3.csv")) |>
+  mutate(
+    Index  = as.factor(Index),
+    Gender = as.factor(Gender),
+    Age    = as.numeric(Age),
+    pid    = row_number()  # more robust than c(1:40)
+  )
+
+exp3_demo_stats <- demo_exp3 |>
+  filter(pid %in% list_participant_analysis_3) |>
+  summarise(
+    n        = n(),
+    n_male   = sum(Gender == "M"),
+    n_female = sum(Gender == "F"),
+    mean_age = round(mean(Age), 2),
+    sd_age   = round(sd(Age), 2),
+    min_age  = min(Age),
+    max_age  = max(Age)
+  )
+
+participant_n_exp3 <- nrow(demo_exp3)
+total_part_exp3    <- exp3_demo_stats$n
+male_exp3          <- exp3_demo_stats$n_male
+female_exp3        <- exp3_demo_stats$n_female
+mean_age_exp3      <- exp3_demo_stats$mean_age
+sd_age_exp3        <- exp3_demo_stats$sd_age
+min_age_exp3       <- exp3_demo_stats$min_age
+max_age_exp3       <- exp3_demo_stats$max_age
+```
+
+```{r}
+#| label: exclusion-exp4
+#| include: false
+
+data_exp4 <- read_csv(here("exp_4", "data", "wrangle_exp_4.csv")) |>
+  mutate(rt_excluded = is.na(rt))
+
+# RT exclusion — participants with >25% missed trials
+exclude_rt_exp4 <- data_exp4 |>
+  group_by(pid) |>
+  summarise(perc_excluded = mean(rt_excluded) * 100) |>
+  filter(perc_excluded > 25) |>
+  pull(pid)
+
+# Accuracy exclusion — participants with <55% accuracy on responded trials
+exclude_acc_exp4 <- data_exp4 |>
+  filter(!pid %in% exclude_rt_exp4) |>
+  group_by(pid) |>
+  summarise(perc_acc = mean(acc, na.rm = TRUE) * 100) |>
+  filter(perc_acc < 55) |>
+  pull(pid)
+
+# Ratings check
+exclude_ratings_exp4 <- read_csv(here("exp_4", "data", "raw_exp_4.csv")) |>
+  filter(!is.na(familiarity_rating)) |>
+  rename(pid = participant) |>
+  group_by(pid) |>
+  summarise(n_fam = sum(familiarity_rating > 6)) |>
+  filter(n_fam < 30, !pid %in% exclude_acc_exp4) |>
+  pull(pid)
+
+# Final retained participant list
+list_participant_analysis_4 <- data_exp4 |>
+  filter(
+    !pid %in% exclude_rt_exp4,
+    !pid %in% exclude_acc_exp4,
+    !pid %in% exclude_ratings_exp4
+  ) |>
+  distinct(pid) |>
+  pull(pid)
+
+# Scalar counts for inline text
+part_trial_25_4           <- length(exclude_rt_exp4)
+part_acc_55_4             <- length(exclude_acc_exp4)
+ratings_only_4            <- length(exclude_ratings_exp4)
+number_participant_analysis_4 <- length(list_participant_analysis_4)
+```
+
+
+```{r}
+#| label: demo-exp4
+#| include: false
+
+demo_exp4 <- read_csv(here("exp_4", "data", "demo_exp_4.csv")) |>
+  mutate(
+    `Participant id` = as.factor(`Participant id`),
+    Sex              = as.factor(Sex),
+    Age              = as.numeric(Age)
+  )
+
+exp4_demo_stats <- demo_exp4 |>
+  filter(
+    Status != "RETURNED",
+    `Participant id` %in% list_participant_analysis_4
+  ) |>
+  summarise(
+    n        = n(),
+    n_male   = sum(Sex == "Male"),
+    n_female = sum(Sex == "Female"),
+    mean_age = round(mean(Age), 2),
+    sd_age   = round(sd(Age), 2),
+    min_age  = min(Age),
+    max_age  = max(Age)
+  )
+
+total_number_part_4   <- nrow(demo_exp4)
+inform_consent_4      <- sum(demo_exp4$Status == "RETURNED")
+number_part_compl_4   <- sum(demo_exp4$Status != "RETURNED")
+number_participant_analysis_4 <- exp4_demo_stats$n
+male_exp4             <- exp4_demo_stats$n_male
+female_exp4           <- exp4_demo_stats$n_female
+participant_n_exp4    <- male_exp4 + female_exp4
+mean_age_exp4         <- exp4_demo_stats$mean_age
+sd_age_exp4           <- exp4_demo_stats$sd_age
+min_age_exp4          <- exp4_demo_stats$min_age
+max_age_exp4          <- exp4_demo_stats$max_age
+```
+
+
+## from Raph
+
+```{r}
+#| label: LBA-exp1
+#| include: false
+load(here("exp_1", "models", "LBA_exp1_v1.RData"))
+param_1_pid = EMC2::parameters(LBA_exp1_v1,selection="alpha", N = NULL)
+
+split_tibble <- function(tibble, col = 'col') tibble |> split(., .[, col])
+array_theta_1 <- split_tibble(param_1_pid, "subjects")
+array_theta_1<-do.call(rbind, array_theta_1)
+array_theta_pid_1 <- array_theta_1 |>
+  pivot_longer(cols = c("v_SNovel:lMTRUE", "v_SNovel:lMFALSE", "v_SLearned:lMTRUE", "v_SLearned:lMFALSE", "sv_lMTRUE", "B_lRNovel", "B_lRLearned", "A", "t0"), names_to = "param", values_to = "value")|>
+  add_column(datapoint = rep(1:15000,each=9,times=30))|> #here 30'000 = number of chains (3) x number of iteration (5'000)
+  rename(pid=subjects)
+
+#Average across participants
+theta_group_1 <- array_theta_pid_1 |>
+  group_by(datapoint,param) |>
+  summarise(value = mean(value, na.rm = T)) |>
+  ungroup() |>
+  add_column(pid = "average") |> ## add a column which makes clear it is the avg. not needed but useful for plotting later
+  relocate(pid, .before = everything())
+
+
+#Quantile at the group level
+theta_group_1_q <- theta_group_1 |>
+  group_by(param) |>
+  median_qi(value)
+
+
+#And per pid
+theta_pid_1_q <- array_theta_pid_1 |>
+  group_by(pid, param) |>
+  median_qi(value)
+
+```
+
+```{r}
+#| label: thresh-pid
+#| include: false
+thresh_pid_1 <- array_theta_pid_1 |>
+  filter(str_detect(param, "B_")) |>
+  mutate(response = if_else(str_detect(param, "lRLearned"), "Learned", "Novel"),
+         response = factor(response,
+                            levels = c("Novel", "Learned")))
+```
+
+```{r}
+#| label: thresh-group
+#| include: false
+thresh_group_1 <- theta_group_1 |>
+  filter(str_detect(param, "B_")) |>
+  mutate(response = if_else(str_detect(param, "lRLearned"), "Learned", "Novel"),
+         response = factor(response,
+                            levels = c("Novel", "Learned")))
+```
+
+```{r}
+#| label: thresh-pid-diff
+#| include: false
+thresh_diff_pid_1 <- thresh_pid_1 |>
+  pivot_wider(id_cols = -param,
+              names_from = "response",
+              values_from = "value") |>
+  mutate(diff = Novel - Learned)
+
+#Quantiles
+thresh_diff_pid_1_q <- thresh_diff_pid_1 |>
+  group_by(pid) |>
+  median_qi(diff)
+
+```
+
+```{r}
+#| label: thresh-group-diff
+#| include: false
+thresh_diff_1 <- thresh_group_1 |>
+  pivot_wider(id_cols = -param,
+              names_from = "response",
+              values_from = "value") |>
+  mutate(diff = Novel - Learned)
+
+#Quantiles
+thresh_diff_1_q <- thresh_diff_1 |>
+  group_by(pid) |>
+  median_qi(diff)
+
+```
+
+```{r}
+#| label: drift-pid
+#| include: false
+drift_rate_pid_1 <- array_theta_pid_1 |>
+  filter(str_detect(param, "v_S")) |>
+  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Learned"),
+         accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
+         condition = factor(condition,
+                            levels = c("Novel", "Learned")),
+         accuracy = factor(accuracy,
+                            levels = c("False", "True")))
+
+## just true > false differences (accuracy)
+drift_acc_diff_pid_1 <- drift_rate_pid_1 |>
+  pivot_wider(id_cols = -param,
+               names_from = accuracy,
+               values_from = value) |>
+  mutate(diff = True - False)
+
+
+## Novel > Learned differences
+drift_acc_cond_diff_pid_1 <- drift_acc_diff_pid_1 |>
+  pivot_wider(id_cols = -c("True", "False"),
+              names_from = condition,
+              values_from = diff) |>
+  mutate(diff = Novel - Learned)
+
+```
+
+```{r}
+#| label: drift-group
+#| include: false
+drift_rate_group_1 <- theta_group_1 |>
+  filter(str_detect(param, "v_S")) |>
+  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Learned"),
+         accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
+         condition = factor(condition,
+                            levels = c("Novel", "Learned")),
+         accuracy = factor(accuracy,
+                            levels = c("False", "True")))
+
+## just true > false differences (accuracy)
+drift_acc_diff_1 <- drift_rate_group_1 |>
+  pivot_wider(id_cols = -param,
+               names_from = accuracy,
+               values_from = value) |>
+  mutate(diff = True - False)
+
+
+## Novel > Learned differences
+drift_acc_cond_diff_1 <- drift_acc_diff_1 |>
+  pivot_wider(id_cols = -c("True", "False"),
+              names_from = condition,
+              values_from = diff) |>
+  mutate(diff = Novel - Learned)
+drift_acc_cond_diff_1
+
+#Quantiles per condition
+drift_acc_diff_1_q <- drift_acc_diff_1 |>
+  group_by(condition) |>
+  median_qi(diff)
+
+
+#Quantiles differnece
+drift_acc_cond_diff_1_q <- drift_acc_cond_diff_1 |>
+  median_qi(diff)
+
+```
+
+```{r}
+#| label: fig-thresh_exp1
+#| fig-cap: "Threshold estimates for Experiment 1: (a) Posterior distribution of the average threshold parameter by response option (Novel / Learned). (b) Difference between the posterior distribution of the average threshold parameter for the Novel response option and the Learned response option. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
+#| fig-subcap:
+#|  - "Threshold by response"
+#|  - "Threshold difference (Novel > Learned)"
+#| layout-ncol: 2
+
+ggplot(thresh_group_1, aes(x = value, y = fct_rev(response))) +
+  stat_halfeye(alpha = 0.7, aes(fill = response)) +
+  scale_fill_paletteer_d("rcartocolor::Safe") +
+  scale_colour_paletteer_d("rcartocolor::Safe")  +
+  geom_vline(xintercept = 0, color = "darkgrey") +
+  labs(y="Response", x="Threshold") +
+  labs(fill = "Response") +
+  theme(legend.position = "none")
+
+ggplot(thresh_diff_1, aes(x = diff, y = "")) +
+  stat_halfeye(alpha = 0.9, fill="firebrick") +
+  geom_vline(xintercept = 0, color = "darkgrey") +
+  labs(x = "Threshold", y="Density")
+
+```
+
+```{r}
+#| label: fig-drift_exp1
+#| fig-cap: "Drift rate estimates for Experiment 1. (a) Posterior distribution of the average drift rate difference (TRUE - FALSE) by stimulus familiarity condition (Novel / Learned). (b) Difference between the posterior distribution of the average drift rate parameter (TRUE - FALSE) of the Novel condition and the Learned condition. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
+#| fig-subcap:
+#|  - "Drift rate (TRUE - FALSE) by familiarity condition"
+#|  - "Drift rate difference (Novel > Learned)"
+#| layout-ncol: 2
+
+
+ggplot(drift_acc_diff_1, aes(x = diff, y = fct_rev(condition))) +
+  stat_halfeye(aes(fill = condition), alpha = 0.7) +
+  scale_fill_paletteer_d("rcartocolor::Safe") +
+  scale_colour_paletteer_d("rcartocolor::Safe")  +
+  geom_vline(xintercept = 0, color = "darkgrey") +
+  theme(legend.position = "none") +
+  labs(x="Drift rate", y="Familiarity")
+
+ggplot(drift_acc_cond_diff_1, aes(x = diff, y = "")) +
+  stat_halfeye(fill = "firebrick", alpha = 0.9) +
+  geom_vline(xintercept = 0, color = "darkgrey") +
+  labs(x="Drift rate", y="") +
+  xlim(0,3)
+
+```

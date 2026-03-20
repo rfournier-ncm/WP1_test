@@ -1,12 +1,10 @@
 ---
-title: How does familiarity impact the computational processes that support face recognition?
-running-head: Decision models of face memory
+title: "How does familiarity impact the computational processes that support face recognition?"
+running-head: "Decision models of face memory"
 author:
   - name: Raphaël Fournier
     email: rfournier@ethz.ch
     orcid: 0000-0002-5135-4066
-    url: https://example.com
-    corresponding: true
     affiliation:
       - ref: 1
   - name: Paul Downing
@@ -15,6 +13,7 @@ author:
   - name: Richard Ramsey
     email: rramsey@ethz.ch
     orcid: 0000-0002-0329-2112
+    corresponding: true
     affiliation:
       - ref: 1
       - ref: 3
@@ -30,16 +29,18 @@ affiliations:
     department: Department of Humanities, Social and Political Sciences, ETH Zurich
 abstract: |
   Recognising a familiar face is a fundamental social cognitive ability, yet the computational mechanisms that underlie this capacity remain poorly understood. Prior research has established that familiarity affects face recognition performance, but has relied primarily on manifest measures — accuracy and response time — that cannot distinguish between qualitatively different sources of performance change. Here, we used evidence accumulation modelling across four experiments to ask not merely whether familiarity affects face recognition, but how — specifically, which latent computational processes are modulated. Experiments 1 and 2 examined visual familiarity (briefly learned faces versus novel faces) and Experiments 3 and 4 examined person knowledge (famous versus novel faces). Fitting linear ballistic accumulator models to recognition data revealed a consistent computational signature across experiments: novel faces produced substantially higher drift rates than familiar faces, accompanied by a smaller but reliable increase in response caution. The dominance of the drift rate effect localises familiarity's primary influence to the quality of evidence accumulation — how cleanly the perceptual system extracts decision-relevant information — rather than to response bias. We interpret this as reflecting a novelty pop-out effect combined with unstable memory traces for familiar faces, alongside a conservative rejection bias in recognition memory. These findings demonstrate that computational modelling reveals dissociable mechanisms underlying face recognition that are invisible to manifest measures alone, and provide a foundation for understanding how familiarity shapes the decision processes that support social perception.
-
-categories: [face perception, memory, familiarity, person knowledge, decision models, evidence accumulation modelling]
+keywords: [face perception, memory, familiarity, person knowledge, decision models, evidence accumulation modelling]
 authornote: |
   Author notes go here.
+wordcount: true
 date: last-modified
 bibliography: bibliography.bib
+functions: [place, appendix]
 format:
   html:
     toc: true
     toc-depth: 3
+    toc-expand: true
     fontsize: 14pt
     mainfont: Fira Sans
     code-fold: true
@@ -53,41 +54,37 @@ format:
       - text: Online supplement
         href: https://rich-ramsey.github.io/preprint-example
         icon: globe2
+      - text: Supplementary Materials (PDF)
+        href: supplementary.pdf
+        icon: file-pdf
       - text: GitHub Repository
-        href: https://github.com/rich-ramsey/preprint-example
+        href: https://github.com/rich-ramsey/
         icon: github
       - text: OSF Repository
-        href: https://osf.io/
+        href: https://osf.io/65bt2
         icon: archive
-  typst:
-    # Common options - uncomment to use
-    lang: "en"
-    wordcount: true
-    citeproc: true
-    # theme: jou                   # Journal theme (2-column)
-    line-number: true              # Line numbering
-    # fontsize: 11pt               # Font size
-    # leading: 0.6em               # Line spacing
-    # first-line-indent: 1.8em     # Paragraph indent
-knitr:
-  opts_chunk: 
-    dev: svglite
+  preprint-typst:
+    output-file: manuscript.pdf
+    fontsize: 11pt
+    mainfont: Libertinus Serif
+    section-numbering: "1."
+  preprint-docx:
+    output-file: manuscript.docx
+editor_options: 
+  chunk_output_type: console
 ---
-
-```{r load-pkg}
-#| include: false
-pkg <- c("tidyverse", "RColorBrewer", "patchwork", "gtsummary", "paletteer","readxl", "eeptools", "here", "gridExtra", "EMC2", "tidybayes", "styler")
-
-lapply(pkg, library, character.only = TRUE)
-```
 
 ```{r}
 #| label: setup
 #| include: false
 
-library(tidyverse)
-library(gt)
-library(tinytable)
+pkgs <- c(
+  "tidyverse", "RColorBrewer", "patchwork", "gtsummary", "paletteer", "eeptools", "here", "gridExtra", "EMC2", "tidybayes", "styler", "tinytable", "osfr"
+)
+vapply(
+  pkgs, library, logical(1),
+  character.only = TRUE, logical.return = TRUE
+)
 
 knitr::opts_chunk$set(echo = FALSE)
 
@@ -95,21 +92,25 @@ theme_set(
   theme_bw() +
     theme(text = element_text(size = 15, face = "bold"), 
           title = element_text(size = 15, face = "bold"),
-          legend.position = "right")
+          legend.position = "none")
 )
 ## plot settings ##
 ## Plot colors
-myColors_1 <- c("Novel" = paletteer_d("rcartocolor::Safe",4)[1],"Learned" =  paletteer_d("rcartocolor::Safe",4)[2])
-myColors_2 <- c("Novel" = paletteer_d("rcartocolor::Safe",4)[1],"Famous" =  paletteer_d("rcartocolor::Safe",4)[3])
-myColors_3 <- c("Novel" = paletteer_d("rcartocolor::Safe",4)[1],"Learned" =  paletteer_d("rcartocolor::Safe",4)[2], "Famous" = paletteer_d("rcartocolor::Safe",4)[3])
+safe_pal <- paletteer_d("rcartocolor::Safe", 4)
+
+myColors_3 <- c(
+  "novel"   = safe_pal[1],
+  "learned" = safe_pal[2],
+  "famous"  = safe_pal[3]
+)
+
+# Subsets for single-experiment plots if still needed
+myColors_1 <- myColors_3[c("novel", "learned")]
+myColors_2 <- myColors_3[c("novel", "famous")]
+
 ## Set the amount of dodge in figures
 pd <- position_dodge(0.7)
 pd2 <- position_dodge(1)
-
-#Color drift rate
-myColors_drift <- RColorBrewer::brewer.pal(12, "Dark2")[4:5]
-colScale_drift <- scale_fill_manual(name = "Accuracy", values = myColors_drift)
-
 ```
 
 {{< pagebreak >}}
@@ -202,32 +203,316 @@ We report how we determined our sample size, all data exclusions (if any), all m
 
 For each experiment, the research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered. The preregistration, raw data, stimuli, data wrangling and analysis code as well as the evidence-accumulation models outputs are available on the Open Science Framework: Experiment 1 (<https://osf.io/azyvu/overview>), Experiment 2 (<https://osf.io/tu2eh/overview>), Experiment 3 (<https://osf.io/ut78f/overview>) and Experiment 4 (<https://osf.io/vj2aq/overview>).
 
-## Experiment 1
-
 ```{r}
-#| label: load-demo-exp1
+#| label: load-all-demographics
 #| include: false
 
-demo_exp1 <- read_xlsx(here("Exp_1", "data", "Master_list_WP1_1.xlsx")) %>%
-    mutate(Index = as.factor(Index),
-         Gender = as.factor(Gender),
-         Date_of_birth = as.Date(Date_of_birth),
-         Age = floor(age_calc(Date_of_birth, units = "years")))
-demo_exp_1_total_part <- demo_exp1 %>%
-  filter(!Index =="1.1-RF-01")
-total_part_exp1 = length(demo_exp_1_total_part$Index)
-mean_age_exp1 = round(mean(demo_exp_1_total_part$Age), digits = 2)
-sd_age_exp1 = round(sd(demo_exp_1_total_part$Age), digits = 2)
-female_exp1 = sum(demo_exp_1_total_part$Gender== "F")
-male_exp1 = sum(demo_exp_1_total_part$Gender== "M")
-participant_n_exp1 = length(demo_exp1$Index)
-min_age_exp1 = min(demo_exp_1_total_part$Age)
-max_age_exp1 = max(demo_exp_1_total_part$Age)
+# ── Experiment 1 ─────────────────────────────────────────────────────────────
+demo_exp1 <- read_csv(here("exp_1", "data", "demo_exp_1.csv")) |>
+  mutate(
+    Index           = as.factor(Index),
+    Gender          = as.factor(Gender),
+    Date_of_birth   = lubridate::my(Date_of_birth),
+    Date_of_testing = lubridate::dmy(`Date of testing`),
+    Age             = floor(age_calc(Date_of_birth,
+                                     enddate = Date_of_testing,
+                                     units = "years"))
+  )
+
+# ── Experiment 2 ─────────────────────────────────────────────────────────────
+data_exp2 <- read_csv(here(
+  "exp_2", "data", "data_exp_2", "wrangle_data_exp_2.csv"
+)) |>
+  mutate(rt_excluded = is.na(rt) | rt > 2.0)
+
+exclude_rt_exp2 <- data_exp2 |>
+  group_by(pid) |>
+  summarise(perc_excluded = mean(rt_excluded) * 100) |>
+  filter(perc_excluded > 25) |>
+  pull(pid)
+
+exclude_acc_exp2 <- data_exp2 |>
+  filter(!pid %in% exclude_rt_exp2) |>
+  group_by(pid) |>
+  summarise(perc_acc = mean(acc, na.rm = TRUE) * 100) |>
+  filter(perc_acc < 55) |>
+  pull(pid)
+
+list_participant_analysis_2 <- data_exp2 |>
+  filter(!pid %in% exclude_rt_exp2, !pid %in% exclude_acc_exp2) |>
+  distinct(pid) |>
+  pull(pid)
+
+demo_exp2 <- read_csv(here("exp_2", "data", "demo_exp_2.csv")) |>
+  mutate(
+    `Participant id` = as.factor(`Participant id`),
+    Sex              = as.factor(Sex),
+    Age              = as.numeric(Age)
+  )
+
+# ── Experiment 3 ─────────────────────────────────────────────────────────────
+data_exp3 <- read_csv(here("exp_3", "data", "raw_data_exp_3.csv"))
+
+acc_check_exp3 <- data_exp3 |>
+  mutate(
+    cond = if_else(fam == 1, "famous", "novel"),
+    acc  = case_when(
+      cond == "famous" & keypress == "q" ~ 1,
+      cond == "novel"  & keypress == "p" ~ 1,
+      TRUE                               ~ 0
+    )
+  ) |>
+  drop_na(rt) |>
+  group_by(pid) |>
+  summarise(perc_acc = mean(acc) * 100)
+
+over_95_pid <- acc_check_exp3 |> filter(perc_acc > 95) |> pull(pid)
+under_55_pid <- acc_check_exp3 |> filter(perc_acc < 55) |> pull(pid)
+
+data_ratings_exp3 <- list.files(
+  here("exp_3", "data"),
+  pattern    = "Ratings.*csv",
+  full.names = TRUE,
+  recursive  = TRUE
+) |>
+  set_names() |>
+  map(read_csv, col_names = c("Image_ID", "Fam_ratings", "Val_ratings", "Chosen_name")) |>
+  list_rbind(names_to = "file") |>
+  mutate(pid = rep(1:40, each = 60)) |>
+  select(-file)
+
+exclude_ratings_exp3 <- data_ratings_exp3 |>
+  group_by(pid) |>
+  summarise(n_fam = sum(Fam_ratings > 6)) |>
+  filter(n_fam < 30, !pid %in% under_55_pid) |>
+  pull(pid)
+
+list_participant_analysis_3 <- data_exp3 |>
+  filter(
+    !pid %in% over_95_pid,
+    !pid %in% under_55_pid,
+    !pid %in% exclude_ratings_exp3
+  ) |>
+  distinct(pid) |>
+  pull(pid)
+
+demo_exp3 <- read_csv(here("exp_3", "data", "demo_exp_3.csv")) |>
+  mutate(
+    Index  = as.factor(Index),
+    Gender = as.factor(Gender),
+    Age    = as.numeric(Age),
+    pid    = row_number()
+  )
+
+# ── Experiment 4 ─────────────────────────────────────────────────────────────
+data_exp4 <- read_csv(here("exp_4", "data", "wrangle_exp_4.csv")) |>
+  mutate(rt_excluded = is.na(rt))
+
+exclude_rt_exp4 <- data_exp4 |>
+  group_by(pid) |>
+  summarise(perc_excluded = mean(rt_excluded) * 100) |>
+  filter(perc_excluded > 25) |>
+  pull(pid)
+
+exclude_acc_exp4 <- data_exp4 |>
+  filter(!pid %in% exclude_rt_exp4) |>
+  group_by(pid) |>
+  summarise(perc_acc = mean(acc, na.rm = TRUE) * 100) |>
+  filter(perc_acc < 55) |>
+  pull(pid)
+
+exclude_ratings_exp4 <- read_csv(here("exp_4", "data", "raw_exp_4.csv")) |>
+  filter(!is.na(familiarity_rating)) |>
+  rename(pid = participant) |>
+  group_by(pid) |>
+  summarise(n_fam = sum(familiarity_rating > 6)) |>
+  filter(n_fam < 30, !pid %in% exclude_acc_exp4) |>
+  pull(pid)
+
+list_participant_analysis_4 <- data_exp4 |>
+  filter(
+    !pid %in% exclude_rt_exp4,
+    !pid %in% exclude_acc_exp4,
+    !pid %in% exclude_ratings_exp4
+  ) |>
+  distinct(pid) |>
+  pull(pid)
+
+demo_exp4 <- read_csv(here("exp_4", "data", "demo_exp_4.csv")) |>
+  mutate(
+    `Participant id` = as.factor(`Participant id`),
+    Sex              = as.factor(Sex),
+    Age              = as.numeric(Age)
+  )
+
+# ── Exp 1 inline text scalars ─────────────────────────────────────────────────
+rt_exp_1 <- read_csv(here("exp_1", "data", "raw_data_exp_1.csv"))
+perc_rt_1 <- rt_exp_1 |>
+  filter(pid != "1") |>
+  summarise(perc = round(mean(rt > 2, na.rm = TRUE) * 100, 3)) |>
+  pull(perc)
 ```
+
+```{r}
+#| label: participant-summary
+#| include: false
+
+participant_summary <- bind_rows(
+  # Exp 1
+  demo_exp1 |>
+    filter(Index != "1.1-RF-01") |>
+    mutate(gender = if_else(Gender == "F", "Female", "Male")) |>
+    summarise(
+      Experiment               = "Experiment 1",
+      Setting                  = "Lab",
+      Started                  = nrow(demo_exp1),
+      Withdrew                 = 0,
+      Completed                = nrow(demo_exp1) - 1L,  # 1 excluded for RT
+      `RT exclusions`          = 1,
+      `Accuracy exclusions`    = 0,
+      `Familiarity exclusions` = "—",
+      `Final n`                = n(),
+      Female                    = sum(gender == "Female"),
+      Male                      = sum(gender == "Male"),
+      `Mean age (SD)`          = paste0(round(mean(Age), 1), " (", round(sd(Age), 1), ")")
+    ),
+
+  # Exp 2
+  demo_exp2 |>
+    filter(Status != "RETURNED",
+           `Participant id` %in% list_participant_analysis_2) |>
+    summarise(
+      Experiment               = "Experiment 2",
+      Setting                  = "Online",
+      Started                  = nrow(demo_exp2),
+      Withdrew                 = sum(demo_exp2$Status == "RETURNED"),
+      Completed                = sum(demo_exp2$Status != "RETURNED"),
+      `RT exclusions`          = length(exclude_rt_exp2),
+      `Accuracy exclusions`    = length(exclude_acc_exp2),
+      `Familiarity exclusions` = "—",
+      `Final n`                = n(),
+      Female                   = sum(Sex == "Female"),
+      Male                     = sum(Sex == "Male"),
+      `Mean age (SD)`          = paste0(round(mean(Age), 1), " (", round(sd(Age), 1), ")")
+    ),
+
+  # Exp 3
+  demo_exp3 |>
+    filter(pid %in% list_participant_analysis_3) |>
+    mutate(gender = if_else(Gender == "F", "Female", "Male")) |>
+    summarise(
+      Experiment               = "Experiment 3",
+      Setting                  = "Lab",
+      Started                  = nrow(demo_exp3),
+      Withdrew                 = 0,
+      Completed                = nrow(demo_exp3),
+      `RT exclusions`          = 0,
+      `Accuracy exclusions`    = length(over_95_pid) + length(under_55_pid),
+      `Familiarity exclusions` = as.character(length(exclude_ratings_exp3)),
+      `Final n`                = n(),
+      Female                   = sum(gender == "Female"),
+      Male                     = sum(gender == "Male"),
+      `Mean age (SD)`          = paste0(round(mean(Age), 1), " (", round(sd(Age), 1), ")")
+    ),
+
+  # Exp 4
+  demo_exp4 |>
+    filter(Status != "RETURNED",
+           `Participant id` %in% list_participant_analysis_4) |>
+    summarise(
+      Experiment               = "Experiment 4",
+      Setting                  = "Online",
+      Started                  = nrow(demo_exp4),
+      Withdrew                 = sum(demo_exp4$Status == "RETURNED"),
+      Completed                = sum(demo_exp4$Status != "RETURNED"),
+      `RT exclusions`          = length(exclude_rt_exp4),
+      `Accuracy exclusions`    = length(exclude_acc_exp4),
+      `Familiarity exclusions` = as.character(length(exclude_ratings_exp4)),
+      `Final n`                = n(),
+      Female                   = sum(Sex == "Female"),
+      Male                     = sum(Sex == "Male"),
+      `Mean age (SD)`          = paste0(round(mean(Age), 1), " (", round(sd(Age), 1), ")")
+    )
+)
+
+
+# Extract scalars for inline text from the table
+# Exp 1
+exp1_row <- participant_summary |> filter(Experiment == "Experiment 1")
+participant_n_exp1 <- nrow(demo_exp1)
+total_part_exp1    <- exp1_row$`Final n`
+male_exp1          <- exp1_row$Men
+female_exp1        <- exp1_row$Women
+mean_age_exp1      <- as.numeric(str_extract(exp1_row$`Mean age (SD)`, "^[0-9.]+"))
+sd_age_exp1        <- as.numeric(str_extract(exp1_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
+min_age_exp1       <- min(demo_exp1$Age[demo_exp1$Index != "1.1-RF-01"])
+max_age_exp1       <- max(demo_exp1$Age[demo_exp1$Index != "1.1-RF-01"])
+
+# Exp 2
+exp2_row           <- participant_summary |> filter(Experiment == "Experiment 2")
+total_number_part  <- exp2_row$Started
+inform_consent     <- exp2_row$Withdrew
+number_part_compl  <- exp2_row$Completed
+part_trial_25      <- exp2_row$`RT exclusions`
+part_acc_55        <- exp2_row$`Accuracy exclusions`
+number_participant_analysis_2 <- exp2_row$`Final n`
+male_exp2          <- exp2_row$Men
+female_exp2        <- exp2_row$Women
+mean_age_exp2      <- as.numeric(str_extract(exp2_row$`Mean age (SD)`, "^[0-9.]+"))
+sd_age_exp2        <- as.numeric(str_extract(exp2_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
+min_age_exp2       <- min(demo_exp2$Age[demo_exp2$Status != "RETURNED" & 
+                          demo_exp2$`Participant id` %in% list_participant_analysis_2])
+max_age_exp2       <- max(demo_exp2$Age[demo_exp2$Status != "RETURNED" & 
+                          demo_exp2$`Participant id` %in% list_participant_analysis_2])
+
+# Exp 3
+exp3_row           <- participant_summary |> filter(Experiment == "Experiment 3")
+participant_n_exp3 <- exp3_row$Started
+number_participant_3 <- exp3_row$`Final n`
+over_95            <- length(over_95_pid)
+under_55           <- length(under_55_pid)
+ratings_only       <- length(exclude_ratings_exp3)
+male_exp3          <- exp3_row$Men
+female_exp3        <- exp3_row$Women
+mean_age_exp3      <- as.numeric(str_extract(exp3_row$`Mean age (SD)`, "^[0-9.]+"))
+sd_age_exp3        <- as.numeric(str_extract(exp3_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
+min_age_exp3       <- min(demo_exp3$Age[demo_exp3$pid %in% list_participant_analysis_3])
+max_age_exp3       <- max(demo_exp3$Age[demo_exp3$pid %in% list_participant_analysis_3])
+
+# Exp 4
+exp4_row           <- participant_summary |> filter(Experiment == "Experiment 4")
+total_number_part_4  <- exp4_row$Started
+inform_consent_4     <- exp4_row$Withdrew
+number_part_compl_4  <- exp4_row$Completed
+part_trial_25_4      <- exp4_row$`RT exclusions`
+part_acc_55_4        <- exp4_row$`Accuracy exclusions`
+ratings_only_4       <- as.integer(exp4_row$`Familiarity exclusions`)
+number_participant_analysis_4 <- exp4_row$`Final n`
+male_exp4            <- exp4_row$Men
+female_exp4          <- exp4_row$Women
+mean_age_exp4        <- as.numeric(str_extract(exp4_row$`Mean age (SD)`, "^[0-9.]+"))
+sd_age_exp4          <- as.numeric(str_extract(exp4_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
+min_age_exp4         <- min(demo_exp4$Age[demo_exp4$Status != "RETURNED" & 
+                            demo_exp4$`Participant id` %in% list_participant_analysis_4])
+max_age_exp4         <- max(demo_exp4$Age[demo_exp4$Status != "RETURNED" & 
+                            demo_exp4$`Participant id` %in% list_participant_analysis_4])
+```
+
+## Experiment 1
 
 ### Participants
 
 All participants were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. Sample size was determined in advance. Following previous suggestions from @heathcoteDynamicModelsChoice2019, a parameter recovery study was run to estimate if 30 usable participant datasets were sufficient to accurately recover the parameter estimates. The parameter recovery study included 30 participant datasets, each with 180 trials (90 trials "familiar" and 90 trials "unfamiliar") and with our selected model parameterisation. The data-generated parameters were sufficiently well-recovered (See Supplementary Materials). `r participant_n_exp1` healthy participants took part in Experiment 1. All participants reported normal or corrected-to-normal vision and received payment (20 CHF) for participating in the experiment. Based on our preregistration, response times longer than 2.5 seconds were removed from the analysis. However, this cutoff value led to the the removal of 59% of the trials of one participant. Given the recommendation of having a certain number of trials per condition per participant when using evidence-accumulation models [@heathcoteDynamicModelsChoice2019; @parker2024], this participant was excluded from the data analysis. In the end, the data of `r total_part_exp1` participants (`r male_exp1` men and `r female_exp1` women) was retained for the analysis and the LBA modeling. Ages ranged from `r min_age_exp1` to `r max_age_exp1` years old ($M_{age} =$ `r mean_age_exp1`, $SD_{age} =$ `r sd_age_exp1`). This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.
+
+```{r}
+#| label: tbl-participants
+#| tbl-cap: "Participant summary across experiments. RT = response time; — = criterion not applicable for this experiment."
+#| include: true
+
+participant_summary |>
+  tt() |>
+  style_tt(fontsize = 0.85)
+```
 
 ### Stimuli
 
@@ -253,71 +538,6 @@ In the recognition part, participants completed three blocks of 90 recognition t
 
 ## Experiment 2
 
-```{r}
-#| label: exclusion-exp2
-#| include: false
-
-data_wrangle_exp_2 <- read_csv(here("Exp_2", "data", "data_exp_2", "wrangle_data_exp_2.csv")) %>%
-  mutate(rt_OSF = if_else(
-         rt < 2.0 | rt < 0.2, "yes", "no"))
-
-#RT check
-rt_check <- data_wrangle_exp_2 %>%
-  group_by(pid) %>%
-  summarise(sum_rt = sum(is.na(rt_OSF)),
-            perc = sum_rt*100/180)
-part_trial_25<-length(rt_check$pid[rt_check$perc>25])
-part_trial_25_pid <- rt_check$pid[rt_check$perc>25]
-
-#Acc check 
-acc_check <- data_wrangle_exp_2 %>%
-  filter(!is.na(rt_OSF),
-         !pid %in% part_trial_25_pid) %>%
-  select(!rt_OSF)
-
-acc_check <- acc_check %>%
-  group_by(pid) %>% 
-  summarise(sum = sum(acc),
-            n = n(), # n here is the total trials per grouping
-            perc = sum/n*100)
-part_acc_55 <- length(acc_check$pid[acc_check$perc < 55])
-part_acc_55_pid <- acc_check$pid[acc_check$perc < 55]
-
-#Participants for data analysis
-participant_analysis_2 <- data_wrangle_exp_2 %>%
-  filter(!pid %in% part_trial_25_pid,
-         !pid %in% part_acc_55_pid)
-number_participant_analysis_2 <- length(unique(participant_analysis_2$pid))
-list_participant_analysis_2 <- unique(participant_analysis_2$pid)
-
-```
-
-```{r}
-#| label: age-gender-exp2
-#| include: false
-
-demo_exp2 <- read_csv(here("Exp_2", "data", "data_exp_2", "prolific_demographic_exp2.csv")) %>%
-    mutate(`Participant id` = as.factor(`Participant id`),
-         Sex = as.factor(Sex), 
-         Age = as.numeric(Age))
-total_number_part <- length(demo_exp2$`Participant id`)
-inform_consent <- length(demo_exp2$`Participant id`[demo_exp2$Status=="RETURNED"])
-demo_exp2_completed <- demo_exp2 %>%
-  filter(!Status == "RETURNED") 
-number_part_compl <- length(demo_exp2_completed$`Participant id`)
-
-after_exclusion_demo_exp2 <- demo_exp2_completed %>%
-  filter(`Participant id` %in% list_participant_analysis_2)
-
-mean_age_exp2 = round(mean(after_exclusion_demo_exp2$Age), digits = 2)
-sd_age_exp2 = round(sd(after_exclusion_demo_exp2$Age), digits = 2)
-female_exp2 = sum(after_exclusion_demo_exp2$Sex== "Female")
-male_exp2 = sum(after_exclusion_demo_exp2$Sex== "Male")
-participant_n_exp2 = female_exp1 + male_exp1
-min_age_exp2 = min(after_exclusion_demo_exp2$Age)
-max_age_exp2 = max(after_exclusion_demo_exp2$Age)
-```
-
 ### Participants
 
 All participant were recruited on the Prolific platform (<https://www.prolific.com>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. Furthermore, Prolific offers the option to chose the approval rate of the participants willing to take part in the study. The approval rate is the percentage for which participants has been approved in previous experiment. A approval rate between 95% and 100% was established in our study to ensure data quality. `r total_number_part` participants started the experiment. After reading the inform consent, `r inform_consent` participants decided to not continue the experimental procedure and withdraw from the experiment. In the end, `r number_part_compl` participants completed the experiment and gave their informed consent. Following our preregistration exclusion criterion, `r part_trial_25` participants were excluded because their percentage of missed trials was higher lower than 25% and `r part_acc_55` was removed because the overall accuracy was lower than 55%. In the end, the data of `r number_participant_analysis_2` participants (`r male_exp2` men and `r female_exp2` women) was retained for the analysis and the LBA modeling. Ages ranged from `r min_age_exp2` to `r max_age_exp2` ($M_{age} =$ `r mean_age_exp2`, $SD_{age} =$ `r sd_age_exp2`). Following Prolific payment principles, each participant received 9£ for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.
@@ -334,115 +554,9 @@ Given the online nature of this experiment, participants were asked to complete 
 
 On Prolific, participants who wished to take part in the experiment read the study information and selected an URL link to the Pavlovia (Open Science Tools, Nottingham, UK) platform. After selecting the URL link, a Pavlovia webpage opened to the inform consent of the study. Participants chose if they wanted to complete this study or not after reading the inform consent. The access to the task was only granted if participants accepted the terms of the inform consent.
 
-```{r}
-#| label: rt-2-exp1
-#| include: false
-rt_exp_1 <- read_csv(here("Exp_1","data", "raw_data_exp_1.csv"))
-rt_exp_1_2 <- rt_exp_1 %>%
-  filter(!pid == "1",
-         rt > 2)
-number_rt_1 <- nrow(rt_exp_1_2)
-perc_rt_1 <- round((number_rt_1 / nrow(rt_exp_1)) *100, 3)
-```
-
 Regarding the experimental procedure, it was almost identical to the one used in Experiment 1 (Method and Materials, Experiment 1, Procedure). A response time window was added in the recognition part of the experiment. Instead of removing trials with a response time higher than 2.5 seconds after data collection, we decided to implement a response time window of 2 seconds for each recognition trial. In Experiment 1, `r perc_rt_1`% of the trials were longer than 2 seconds. We expected participants to quickly get accustomed to the response time limit and that the average percentage of missed trials will be similar or lower than in Experiment 1. Response time \[s\] and accuracy were collected after each recognition trial.
 
 ## Experiment 3
-
-```{r}
-#| label: exclusion-exp3
-#| include: false
-
-data_exp_3 <- read_csv(here("Exp_3", "data", "raw_data_exp_3.csv")) 
-
-#RT check
-rt_check <- data_exp_3 %>% 
-  mutate(missed_trial = if_else(
-        is.na(keypress), "yes", "no"))
-filtered_subjects <- rt_check %>%  
-  group_by(pid) %>%
-  summarise(missed_count = sum(missed_trial == "yes", na.rm = TRUE))
-
-#Accuracy check
-acc_check <- data_exp_3 %>% 
-  mutate(cond = as.factor(case_when(
-    fam == "1" ~ "Famous",
-    TRUE ~ "Novel")),
-    acc = case_when(
-    cond == "Famous" & keypress == "q" ~ 1,
-    cond == "Novel" & keypress == "p" ~ 1,
-    TRUE ~ 0))%>%
-  mutate(cond = fct_relevel(cond,"Famous", "Novel")) %>%
-  drop_na(rt) %>% #Removing the missed trials  
-  group_by(pid) %>%
-  summarise(sum = sum(acc),
-            n = n(), # n here is the total trials per grouping
-            perc = sum/n*100)
-#Over 95%
-over_95 <- length(acc_check$pid[acc_check$perc > 95])
-over_95_pid <- acc_check$pid[acc_check$perc > 95]
-
-
-
-#Under 55%
-under_55 <- length(acc_check$pid[acc_check$perc < 55])
-under_55_id <- acc_check$pid[acc_check$perc < 55]
-
-
-#Ratings check
-data_ratings <- list.files(here("Exp_3", "data"), pattern = "Ratings.*csv", full.names = TRUE, recursive = TRUE)%>% # check out list.files for info on selecting a bunch of files
-  set_names() %>% 
-  map_dfr(read_csv, col_names = c("Image_ID", "Fam_ratings", "Val_ratings", "Chosen_name")) %>%
-  add_column(pid = rep(1:40, each = 60), .before = "Image_ID") 
-
-#list of participants with number of fam ratings between 7-10 is lower than 30
-number_ratings <- data_ratings %>%
-  select(pid, Fam_ratings) %>%
-  group_by(pid) %>%
-  mutate(number_fam = sum(Fam_ratings > 6)) %>%
-  select(pid, number_fam) %>%
-  distinct() %>%
-  filter(number_fam < 30)
-ratings_only_id <- number_ratings$pid
-
-#Ratings_only
-ratings_only_id_tibble = tibble(value = number_ratings$pid) %>%
-  filter(!value %in% under_55_id)
-
-ratings_only_id <- pull(ratings_only_id_tibble, value)
-ratings_only = length(ratings_only_id)
-
-
-#Participant kept for data analysis
-participant_analysis_3 <- data_exp_3 %>%
-  filter(!pid %in% over_95_pid,
-         !pid %in% under_55_id,
-         !pid %in% ratings_only_id) 
-number_participant_3 <- length(unique(participant_analysis_3$pid))
-list_participant_analysis_3 <- unique(participant_analysis_3$pid)
-```
-
-```{r}
-#| label: load-demo-exp3
-#| include: false
-
-demo_exp3 <- read_xlsx(here("Exp_3", "data", "demo_exp_3.xlsx")) %>%
-    mutate(Index = as.factor(Index),
-         Gender = as.factor(Gender),
-         Age = as.numeric(Age),
-         pid = c(1:40),
-         pid = as.factor(pid))
-after_exclusion_demo_exp3 <- demo_exp3 %>%
-  filter(pid %in% list_participant_analysis_3)
-
-mean_age_exp3 = round(mean(after_exclusion_demo_exp3$Age), digits = 2)
-sd_age_exp3 = round(sd(after_exclusion_demo_exp3$Age), digits = 2)
-female_exp3 = sum(after_exclusion_demo_exp3$Gender== "F")
-male_exp3 = sum(after_exclusion_demo_exp3$Gender== "M")
-participant_n_exp3 = length(unique(demo_exp3$pid))
-min_age_exp3 = min(after_exclusion_demo_exp3$Age)
-max_age_exp3 = max(after_exclusion_demo_exp3$Age)
-```
 
 ### Participants
 
@@ -480,100 +594,6 @@ The experimental task was divided into two distinct parts: a rating part and a r
 
 ### Participants
 
-```{r}
-#| label: load-demo-exp4
-#| include: false
-
-demo_exp4 <- read_csv(here("Exp_4", "data", "demo", "demo_exp_4.csv")) %>%
-    mutate(`Participant id` = as.factor(`Participant id`),
-         Sex = as.factor(Sex), 
-         Age = as.numeric(Age))
-total_number_part_4 <- length(demo_exp4$`Participant id`)
-inform_consent_4 <- length(demo_exp4$`Participant id`[demo_exp4$Status=="RETURNED"])
-demo_exp4_completed <- demo_exp4 %>%
-  filter(!Status == "RETURNED")
-number_part_compl_4 <- length(demo_exp4_completed$`Participant id`)
-
-mean_age_exp4 = round(mean(demo_exp4_completed$Age), digits = 2)
-sd_age_exp4 = round(sd(demo_exp4_completed$Age), digits = 2)
-female_exp4 = sum(demo_exp4_completed$Sex== "Female")
-male_exp4 = sum(demo_exp4_completed$Sex== "Male")
-participant_n_exp4 = female_exp4 + male_exp4
-min_age_exp4 = min(demo_exp4_completed$Age)
-max_age_exp4 = max(demo_exp4_completed$Age)
-```
-
-```{r}
-#| label: exclusion-exp4
-#| include: false
-data_wrangle_exp_4 <- read_csv(here("Exp_4", "data", "wrangle_exp_4.csv")) %>%
-  mutate(rt_OSF = if_else(
-         rt < 2.0 | rt < 0.2, "yes", "no"))
-
-#RT check
-rt_check_4 <- data_wrangle_exp_4 %>%
-  group_by(pid) %>%
-  summarise(sum_rt = sum(is.na(rt_OSF)),
-            perc = sum_rt*100/180)
-part_trial_25_4<-length(rt_check_4$pid[rt_check_4$perc>25])
-part_trial_25_pid_4 <-rt_check_4$pid[rt_check_4$perc>25]
-#Acc check 
-acc_check_4 <- data_wrangle_exp_4 %>%
-  filter(!is.na(rt_OSF),
-         !pid %in% rt_check_4$pid[rt_check_4$perc>25]) %>%
-  select(!rt_OSF)
-
-acc_check_4 <- acc_check_4 %>%
-  group_by(pid) %>% 
-  summarise(sum = sum(acc),
-            n = n(), # n here is the total trials per grouping
-            perc = sum/n*100)
-part_acc_55_4 <- length(acc_check_4$pid[acc_check_4$perc < 55])
-under_55_id_4 <- acc_check_4$pid[acc_check_4$perc < 55]
-
-
-#Ratings check
-data_ratings_4 <- read_csv(here::here("Exp_4", "data", "raw_exp_4.csv")) %>%
-  filter(!is.na(familiarity_rating)) %>%
-  select(participant, familiarity_rating, valence_rating, name_correct) %>%
-  dplyr::rename(pid = participant)
-
-#list of participants with number of fam ratings between 7-10 is lower than 30
-number_ratings_4 <- data_ratings_4 %>%
-  mutate(pid = as.factor(pid)) %>%
-  select(pid, familiarity_rating) %>%
-  group_by(pid) %>%
-  summarise(familiarity_rating = sum(familiarity_rating > 6)) %>%
-  select(pid, familiarity_rating) %>%
-  distinct() %>%
-  filter(familiarity_rating < 30)
-droplevels(number_ratings_4)
-under_30_4 <- number_ratings_4 
-ratings_only_id_4 <- number_ratings_4$pid
-
-#Ratings_only
-ratings_only_id_tibble = tibble(value = number_ratings_4$pid) %>%
-  filter(!value %in% under_55_id_4,
-         !value %in% under_55_id_4)
-
-ratings_only_id_4 <- pull(ratings_only_id_tibble, value)
-ratings_only_4 = length(ratings_only_id_4)
-
-participant_analysis_4 <- demo_exp4_completed %>%
-  filter(!`Participant id` %in% part_trial_25_pid_4,
-         !`Participant id` %in% under_55_id_4,
-         !`Participant id` %in% ratings_only_id_4)
-number_participant_analysis_4 <- length(participant_analysis_4$`Participant id`)
-
-mean_age_exp4 = round(mean(participant_analysis_4$Age), digits = 2)
-sd_age_exp4 = round(sd(participant_analysis_4$Age), digits = 2)
-female_exp4 = sum(participant_analysis_4$Sex== "Female")
-male_exp4 = sum(participant_analysis_4$Sex== "Male")
-participant_n_exp4 = female_exp4 + male_exp4
-min_age_exp4 = min(participant_analysis_4$Age)
-max_age_exp4 = max(participant_analysis_4$Age)
-```
-
 All participant were recruited on the Prolific platform (<https://www.prolific.com>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. An approval rate between 95% and 100% was established in our study to ensure data quality. `r total_number_part_4` participants started the experiment. After reading the inform consent, `r inform_consent_4` participants decided to not continue the experimental procedure and withdraw from the experiment. `r number_part_compl_4` participants completed the experiment. Following our preregistration exclusion criterion, `r part_trial_25_4` participant was excluded because the percentage of missed trials was higher than 25% and `r part_acc_55_4` were removed because the overall accuracy was lower than 55%. Furthermore, `r ratings_only_4` did not show a level of familiarity high enough with the presented faces in the first part of the experiment. In the end, the data of `r number_participant_analysis_4` participants (`r male_exp4` men and `r female_exp4` women) was retained for further analysis and the LBA modeling. Ages ranged from `r min_age_exp4` to `r max_age_exp4` ($M_{age} =$ `r mean_age_exp4`, $SD_{age} =$ `r sd_age_exp4`). Following Prolific payment principles, each participant received 9£ for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.
 
 ### Stimuli
@@ -608,847 +628,563 @@ For every experiment, the separate analysis of response times and accuracy was c
 
 # Results
 
-The raw data and separate analysis of the accuracy and response times of each experiment is available in the Supplementary materials. In this section, only the results from the LBA modeling will be presented.
+First, we show raw data plots and descriptive statistics when reaction time and accuracy are analyses separately. Second, results from the LBA modeling will be presented.
+
+## Raw data plots and descriptive statistics 
+
+```{r}
+#| label: summarise-rt-acc
+#| include: false
+
+# ── Load & normalise ─────────────────────────────────────────────────────────
+# Each experiment gets labelled and pid coerced to character on read-in
+read_exp <- function(path, exp_number, recode = NULL) {
+  read_csv(here(path)) |>
+    mutate(
+      pid        = as.integer(factor(pid)),  # consistent across both formats
+      experiment = as.integer(exp_number),
+      block      = as.integer(block),
+      cond       = str_to_lower(cond)
+    ) |>
+    (\(df) if (!is.null(recode)) mutate(df, cond = dplyr::recode(cond, !!!recode)) else df)() |>
+    select(pid, block, experiment, cond, acc, rt)
+}
+
+data_all <- bind_rows(
+  read_exp("exp_1/data/data_exp_1.csv", 1),
+  read_exp("exp_2/data/data_exp_2.csv", 2),
+  read_exp("exp_3/data/data_exp_3.csv", 3),
+  read_exp("exp_4/data/data_exp_4.csv", 4, recode = c(familiar = "famous", novel = "novel"))
+)
+
+head(data_all)
+
+# ── Summary helpers ───────────────────────────────────────────────────────────
+# Participant-level summary, then group-level summary joined back on
+summarise_pid <- function(df, outcome_col, summary_fn) {
+  summary_fn <- rlang::as_function(summary_fn)  # handles both mean and ~ mean(.x)*100
+  
+  pid_level <- df |>
+    drop_na(all_of(outcome_col)) |>
+    group_by(experiment, pid, cond) |>
+    summarise(pid_val = summary_fn(.data[[outcome_col]]), .groups = "drop")
+
+  grp_level <- pid_level |>
+    group_by(experiment, cond) |>
+    summarise(
+      grp_val = mean(pid_val),
+      sem     = sd(pid_val) / sqrt(n()),
+      .groups = "drop"
+    )
+
+  left_join(pid_level, grp_level, by = c("experiment", "cond"))
+}
+
+acc_all <- summarise_pid(data_all, "acc", ~ mean(.x) * 100)
+head(acc_all)
+
+rt_all  <- summarise_pid(data_all, "rt",  mean)
+head(rt_all)
+
+# Define which conditions belong to which experiments
+exp_conds <- tribble(
+  ~experiment, ~cond,
+  1, "learned", 1, "novel",
+  2, "learned", 2, "novel",
+  3, "famous",  3, "novel",
+  4, "famous",  4, "novel"
+)
+
+# Filter rt_all and acc_all to only relevant conditions per experiment
+rt_plot_data  <- rt_all  |> semi_join(exp_conds, by = c("experiment", "cond"))
+acc_plot_data <- acc_all |> semi_join(exp_conds, by = c("experiment", "cond"))
+```
+
+```{r}
+#| label: create-rt-acc-plots
+#| include: false
+
+## paired plots for summarised RT and accuracy data
+paired_plot <- function(df, yvar, ylab, ylims) {
+  ggplot(df, aes(x = cond, y = {{ yvar }}, 
+                 fill = cond, colour = cond)) +
+    # per-participant lines
+    geom_line(
+      aes(group = pid),
+      colour    = "grey70",
+      linewidth = 0.3,
+      alpha     = 0.5
+    ) +
+    # per-participant dots
+    geom_point(
+      position = position_jitter(width = 0.06, height = 0, seed = 123),
+      alpha    = 0.5,
+      size     = 1.5
+    ) +
+    # group mean + 95% CI
+    stat_summary(
+      fun.data  = mean_se,
+      geom      = "pointrange",
+      colour    = "black",
+      size      = 0.6,
+      linewidth = 1.2,
+      fun.args  = list(mult = 1.96)
+    ) +
+    # line connecting group means
+    stat_summary(
+      aes(group = experiment),
+      fun       = mean,
+      geom      = "line",
+      colour    = "black",
+      linewidth = 0.8
+    ) +
+    scale_fill_manual(values   = myColors_3) +
+    scale_colour_manual(values = myColors_3) +
+    facet_grid(
+      ~ experiment, scales = "free_x",
+      labeller = labeller(experiment = ~ paste("Experiment", .x))
+    ) +
+    coord_cartesian(ylim = ylims) +
+    labs(x = NULL, y = ylab) 
+}
+
+acc_paired <- paired_plot(acc_plot_data, pid_val, "Accuracy [%]",  c(0, 100))
+#acc_paired
+
+rt_paired  <- paired_plot(rt_plot_data,  pid_val, "Mean RT [s]",   c(0, 1.75))
+#rt_paired
+
+## Density plots for all trial RT data
+
+# Dummy data to set x limits per experiment
+dummy_limits <- tibble(
+  experiment = c(1, 1, 2, 2, 3, 3, 4, 4),
+  rt         = c(0, 2.5, 0, 2.5, 0, 1.1, 0, 1.1),
+  cond       = "novel",
+  density    = 0
+)
+
+rt_density <- data_all |>
+  drop_na(rt) |>
+  semi_join(exp_conds, by = c("experiment", "cond")) |>
+  ggplot(aes(x = rt, fill = cond, colour = cond)) +
+  geom_density(alpha = 0.7) +
+  # invisible points to set x range per facet
+  geom_blank(
+    data = dummy_limits,
+    aes(x = rt),
+    inherit.aes = FALSE
+  ) +
+  geom_text(
+    data = tibble(
+      experiment = 3, x = 0.08, y = 7,
+      label = "RT artefact\n (80ms bins)"
+    ),
+    aes(x = x, y = y, label = label),
+    inherit.aes = FALSE, size = 2.5, hjust = 0,
+    colour = "grey40", lineheight = 0.9
+  ) +
+  geom_segment(
+    data = tibble(experiment = 3, x = 0.48, xend = 0.58, y = 6.7, yend = 5.5),
+    aes(x = x, xend = xend, y = y, yend = yend),
+    inherit.aes = FALSE, colour = "grey40", linewidth = 0.4,
+    arrow = arrow(length = unit(0.15, "cm"))
+  ) +
+  scale_fill_manual(values = myColors_3) +
+  scale_colour_manual(values = myColors_3) +
+  scale_x_continuous(breaks = seq(0, 2.5, by = 0.5)) +
+  facet_grid(
+    ~experiment,
+    scales   = "free_x",
+    labeller = labeller(experiment = ~ paste("Experiment", .x))
+  ) +
+  labs(
+    x = "Response time [s]", y = "Density",
+    fill = "Condition", colour = "Condition"
+  ) +
+  theme(
+    legend.position  = c(0.92, 0.8),
+    legend.text      = element_text(size = 7),
+    legend.title     = element_text(size = 8)
+  )
+rt_density
+```
+
+```{r}
+#| label: fig-acc-rt
+#| fig-cap: "Proportion of correct responses [%] and mean response times [s] across conditions for the four experiments. Coloured points represent individual participant averages, black points denote the group mean and error bars represent 95% confidence intervals."
+#| fig-subcap: 
+#|  - "Proportion of correct responses [%]"
+#|  - "Mean response times [s]"
+#| layout-ncol: 1
+#| warning: false
+#| fig-width: 7
+#| fig-height: 4
+
+acc_paired
+rt_paired
+```
+
+```{r}
+#| label: fig-rt-density
+#| fig-cap: "Density of response times [s] across conditions for the four experiments. The density plot for Experiment 3 clearly shows the timing quantisation artefact discussed in the Methods, where keypress responses were recorded in ~80ms bins rather than continuously."
+#| warning: false
+#| fig-width: 7
+#| fig-height: 4
+
+rt_density
+```
 
 ## Evidence accumulation modeling results
 
+For all experiments, posterior distributions for drift rate and threshold parameters are visulaised in @fig-threshold-all and @fig-drift-all and the medians and 95% quantile intervals are summarised in @tbl-lba-params.
+
+```{r}
+#| label: download-models
+#| include: false
+
+## Model objects are rather big files, so we keep them on the OSF
+## This will only download them once and not again
+# OSF authentication is only required if the project is private.
+# Once the project is made public, this line can be removed.
+# To authenticate: store your OSF token in .Renviron as OSF_PAT=your_token
+# See https://docs.ropensci.org/osfr/articles/auth.html for instructions.
+# this next line means authentication is attempted only if a token exists — so the same code works for both private and public scenarios
+
+if (Sys.getenv("OSF_PAT") != "") osf_auth(Sys.getenv("OSF_PAT")) 
+
+## download function
+download_if_missing <- function(exp_folder, file_name, local_dir) {
+  if (!dir.exists(here(local_dir))) {
+    dir.create(here(local_dir), recursive = TRUE)
+  }
+  local_file <- here(local_dir, file_name)
+  if (!file.exists(local_file)) {
+    osf_retrieve_node("65bt2") |>
+      osf_ls_files() |>
+      filter(name == exp_folder) |>
+      osf_ls_files() |>
+      osf_ls_files() |>
+      filter(name == file_name) |>
+      osf_download(path = here(local_dir), conflicts = "overwrite")
+  }
+}
+
+download_if_missing("exp_1", "LBA_exp1_v1.RData", "exp_1/models")
+download_if_missing("exp_2", "LBA_exp2_v1.RData", "exp_2/models")
+download_if_missing("exp_4", "LBA_exp4_v1.RData", "exp_4/models")
+```
+
+```{r}
+#| label: wrangle-lba
+#| include: false
+
+wrangle_lba <- function(model, exp_num, cond_label) {
+  # cond_label: "Learned" for Exp 1&2, "Famous" for Exp 4
+  
+  # Extract posterior samples and pivot to long format
+  params <- EMC2::parameters(model, selection = "alpha", N = NULL)
+  
+  param_cols <- c(
+    paste0("v_SNovel:lMTRUE"),
+    paste0("v_SNovel:lMFALSE"),
+    paste0("v_S", cond_label, ":lMTRUE"),
+    paste0("v_S", cond_label, ":lMFALSE"),
+    "sv_lMTRUE",
+    "B_lRNovel",
+    paste0("B_lR", cond_label),
+    "A", "t0"
+  )
+  
+  n_pids      <- length(unique(params$subjects))
+  n_draws     <- nrow(params) / n_pids
+  
+  pid_long <- params |>
+    as_tibble() |>
+    pivot_longer(
+      cols      = all_of(param_cols),
+      names_to  = "param",
+      values_to = "value"
+    ) |>
+    rename(pid = subjects) |>
+    mutate(
+      .draw  = rep(1:n_draws, each = length(param_cols), times = n_pids),
+      experiment = exp_num
+    )
+  
+  # Average across participants to get group level
+  pid_long |>
+    group_by(experiment, .draw, param) |>
+    summarise(value = mean(value, na.rm = TRUE), .groups = "drop")
+}
+
+# Load models and wrangle
+load(here("Exp_1/models/LBA_exp1_v1.RData"))
+load(here("Exp_2/models/LBA_exp2_v1.RData"))
+load(here("Exp_4/models/LBA_exp4_v1.RData"))
+
+theta_all <- bind_rows(
+  wrangle_lba(LBA_exp1_v1, 1, "Learned"),
+  wrangle_lba(LBA_exp2_v1, 2, "Learned"),
+  wrangle_lba(LBA_exp4_v1, 4, "Famous")
+)
+```
+
+```{r}
+#| label: wrangle-threshold
+#| include: false
+
+# Threshold
+thresh_all <- theta_all |>
+  filter(str_detect(param, "B_")) |>
+  mutate(
+    response   = case_when(
+      str_detect(param, "lRNovel")   ~ "novel",
+      str_detect(param, "lRLearned") ~ "learned",
+      str_detect(param, "lRFamous")  ~ "famous"
+    ),
+    response   = factor(response, levels = c("novel", "learned", "famous"))
+    #experiment = factor(experiment, labels = c("Experiment 1", "Experiment 2", "Experiment 4"))
+  )
+
+# Threshold contrast
+thresh_diff_all <- thresh_all |>
+  pivot_wider(
+    id_cols     = c(experiment, .draw),
+    names_from  = response,
+    values_from = value
+  ) |>
+  mutate(diff = novel - coalesce(learned, famous))  # works for both label schemes
+
+# Quantiles for inline text
+# Group-level quantiles per parameter per experiment — for inline text
+theta_all_q <- theta_all |>
+  group_by(experiment, param) |>
+  median_qi(value)
+
+# Threshold contrast quantiles per experiment
+thresh_diff_q <- thresh_diff_all |>
+  group_by(experiment) |>
+  median_qi(diff)
+```
+
+```{r}
+#| label: wrangle-drift
+#| include: false
+
+# Drift rate
+drift_all <- theta_all |>
+  filter(str_detect(param, "v_S")) |>
+  mutate(
+    condition = case_when(
+      str_detect(param, "Novel")   ~ "novel",
+      str_detect(param, "Learned") ~ "learned",
+      str_detect(param, "Famous")  ~ "famous"
+    ),
+    accuracy  = if_else(str_detect(param, "TRUE"), "true", "false"),
+    condition = factor(condition, levels = c("novel", "learned", "famous")),
+    accuracy  = factor(accuracy,  levels = c("false", "true"))
+  )
+
+# TRUE - FALSE per condition
+drift_acc_diff_all <- drift_all |>
+  pivot_wider(
+    id_cols     = c(experiment, .draw, condition),
+    names_from  = accuracy,
+    values_from = value
+  ) |>
+  mutate(
+    diff       = true - false
+    #experiment = factor(experiment, labels = c("Experiment 1", "Experiment 2", "Experiment 4"))
+  )
+
+# Novel - Learned/Famous contrast
+drift_cond_diff_all <- drift_acc_diff_all |>
+  pivot_wider(
+    id_cols     = c(experiment, .draw),
+    names_from  = condition,
+    values_from = diff
+  ) |>
+  mutate(diff = novel - coalesce(learned, famous))
+
+# Quantiles for inline text
+drift_acc_diff_q <- drift_acc_diff_all |>
+  group_by(experiment, condition) |>
+  median_qi(diff)
+
+drift_cond_diff_q <- drift_cond_diff_all |>
+  group_by(experiment) |>
+  median_qi(diff)
+```
+
 ### Experiment 1
 
-```{r}
-#| label: LBA-exp1
-#| include: false
-load(here("Exp_1", "models", "LBA_exp1_v1.RData"))
-param_1_pid = EMC2::parameters(LBA_exp1_v1,selection="alpha", N = NULL)
-
-split_tibble <- function(tibble, col = 'col') tibble %>% split(., .[, col])
-array_theta_1 <- split_tibble(param_1_pid, "subjects")
-array_theta_1<-do.call(rbind, array_theta_1)
-array_theta_pid_1 <- array_theta_1 %>%
-  pivot_longer(cols = c("v_SNovel:lMTRUE", "v_SNovel:lMFALSE", "v_SLearned:lMTRUE", "v_SLearned:lMFALSE", "sv_lMTRUE", "B_lRNovel", "B_lRLearned", "A", "t0"), names_to = "param", values_to = "value")%>%
-  add_column(datapoint = rep(1:15000,each=9,times=30))%>% #here 30'000 = number of chains (3) x number of iteration (5'000)
-  rename(pid=subjects)
-
-#Average across participants
-theta_group_1 <- array_theta_pid_1 %>%
-  group_by(datapoint,param) %>%
-  summarise(value = mean(value, na.rm = T)) %>%
-  ungroup() %>%
-  add_column(pid = "average") %>% ## add a column which makes clear it is the avg. not needed but useful for plotting later
-  relocate(pid, .before = everything())
-
-
-#Quantile at the group level
-theta_group_1_q <- theta_group_1 %>%
-  group_by(param) %>%
-  median_qi(value)
-
-
-#And per pid
-theta_pid_1_q <- array_theta_pid_1 %>%
-  group_by(pid, param) %>%
-  median_qi(value)
-
-```
+*Threshold:* We estimated the threshold parameter for both response options (Novel and Learned). Inspection of the posterior distributions of the effect of face familiarity on the threshold parameter shows that while the threshold for Novel faces is greater that the one for Learned faces.
 
 ```{r}
-#| label: thresh-pid
-#| include: false
-thresh_pid_1 <- array_theta_pid_1 %>%
-  filter(str_detect(param, "B_")) %>%
-  mutate(response = if_else(str_detect(param, "lRLearned"), "Learned", "Novel"),
-         response = factor(response,
-                            levels = c("Novel", "Learned")))
-```
-
-```{r}
-#| label: thresh-group
-#| include: false
-thresh_group_1 <- theta_group_1 %>%
-  filter(str_detect(param, "B_")) %>%
-  mutate(response = if_else(str_detect(param, "lRLearned"), "Learned", "Novel"),
-         response = factor(response,
-                            levels = c("Novel", "Learned")))
-```
-
-```{r}
-#| label: thresh-pid-diff
-#| include: false
-thresh_diff_pid_1 <- thresh_pid_1 %>%
-  pivot_wider(id_cols = -param,
-              names_from = "response",
-              values_from = "value") %>%
-  mutate(diff = Novel - Learned)
-
-#Quantiles
-thresh_diff_pid_1_q <- thresh_diff_pid_1 %>%
-  group_by(pid) %>%
-  median_qi(diff)
-
-```
-
-```{r}
-#| label: thresh-group-diff
-#| include: false
-thresh_diff_1 <- thresh_group_1 %>%
-  pivot_wider(id_cols = -param,
-              names_from = "response",
-              values_from = "value") %>%
-  mutate(diff = Novel - Learned)
-
-#Quantiles
-thresh_diff_1_q <- thresh_diff_1 %>%
-  group_by(pid) %>%
-  median_qi(diff)
-
-```
-
-```{r}
-#| label: drift-pid
-#| include: false
-drift_rate_pid_1 <- array_theta_pid_1 %>%
-  filter(str_detect(param, "v_S")) %>%
-  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Learned"),
-         accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
-         condition = factor(condition,
-                            levels = c("Novel", "Learned")),
-         accuracy = factor(accuracy,
-                            levels = c("False", "True")))
-
-## just true > false differences (accuracy)
-drift_acc_diff_pid_1 <- drift_rate_pid_1 %>%
-  pivot_wider(id_cols = -param,
-               names_from = accuracy,
-               values_from = value) %>%
-  mutate(diff = True - False)
-
-
-## Novel > Learned differences
-drift_acc_cond_diff_pid_1 <- drift_acc_diff_pid_1 %>%
-  pivot_wider(id_cols = -c("True", "False"),
-              names_from = condition,
-              values_from = diff) %>%
-  mutate(diff = Novel - Learned)
-
-```
-
-```{r}
-#| label: drift-group
-#| include: false
-drift_rate_group_1 <- theta_group_1 %>%
-  filter(str_detect(param, "v_S")) %>%
-  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Learned"),
-         accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
-         condition = factor(condition,
-                            levels = c("Novel", "Learned")),
-         accuracy = factor(accuracy,
-                            levels = c("False", "True")))
-
-## just true > false differences (accuracy)
-drift_acc_diff_1 <- drift_rate_group_1 %>%
-  pivot_wider(id_cols = -param,
-               names_from = accuracy,
-               values_from = value) %>%
-  mutate(diff = True - False)
-
-
-## Novel > Learned differences
-drift_acc_cond_diff_1 <- drift_acc_diff_1 %>%
-  pivot_wider(id_cols = -c("True", "False"),
-              names_from = condition,
-              values_from = diff) %>%
-  mutate(diff = Novel - Learned)
-drift_acc_cond_diff_1
-
-#Quantiles per condition
-drift_acc_diff_1_q <- drift_acc_diff_1 %>%
-  group_by(condition) %>%
-  median_qi(diff)
-
-
-#Quantiles differnece
-drift_acc_cond_diff_1_q <- drift_acc_cond_diff_1 %>%
-  median_qi(diff)
-
-```
-
-*Threshold:* We estimated the threshold parameter for both response options (Novel and Learned). Inspection of the posterior distributions of the effect of face familiarity on the threshold parameter shows that while the threshold for Novel faces is greater that the one for "Learned" faces (`r round(thresh_diff_1_q$diff, digits = 3)` \[`r round(thresh_diff_1_q$.lower, digits = 3)`, `r round(thresh_diff_1_q$.upper, digits = 3)`\]), both posterior distributions overlap with zero: threshold for "Novel" faces (`r round(theta_group_1_q$value[theta_group_1_q$param == "B_lRNovel"], digits = 3)` \[`r round(theta_group_1_q$.lower[theta_group_1_q$param == "B_lRNovel"], digits =   3)`, `r round(theta_group_1_q$.upper[theta_group_1_q$param == "B_lRNovel"], digits = 3)`\]) and for "Learned" faces (`r round(theta_group_1_q$value[theta_group_1_q$param == "B_lRLearned"], digits = 3)` \[`r round(theta_group_1_q$.lower[theta_group_1_q$param == "B_lRLearned"], digits =   3)`, `r round(theta_group_1_q$.upper[theta_group_1_q$param == "B_lRLearned"], digits = 3)`\]; see @fig-thresh_exp1).
-
-```{r}
-#| label: fig-thresh_exp1
-#| fig-cap: "Threshold estimates for Experiment 1: (a) Posterior distribution of the average threshold parameter by response option (Novel / Learned). (b) Difference between the posterior distribution of the average threshold parameter for the Novel response option and the Learned response option. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
+#| label: fig-threshold-all
+#| fig-cap: "Threshold estimates across experiments"
 #| fig-subcap:
-#|  - "Threshold by response"
-#|  - "Threshold difference (Novel > Learned)"
+#|   - "Threshold by response"
+#|   - "Threshold contrast"
 #| layout-ncol: 2
+#| fig-height: 10
+#| fig-width: 7
 
-ggplot(thresh_group_1, aes(x = value, y = fct_rev(response))) +
-  stat_halfeye(alpha = 0.7, aes(fill = response)) +
-  scale_fill_paletteer_d("rcartocolor::Safe") +
-  scale_colour_paletteer_d("rcartocolor::Safe")  +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(y="Response", x="Threshold") +
-  labs(fill = "Response") +
-  theme(legend.position = "none")
+# Left panel: condition distributions
+ggplot(thresh_all, aes(x = value, y = fct_rev(response), fill = response)) +
+  stat_halfeye(alpha = 0.7) +
+  geom_vline(xintercept = 0, colour = "darkgrey") +
+  scale_fill_manual(values = myColors_3) +
+  facet_grid(experiment ~ .,
+             labeller = labeller(experiment = ~ paste("Experiment", .x))) +
+  labs(x = "Threshold", y = "Response") +
+  theme(
+    text       = element_text(size = 20, face = "bold"),
+    strip.text = element_text(size = 20, face = "bold"),
+    axis.text  = element_text(size = 20, face = "bold")
+  )
 
-ggplot(thresh_diff_1, aes(x = diff, y = "")) +
-  stat_halfeye(alpha = 0.9, fill="firebrick") +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(x = "Threshold", y="Density")
-
+# Right panel: contrast
+ggplot(thresh_diff_all, aes(x = diff, y = "")) +
+  stat_halfeye(alpha = 0.9, fill = "firebrick") +
+  geom_vline(xintercept = 0, colour = "darkgrey") +
+  facet_grid(experiment ~ .,
+             labeller = labeller(experiment = ~ paste("Experiment", .x))) +
+  labs(x = "Threshold difference", y = "") +
+  theme(
+    text       = element_text(size = 20, face = "bold"),
+    strip.text = element_text(size = 20, face = "bold"),
+    axis.text  = element_text(size = 20, face = "bold")
+  )
 ```
 
-*Drift rate:* To quantify the contribution of face familiarity on the drift rate, we computed the difference between the TRUE and FALSE drift rate for each familiarity condition as our main dependent measure. To estimate the familiarity effect, we then subtracted the drift rate difference on learned trials from novel trials. Inspection of the posterior distribution shows that there is a novelty effect in drift rate difference in Experiment 1 (`r round(drift_acc_cond_diff_1_q$diff, digits = 3)` \[`r round(drift_acc_cond_diff_1_q$.lower, digits = 3)`, `r round(drift_acc_cond_diff_1_q$.upper, digits = 3)`\]). The quality of the evidence accumulation was greater for "Novel" faces (`r round(drift_acc_diff_1_q$diff[drift_acc_diff_1_q$condition == "Novel"], digits = 3)` \[`r round(drift_acc_diff_1_q$.lower[drift_acc_diff_1_q$condition == "Novel"], digits = 3)`, `r round(drift_acc_diff_1_q$.upper[drift_acc_diff_1_q$condition == "Novel"], digits = 3)`\]) compared to "Learned" faces (`r round(drift_acc_diff_1_q$diff[drift_acc_diff_1_q$condition == "Learned"], digits = 3)` \[`r round(drift_acc_diff_1_q$.lower[drift_acc_diff_1_q$condition == "Learned"], digits = 3)`, `r round(drift_acc_diff_1_q$.upper[drift_acc_diff_1_q$condition == "Learned"], digits = 3)`\]; see @fig-drift_exp1).
+*Drift rate:* To quantify the contribution of face familiarity on the drift rate, we computed the difference between the TRUE and FALSE drift rate for each familiarity condition as our main dependent measure. To estimate the familiarity effect, we then subtracted the drift rate difference on learned trials from novel trials. Inspection of the posterior distribution shows that there is a novelty effect in drift rate difference in Experiment 1. The quality of the evidence accumulation was greater for Novel faces compared to Learned faces.
 
 ```{r}
-#| label: fig-drift_exp1
-#| fig-cap: "Drift rate estimates for Experiment 1. (a) Posterior distribution of the average drift rate difference (TRUE - FALSE) by stimulus familiarity condition (Novel / Learned). (b) Difference between the posterior distribution of the average drift rate parameter (TRUE - FALSE) of the Novel condition and the Learned condition. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
+#| label: fig-drift-all
+#| fig-cap: "Drift rate estimates across experiments"
 #| fig-subcap:
-#|  - "Drift rate (TRUE - FALSE) by familiarity condition"
-#|  - "Drift rate difference (Novel > Learned)"
+#|   - "Drift rate (TRUE - FALSE) by condition"
+#|   - "Drift rate contrast"
 #| layout-ncol: 2
+#| fig-height: 10
+#| fig-width: 7
 
+# Left panel: condition distributions
+ggplot(drift_acc_diff_all, aes(x = diff, y = fct_rev(condition), fill = condition)) +
+  stat_halfeye(alpha = 0.7) +
+  geom_vline(xintercept = 0, colour = "darkgrey") +
+  scale_fill_manual(values = myColors_3) +
+  facet_grid(experiment ~ .,
+             labeller = labeller(experiment = ~ paste("Experiment", .x))) +
+  labs(x = "Drift rate (TRUE - FALSE)", y = "Condition") +
+  theme(
+    text       = element_text(size = 20, face = "bold"),
+    strip.text = element_text(size = 20, face = "bold"),
+    axis.text  = element_text(size = 20, face = "bold")
+  )
 
-ggplot(drift_acc_diff_1, aes(x = diff, y = fct_rev(condition))) +
-  stat_halfeye(aes(fill = condition), alpha = 0.7) +
-  scale_fill_paletteer_d("rcartocolor::Safe") +
-  scale_colour_paletteer_d("rcartocolor::Safe")  +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  theme(legend.position = "none") +
-  labs(x="Drift rate", y="Familiarity")
+# Right panel: contrast
+ggplot(drift_cond_diff_all, aes(x = diff, y = "")) +
+  stat_halfeye(alpha = 0.9, fill = "firebrick") +
+  geom_vline(xintercept = 0, colour = "darkgrey") +
+  facet_grid(experiment ~ .,
+             labeller = labeller(experiment = ~ paste("Experiment", .x))) +
+  labs(x = "Drift rate difference", y = "") +
+  theme(
+    text       = element_text(size = 20, face = "bold"),
+    strip.text = element_text(size = 20, face = "bold"),
+    axis.text  = element_text(size = 20, face = "bold")
+  )
+```
 
-ggplot(drift_acc_cond_diff_1, aes(x = diff, y = "")) +
-  stat_halfeye(fill = "firebrick", alpha = 0.9) +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(x="Drift rate", y="") +
-  xlim(0,3)
+```{r}
+#| label: tbl-lba-params
+#| tbl-cap: "Posterior median and 95% credible intervals for threshold and drift rate parameters across experiments. Positive contrast values indicate a novel face advantage."
+#| include: true
 
+# Build table
+thresh_cond_table <- theta_all_q |>
+  filter(str_detect(param, "B_")) |>
+  mutate(
+    parameter = "Threshold",
+    condition = case_when(
+      str_detect(param, "lRNovel")   ~ "novel",
+      str_detect(param, "lRLearned") ~ "learned",
+      str_detect(param, "lRFamous")  ~ "famous"
+    )
+  ) |>
+  select(experiment, parameter, condition, median = value, lower = .lower, upper = .upper)
+
+thresh_table <- thresh_diff_all |>
+  group_by(experiment) |>
+  median_qi(diff) |>
+  mutate(
+    parameter = "Threshold contrast",
+    condition = if_else(experiment == 4, "novel - famous", "novel - learned")
+  ) |>
+  select(experiment, parameter, condition, median = diff, lower = .lower, upper = .upper)
+
+drift_table <- drift_acc_diff_all |>
+  group_by(experiment, condition) |>
+  median_qi(diff) |>
+  mutate(parameter = "Drift rate") |>
+  select(experiment, parameter, condition, median = diff, lower = .lower, upper = .upper)
+
+drift_diff_table <- drift_cond_diff_all |>
+  group_by(experiment) |>
+  median_qi(diff) |>
+  mutate(
+    parameter = "Drift rate contrast",
+    condition = if_else(experiment == 4, "novel - famous", "novel - learned")
+  ) |>
+  select(experiment, parameter, condition, median = diff, lower = .lower, upper = .upper)
+
+# Combine
+lba_table <- bind_rows(
+  thresh_cond_table,
+  thresh_table,
+  drift_table,
+  drift_diff_table
+) |>
+  mutate(
+    qi         = paste0("[", round(lower, 3), ", ", round(upper, 3), "]"),
+    median     = round(median, 3),
+    experiment = paste("Experiment", experiment),
+    Parameter  = factor(parameter, levels = c("Threshold", "Threshold contrast",
+                                               "Drift rate", "Drift rate contrast")),
+    Condition  = factor(condition, levels = c("novel", "learned", "famous",
+                                              "novel - learned", "novel - famous"))
+  ) |>
+  arrange(experiment, Parameter, Condition) |>
+  select(
+    Experiment = experiment,
+    Parameter,
+    Condition,
+    Median     = median,
+    `95% QI`   = qi
+  )
+
+lba_table |> 
+  tt()
 ```
 
 ### Experiment 2
 
-```{r}
-#| label: LBA-exp2
-#| include: false
-load(here("Exp_2", "models", "LBA_exp2_v1.RData"))
-param_2_pid = EMC2::parameters(LBA_exp2_v1,selection="alpha", N = NULL)
+*Threshold:* Inspection of the posterior distribution shows that there is an effect of familiarity on the threshold parameter.
 
-split_tibble <- function(tibble, col = 'col') tibble %>% split(., .[, col])
-array_theta_2 <- split_tibble(param_2_pid, "subjects")
-array_theta_2<-do.call(rbind, array_theta_2)
-array_theta_pid_2 <- array_theta_2 %>%
-  pivot_longer(cols = c("v_SNovel:lMTRUE", "v_SNovel:lMFALSE", "v_SLearned:lMTRUE", "v_SLearned:lMFALSE", "sv_lMTRUE", "B_lRNovel", "B_lRLearned", "A", "t0"), names_to = "param", values_to = "value")%>%
-  add_column(datapoint = rep(1:15000,each=9,times=30))%>% #here 30'000 = number of chains (3) x number of iteration (5'000)
-  rename(pid=subjects)
-
-#Average across participants
-theta_group_2 <- array_theta_pid_2 %>%
-  group_by(datapoint,param) %>%
-  summarise(value = mean(value, na.rm = T)) %>%
-  ungroup() %>%
-  add_column(pid = "average") %>% ## add a column which makes clear it is the avg. not needed but useful for plotting later
-  relocate(pid, .before = everything())
-
-
-#Quantile at the group level
-theta_group_2_q <- theta_group_2 %>%
-  group_by(param) %>%
-  median_qi(value)
-
-
-#And per pid
-theta_pid_2_q <- array_theta_pid_2 %>%
-  group_by(pid, param) %>%
-  median_qi(value)
-
-```
-
-```{r}
-#| label: thresh-pid-exp2
-#| include: false
-thresh_pid_2 <- array_theta_pid_2 %>%
-  filter(str_detect(param, "B_")) %>%
-  mutate(response = if_else(str_detect(param, "lRLearned"), "Learned", "Novel"),
-         response = factor(response,
-                            levels = c("Novel", "Learned")))
-```
-
-```{r}
-#| label: thresh-group-exp2
-#| include: false
-thresh_group_2 <- theta_group_2 %>%
-  filter(str_detect(param, "B_")) %>%
-  mutate(response = if_else(str_detect(param, "lRLearned"), "Learned", "Novel"),
-         response = factor(response,
-                            levels = c("Novel", "Learned")))
-```
-
-```{r}
-#| label: thresh-pid-diff-exp2
-#| include: false
-thresh_diff_pid_2 <- thresh_pid_2 %>%
-  pivot_wider(id_cols = -param,
-              names_from = "response",
-              values_from = "value") %>%
-  mutate(diff = Novel - Learned)
-
-#Quantiles
-thresh_diff_pid_2_q <- thresh_diff_pid_2 %>%
-  group_by(pid) %>%
-  median_qi(diff)
-
-```
-
-```{r}
-#| label: thresh-group-diff-exp2
-#| include: false
-thresh_diff_2 <- thresh_group_2 %>%
-  pivot_wider(id_cols = -param,
-              names_from = "response",
-              values_from = "value") %>%
-  mutate(diff = Novel - Learned)
-
-#Quantiles
-thresh_diff_2_q <- thresh_diff_2 %>%
-  group_by(pid) %>%
-  median_qi(diff)
-
-```
-
-```{r}
-#| label: drift-pid-exp2
-#| include: false
-drift_rate_pid_2 <- array_theta_pid_2 %>%
-  filter(str_detect(param, "v_S")) %>%
-  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Learned"),
-         accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
-         condition = factor(condition,
-                            levels = c("Novel", "Learned")),
-         accuracy = factor(accuracy,
-                            levels = c("False", "True")))
-
-## just true > false differences (accuracy)
-drift_acc_diff_pid_2 <- drift_rate_pid_2 %>%
-  pivot_wider(id_cols = -param,
-               names_from = accuracy,
-               values_from = value) %>%
-  mutate(diff = True - False)
-
-
-## Novel > Learned differences
-drift_acc_cond_diff_pid_2 <- drift_acc_diff_pid_2 %>%
-  pivot_wider(id_cols = -c("True", "False"),
-              names_from = condition,
-              values_from = diff) %>%
-  mutate(diff = Novel - Learned)
-
-```
-
-```{r}
-#| label: drift-group-exp2
-#| include: false
-drift_rate_group_2 <- theta_group_2 %>%
-  filter(str_detect(param, "v_S")) %>%
-  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Learned"),
-         accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
-         condition = factor(condition,
-                            levels = c("Novel", "Learned")),
-         accuracy = factor(accuracy,
-                            levels = c("False", "True")))
-
-## just true > false differences (accuracy)
-drift_acc_diff_2 <- drift_rate_group_2 %>%
-  pivot_wider(id_cols = -param,
-               names_from = accuracy,
-               values_from = value) %>%
-  mutate(diff = True - False)
-
-
-## Novel > Learned differences
-drift_acc_cond_diff_2 <- drift_acc_diff_2 %>%
-  pivot_wider(id_cols = -c("True", "False"),
-              names_from = condition,
-              values_from = diff) %>%
-  mutate(diff = Novel - Learned)
-
-
-#Quantiles per condition
-drift_acc_diff_2_q <- drift_acc_diff_2 %>%
-  group_by(condition) %>%
-  median_qi(diff)
-
-
-#Quantiles differnece
-drift_acc_cond_diff_2_q <- drift_acc_cond_diff_2 %>%
-  median_qi(diff)
-
-```
-
-*Threshold:* We estimated the threshold parameter for both response options (Novel and Learned). Inspection of the posterior distribution shows that there is an effect of familiarity on the threshold parameter (`r round(thresh_diff_2_q$diff, digits = 3)` \[`r round(thresh_diff_2_q$.lower, digits = 3)`, `r round(thresh_diff_2_q$.upper, digits = 3)`\]). Threshold was greater for "Novel" faces (`r round(theta_group_2_q$value[theta_group_2_q$param == "B_lRNovel"], digits = 3)` \[`r round(theta_group_2_q$.lower[theta_group_2_q$param == "B_lRNovel"], digits =   3)`, `r round(theta_group_2_q$.upper[theta_group_2_q$param == "B_lRNovel"], digits = 3)`\]) than for "Learned" faces (`r round(theta_group_2_q$value[theta_group_2_q$param == "B_lRLearned"], digits = 3)` \[`r round(theta_group_2_q$.lower[theta_group_2_q$param == "B_lRLearned"], digits =   3)`, `r round(theta_group_2_q$.upper[theta_group_2_q$param == "B_lRLearned"], digits = 3)`\]; see @fig-thresh_exp2). Unlike as in Experiment 1, none of the posterior distributions overlap with zero.
-
-```{r}
-#| label: fig-thresh_exp2
-#| fig-cap: "Threshold estimates for Experiment 2: (a) Posterior distribution of the average threshold parameter by response option (Novel / Learned). (b) Difference between the posterior distribution of the average threshold parameter for the Novel response option and the Learned response option. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
-#| fig-subcap:
-#|  - "Group level: Threshold by response"
-#|  - "Group level: Threshold difference (Novel > Learned)"
-#| layout-ncol: 2
-
-ggplot(thresh_group_2, aes(x = value, y = fct_rev(response))) +
-  stat_halfeye(alpha = 0.7, aes(fill = response)) +
-  scale_fill_paletteer_d("rcartocolor::Safe") +
-  scale_colour_paletteer_d("rcartocolor::Safe")  +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(y="Response", x="Threshold") +
-  labs(fill = "Response") +
-  theme(legend.position = "none")
-
-ggplot(thresh_diff_2, aes(x = diff, y = "")) +
-  stat_halfeye(alpha = 0.9, fill="firebrick") +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(x = "Threshold", y="Density")
-
-```
-
-*Drift rate:* Inspection of the posterior distribution shows that there is a similar familiarity effect in drift rate difference as in Experiment 1 (`r round(drift_acc_cond_diff_2_q$diff, digits = 3)` \[`r round(drift_acc_cond_diff_2_q$.lower, digits = 3)`, `r round(drift_acc_cond_diff_2_q$.upper, digits = 3)`\]). The quality of the evidence accumulation was greater for "Novel" faces (`r round(drift_acc_diff_2_q$diff[drift_acc_diff_2_q$condition == "Novel"], digits = 3)` \[`r round(drift_acc_diff_2_q$.lower[drift_acc_diff_2_q$condition == "Novel"], digits = 3)`, `r round(drift_acc_diff_2_q$.upper[drift_acc_diff_2_q$condition == "Novel"], digits = 3)`\]) compared to "Learned" faces (`r round(drift_acc_diff_2_q$diff[drift_acc_diff_2_q$condition == "Learned"], digits = 3)` \[`r round(drift_acc_diff_2_q$.lower[drift_acc_diff_2_q$condition == "Learned"], digits = 3)`, `r round(drift_acc_diff_2_q$.upper[drift_acc_diff_2_q$condition == "Learned"], digits = 3)`\]; see @fig-drift_exp2).
-
-```{r}
-#| label: fig-drift_exp2
-#| fig-cap: "Drift rate estimates for Experiment 2. (a) Posterior distribution of the average drift rate difference (TRUE - FALSE) by stimulus familiarity condition (Novel / Learned). (b) Difference between the posterior distribution of the average drift rate parameter (TRUE - FALSE) of the Novel condition and the Learned condition. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
-#| fig-subcap:
-#|  - "Group level: Drift rate (TRUE - FALSE) by familiarity condition"
-#|  - "Group level: Drift rate difference (Novel > Learned)"
-#| layout-ncol: 2
-
-
-ggplot(drift_acc_diff_2, aes(x = diff, y = fct_rev(condition))) +
-  stat_halfeye(aes(fill = condition), alpha = 0.7) +
-  scale_fill_paletteer_d("rcartocolor::Safe") +
-  scale_colour_paletteer_d("rcartocolor::Safe")  +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  theme(legend.position = "none") +
-  labs(x="Drift rate", y="Familiarity")
-
-ggplot(drift_acc_cond_diff_2, aes(x = diff, y = "")) +
-  stat_halfeye(fill = "firebrick", alpha = 0.9) +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(x="Drift rate", y="") +
-  xlim(0,3)
-
-```
+*Drift rate:* Inspection of the posterior distribution shows that there is a similar familiarity effect in drift rate difference as in Experiment 1. The quality of the evidence accumulation was greater for Novel faces compared to Learned faces.
 
 ### Experiment 3
 
-```{r}
-#| label: LBA-exp3
-#| include: false
-load(here("Exp_3", "models", "LBA_exp3_v1.RData"))
-param_3_pid = EMC2::parameters(LBA_exp3_v1,selection="alpha", N = NULL)
-
-split_tibble <- function(tibble, col = 'col') tibble %>% split(., .[, col])
-array_theta_3 <- split_tibble(param_3_pid, "subjects")
-array_theta_3 <-do.call(rbind, array_theta_3)
-array_theta_pid_3 <- array_theta_3 %>%
-  pivot_longer(cols = c("v_SNovel:lMTRUE", "v_SNovel:lMFALSE", "v_SFamous:lMTRUE", "v_SFamous:lMFALSE", "sv_lMTRUE", "B_lRNovel", "B_lRFamous", "A", "t0"), names_to = "param", values_to = "value")%>%
-  add_column(datapoint = rep(1:15000,each=9,times=30))%>% #here 30'000 = number of chains (3) x number of iteration (5'000)
-  rename(pid=subjects)
-
-#Average across participants
-theta_group_3 <- array_theta_pid_3 %>%
-  group_by(datapoint,param) %>%
-  summarise(value = mean(value, na.rm = T)) %>%
-  ungroup() %>%
-  add_column(pid = "average") %>% ## add a column which makes clear it is the avg. not needed but useful for plotting later
-  relocate(pid, .before = everything())
-
-
-#Quantile at the group level
-theta_group_3_q <- theta_group_3 %>%
-  group_by(param) %>%
-  median_qi(value)
-
-
-#And per pid
-theta_pid_3_q <- array_theta_pid_3 %>%
-  group_by(pid, param) %>%
-  median_qi(value)
-
-```
-
-```{r}
-#| label: thresh-pid-exp3
-#| include: false
-thresh_pid_3 <- array_theta_pid_3 %>%
-  filter(str_detect(param, "B_")) %>%
-  mutate(response = if_else(str_detect(param, "lRFamous"), "Famous", "Novel"),
-         response = factor(response,
-                            levels = c("Novel", "Famous")))
-```
-
-```{r}
-#| label: thresh-group-exp3
-#| include: false
-thresh_group_3 <- theta_group_3 %>%
-  filter(str_detect(param, "B_")) %>%
-  mutate(response = if_else(str_detect(param, "lRFamous"), "Famous", "Novel"),
-         response = factor(response,
-                            levels = c("Novel", "Famous")))
-```
-
-```{r}
-#| label: thresh-pid-diff-exp3
-#| include: false
-thresh_diff_pid_3 <- thresh_pid_3 %>%
-  pivot_wider(id_cols = -param,
-              names_from = "response",
-              values_from = "value") %>%
-  mutate(diff = Famous - Novel)
-
-#Quantiles
-thresh_diff_pid_3_q <- thresh_diff_pid_3 %>%
-  group_by(pid) %>%
-  median_qi(diff)
-
-```
-
-```{r}
-#| label: thresh-group-diff-exp3
-#| include: false
-thresh_diff_3 <- thresh_group_3 %>%
-  pivot_wider(id_cols = -param,
-              names_from = "response",
-              values_from = "value") %>%
-  mutate(diff = Famous - Novel)
-
-#Quantiles
-thresh_diff_3_q <- thresh_diff_3 %>%
-  group_by(pid) %>%
-  median_qi(diff)
-
-```
-
-```{r}
-#| label: drift-pid-exp3
-#| include: false
-drift_rate_pid_3 <- array_theta_pid_3 %>%
-  filter(str_detect(param, "v_S")) %>%
-  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Famous"),
-         accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
-         condition = factor(condition,
-                            levels = c("Novel", "Famous")),
-         accuracy = factor(accuracy,
-                            levels = c("False", "True")))
-
-## just true > false differences (accuracy)
-drift_acc_diff_pid_3 <- drift_rate_pid_3 %>%
-  pivot_wider(id_cols = -param,
-               names_from = accuracy,
-               values_from = value) %>%
-  mutate(diff = True - False)
-
-
-## Novel > Learned differences
-drift_acc_cond_diff_pid_3 <- drift_acc_diff_pid_3 %>%
-  pivot_wider(id_cols = -c("True", "False"),
-              names_from = condition,
-              values_from = diff) %>%
-  mutate(diff = Famous - Novel)
-
-```
-
-```{r}
-#| label: drift-group-exp3
-#| include: false
-drift_rate_group_3 <- theta_group_3 %>%
-  filter(str_detect(param, "v_S")) %>%
-  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Famous"),
-         accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
-         condition = factor(condition,
-                            levels = c("Novel", "Famous")),
-         accuracy = factor(accuracy,
-                            levels = c("False", "True")))
-
-## just true > false differences (accuracy)
-drift_acc_diff_3 <- drift_rate_group_3 %>%
-  pivot_wider(id_cols = -param,
-               names_from = accuracy,
-               values_from = value) %>%
-  mutate(diff = True - False)
-
-
-## Novel > Learned differences
-drift_acc_cond_diff_3 <- drift_acc_diff_3 %>%
-  pivot_wider(id_cols = -c("True", "False"),
-              names_from = condition,
-              values_from = diff) %>%
-  mutate(diff = Famous - Novel)
-
-
-#Quantiles per condition
-drift_acc_diff_3_q <- drift_acc_diff_3 %>%
-  group_by(condition) %>%
-  median_qi(diff)
-
-
-#Quantiles difference
-drift_acc_cond_diff_3_q <- drift_acc_cond_diff_3 %>%
-  median_qi(diff)
-```
-
-*Threshold:* We estimated the threshold parameter for both response options (Novel and Famous). Inspection of the posterior distribution shows that there is an effect of familiarity on the threshold parameter (`r round(thresh_diff_3_q$diff, digits = 3)` \[`r round(thresh_diff_3_q$.lower, digits = 3)`, `r round(thresh_diff_3_q$.upper, digits = 3)`\]). Threshold was greater for "Famous" faces (`r round(theta_group_3_q$value[theta_group_3_q$param == "B_lRFamous"], digits = 3)` \[`r round(theta_group_3_q$.lower[theta_group_3_q$param == "B_lRFamous"], digits =   3)`, `r round(theta_group_3_q$.upper[theta_group_3_q$param == "B_lRFamous"], digits = 3)`\]) than for "Novel" faces (`r round(theta_group_3_q$value[theta_group_3_q$param == "B_lRNovel"], digits = 3)` \[`r round(theta_group_3_q$.lower[theta_group_3_q$param == "B_lRNovel"], digits =   3)`, `r round(theta_group_3_q$.upper[theta_group_3_q$param == "B_lRNovel"], digits = 3)`\]; see @fig-thresh_exp3).
-
-```{r}
-#| label: fig-thresh_exp3
-#| fig-cap: "Threshold estimates for Experiment 3: (a) Posterior distribution of the average threshold parameter by response option (Novel / Learned). (b) Difference between the posterior distribution of the average threshold parameter for the Novel response option and the Learned response option. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
-#| fig-subcap:
-#|  - "Group level: Threshold by response"
-#|  - "Group level: Threshold difference (Famous > Novel)"
-#| layout-ncol: 2
-
-ggplot(thresh_group_3, aes(x = value, y = fct_rev(response))) +
-  stat_halfeye(alpha = 0.7, aes(fill = response)) +
-  scale_fill_manual(values = myColors_2) +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(y="Response", x="Threshold") +
-  labs(fill = "Response") +
-  theme(legend.position = "none")
-
-ggplot(thresh_diff_3, aes(x = diff, y = "")) +
-  stat_halfeye(alpha = 0.9, fill="firebrick") +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(x = "Threshold", y="Density")
-
-```
-
-*Drift rate:* Inspection of the posterior distribution shows that there is a familiarity effect in drift rate difference (`r round(drift_acc_cond_diff_3_q$diff, digits = 3)` \[`r round(drift_acc_cond_diff_3_q$.lower, digits = 3)`, `r round(drift_acc_cond_diff_3_q$.upper, digits = 3)`\]). The quality of the evidence accumulation was greater for "Famous" faces (`r round(drift_acc_diff_3_q$diff[drift_acc_diff_3_q$condition == "Famous"], digits = 3)` \[`r round(drift_acc_diff_3_q$.lower[drift_acc_diff_3_q$condition == "Famous"], digits = 3)`, `r round(drift_acc_diff_3_q$.upper[drift_acc_diff_3_q$condition == "Famous"], digits = 3)`\]) compared to "Novel" faces (`r round(drift_acc_diff_3_q$diff[drift_acc_diff_3_q$condition == "Novel"], digits = 3)` \[`r round(drift_acc_diff_3_q$.lower[drift_acc_diff_3_q$condition == "Novel"], digits = 3)`, `r round(drift_acc_diff_3_q$.upper[drift_acc_diff_3_q$condition == "Novel"], digits = 3)`\]; see @fig-drift_exp3).
-
-```{r}
-#| label: fig-drift_exp3
-#| fig-cap: "Drift rate estimates for Experiment 3. (a) Posterior distribution of the average drift rate difference (TRUE - FALSE) by stimulus familiarity condition (Novel / Famous). (b) Difference between the posterior distribution of the average drift rate parameter (TRUE - FALSE) of the Famous condition and the Novel condition. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
-#| fig-subcap:
-#|  - "Group level: Drift rate (TRUE - FALSE) by familiarity condition"
-#|  - "Group level: Drift rate difference (Famous > Novel)"
-#| layout-ncol: 2
-
-
-ggplot(drift_acc_diff_3, aes(x = diff, y = fct_rev(condition))) +
-  stat_halfeye(aes(fill = condition), alpha = 0.7) +
-  scale_fill_manual(values = myColors_2) +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  theme(legend.position = "none") +
-  labs(x="Drift rate", y="Familiarity")
-
-ggplot(drift_acc_cond_diff_3, aes(x = diff, y = "")) +
-  stat_halfeye(fill = "firebrick", alpha = 0.9) +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(x="Drift rate", y="") +
-  xlim(0,3)
-
-```
+As explained in the Methods, due to a timing artefact in data collection (responses recorded in discrete 80ms bins), the RT distributions from Experiment 3 do not meet the continuity assumptions of the LBA and we do not report model parameter estimates for this experiment. 
 
 ### Experiment 4
 
-```{r}
-#| label: LBA-exp4
-#| include: false
-load(here("Exp_4", "models", "LBA_exp4_v1.RData"))
-param_4_pid = EMC2::parameters(LBA_exp4_v1,selection="alpha", N = NULL)
+*Threshold:* Inspection of the posterior distribution shows that there is an effect of familiarity on the threshold parameter. Threshold was greater for Novel faces than for Famous faces.
 
-split_tibble <- function(tibble, col = 'col') tibble %>% split(., .[, col])
-array_theta_4 <- split_tibble(param_4_pid, "subjects")
-array_theta_4 <-do.call(rbind, array_theta_4)
-array_theta_pid_4 <- array_theta_4 %>%
-  pivot_longer(cols = c("v_SNovel:lMTRUE", "v_SNovel:lMFALSE", "v_SFamous:lMTRUE", "v_SFamous:lMFALSE", "sv_lMTRUE", "B_lRNovel", "B_lRFamous", "A", "t0"), names_to = "param", values_to = "value")%>%
-  add_column(datapoint = rep(1:15000,each=9,times=30))%>% #here 30'000 = number of chains (3) x number of iteration (5'000)
-  rename(pid=subjects)
-
-#Average across participants
-theta_group_4 <- array_theta_pid_4 %>%
-  group_by(datapoint,param) %>%
-  summarise(value = mean(value, na.rm = T)) %>%
-  ungroup() %>%
-  add_column(pid = "average") %>% ## add a column which makes clear it is the avg. not needed but useful for plotting later
-  relocate(pid, .before = everything())
-
-
-#Quantile at the group level
-theta_group_4_q <- theta_group_4 %>%
-  group_by(param) %>%
-  median_qi(value)
-
-#And per pid
-theta_pid_4_q <- array_theta_pid_4 %>%
-  group_by(pid, param) %>%
-  median_qi(value)
-
-```
-
-```{r}
-#| label: thresh-pid-exp4
-#| include: false
-thresh_pid_4 <- array_theta_pid_4 %>%
-  filter(str_detect(param, "B_")) %>%
-  mutate(response = if_else(str_detect(param, "lRFamous"), "Famous", "Novel"),
-         response = factor(response,
-                            levels = c("Novel", "Famous")))
-```
-
-```{r}
-#| label: thresh-group-exp4
-#| include: false
-thresh_group_4 <- theta_group_4 %>%
-  filter(str_detect(param, "B_")) %>%
-  mutate(response = if_else(str_detect(param, "lRFamous"), "Famous", "Novel"),
-         response = factor(response,
-                            levels = c("Novel", "Famous")))
-```
-
-```{r}
-#| label: thresh-pid-diff-exp4
-#| include: false
-thresh_diff_pid_4 <- thresh_pid_4 %>%
-  pivot_wider(id_cols = -param,
-              names_from = "response",
-              values_from = "value") %>%
-  mutate(diff = Novel - Famous)
-
-#Quantiles
-thresh_diff_pid_4_q <- thresh_diff_pid_4 %>%
-  group_by(pid) %>%
-  median_qi(diff)
-```
-
-```{r}
-#| label: thresh-group-diff-exp4
-#| include: false
-thresh_diff_4 <- thresh_group_4 %>%
-  pivot_wider(id_cols = -param,
-              names_from = "response",
-              values_from = "value") %>%
-  mutate(diff = Novel - Famous)
-
-#Quantiles
-thresh_diff_4_q <- thresh_diff_4 %>%
-  group_by(pid) %>%
-  median_qi(diff)
-```
-
-```{r}
-#| label: drift-pid-exp4
-#| include: false
-drift_rate_pid_4 <- array_theta_pid_4 %>%
-  filter(str_detect(param, "v_S")) %>%
-  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Famous"),
-         accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
-         condition = factor(condition,
-                            levels = c("Novel", "Famous")),
-         accuracy = factor(accuracy,
-                            levels = c("False", "True")))
-
-## just true > false differences (accuracy)
-drift_acc_diff_pid_4 <- drift_rate_pid_4 %>%
-  pivot_wider(id_cols = -param,
-               names_from = accuracy,
-               values_from = value) %>%
-  mutate(diff = True - False)
-
-
-## Novel > Learned differences
-drift_acc_cond_diff_pid_4 <- drift_acc_diff_pid_4 %>%
-  pivot_wider(id_cols = -c("True", "False"),
-              names_from = condition,
-              values_from = diff) %>%
-  mutate(diff = Novel - Famous)
-
-```
-
-```{r}
-#| label: drift-group-exp4
-#| include: false
-drift_rate_group_4 <- theta_group_4 %>%
-  filter(str_detect(param, "v_S")) %>%
-  mutate(condition = if_else(str_detect(param, "Novel"), "Novel", "Famous"),
-         accuracy = if_else(str_detect(param, "TRUE"), "True", "False"),
-         condition = factor(condition,
-                            levels = c("Novel", "Famous")),
-         accuracy = factor(accuracy,
-                            levels = c("False", "True")))
-
-## just true > false differences (accuracy)
-drift_acc_diff_4 <- drift_rate_group_4 %>%
-  pivot_wider(id_cols = -param,
-               names_from = accuracy,
-               values_from = value) %>%
-  mutate(diff = True - False)
-
-
-## Novel > Learned differences
-drift_acc_cond_diff_4 <- drift_acc_diff_4 %>%
-  pivot_wider(id_cols = -c("True", "False"),
-              names_from = condition,
-              values_from = diff) %>%
-  mutate(diff = Novel - Famous)
-
-
-#Quantiles per condition
-drift_acc_diff_4_q <- drift_acc_diff_4 %>%
-  group_by(condition) %>%
-  median_qi(diff)
-
-#Quantiles difference
-drift_acc_cond_diff_4_q <- drift_acc_cond_diff_4 %>%
-  median_qi(diff)
-```
-
-*Threshold:* We estimated the threshold parameter for both response options (Novel and Famous). Inspection of the posterior distribution shows that there is an effect of familiarity on the threshold parameter (`r round(thresh_diff_4_q$diff, digits = 3)` \[`r round(thresh_diff_4_q$.lower, digits = 3)`, `r round(thresh_diff_4_q$.upper, digits = 3)`\]). Threshold was greater for "Novel" faces (`r round(theta_group_4_q$value[theta_group_4_q$param == "B_lRNovel"], digits = 3)` \[`r round(theta_group_4_q$.lower[theta_group_4_q$param == "B_lRNovel"], digits =   3)`, `r round(theta_group_4_q$.upper[theta_group_4_q$param == "B_lRNovel"], digits = 3)`\]) than for "Famous" faces (`r round(theta_group_4_q$value[theta_group_4_q$param == "B_lRFamous"], digits = 3)` \[`r round(theta_group_4_q$.lower[theta_group_4_q$param == "B_lRFamous"], digits =   3)`, `r round(theta_group_4_q$.upper[theta_group_4_q$param == "B_lRFamous"], digits = 3)`\]; see @fig-thresh_exp4).
-
-```{r}
-#| label: fig-thresh_exp4
-#| fig-cap: "Threshold estimates for Experiment 4: (a) Posterior distribution of the average threshold parameter by response option (Novel / Learned). (b) Difference between the posterior distribution of the average threshold parameter for the Novel response option and the Learned response option. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
-#| fig-subcap:
-#|  - "Group level: Threshold by response"
-#|  - "Group level: Threshold difference (Novel > Famous)"
-#| layout-ncol: 2
-
-ggplot(thresh_group_4, aes(x = value, y = fct_rev(response))) +
-  stat_halfeye(alpha = 0.7, aes(fill = response)) +
-  scale_fill_manual(values = myColors_2) +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(y="Response", x="Threshold") +
-  labs(fill = "Response") +
-  theme(legend.position = "none")
-
-ggplot(thresh_diff_4, aes(x = diff, y = "")) +
-  stat_halfeye(alpha = 0.9, fill="firebrick") +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(x = "Threshold", y="Density")
-
-```
-
-*Drift rate:* Inspection of the posterior distribution shows that there is a familiarity effect in drift rate difference (`r round(drift_acc_cond_diff_4_q$diff, digits = 3)` \[`r round(drift_acc_cond_diff_3_q$.lower, digits = 3)`, `r round(drift_acc_cond_diff_4_q$.upper, digits = 3)`\]). The quality of the evidence accumulation was greater for "Novel" faces (`r round(drift_acc_diff_4_q$diff[drift_acc_diff_4_q$condition == "Novel"], digits = 3)` \[`r round(drift_acc_diff_4_q$.lower[drift_acc_diff_4_q$condition == "Novel"], digits = 3)`, `r round(drift_acc_diff_4_q$.upper[drift_acc_diff_4_q$condition == "Novel"], digits = 3)`\]) compared to "Famous" faces (`r round(drift_acc_diff_4_q$diff[drift_acc_diff_4_q$condition == "Famous"], digits = 3)` \[`r round(drift_acc_diff_4_q$.lower[drift_acc_diff_4_q$condition == "Famous"], digits = 3)`, `r round(drift_acc_diff_4_q$.upper[drift_acc_diff_4_q$condition == "Famous"], digits = 3)`\]; see @fig-drift_exp4).
-
-```{r}
-#| label: fig-drift_exp4
-#| fig-cap: "Drift rate estimates for Experiment 4. (a) Posterior distribution of the average drift rate difference (TRUE - FALSE) by stimulus familiarity condition (Novel / Famous). (b) Difference between the posterior distribution of the average drift rate parameter (TRUE - FALSE) of the Novel condition and the Famous condition. Note that the points are median values, whereas the black lines represent the 80% credible intervals (thick) and 95% credible intervals (thin)."
-#| fig-subcap:
-#|  - "Group level: Drift rate (TRUE - FALSE) by familiarity condition"
-#|  - "Group level: Drift rate difference (Novel > Famous)"
-#| layout-ncol: 2
-
-
-ggplot(drift_acc_diff_4, aes(x = diff, y = fct_rev(condition))) +
-  stat_halfeye(aes(fill = condition), alpha = 0.7) +
-  scale_fill_manual(values = myColors_2) +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  theme(legend.position = "none") +
-  labs(x="Drift rate", y="Familiarity")
-
-ggplot(drift_acc_cond_diff_4, aes(x = diff, y = "")) +
-  stat_halfeye(fill = "firebrick", alpha = 0.9) +
-  geom_vline(xintercept = 0, color = "darkgrey") +
-  labs(x="Drift rate", y="") +
-  xlim(0,5)
-
-```
+*Drift rate:* Inspection of the posterior distribution shows that there is a familiarity effect in drift rate difference, which mirrors the results from Experiment 1 and Experiment 2. The quality of the evidence accumulation was greater for Novel faces compared to Learned faces.
 
 # General discussion
 
@@ -1460,7 +1196,7 @@ The most theoretically important finding is the combination of drift rate and th
 
 Set within the Bruce and Young framework of face perception [@bruceUnderstandingFaceRecognition1986], visual familiarity modulates the quality of structural encoding and feature matching within the core face processing system [@bruceUnderstandingFaceRecognition1986; @gobbiniNeuralResponseVisual2006], thus generating a stronger perceptual signal that feeds into the decision process. Novel faces, by this account, provide a cleaner and less ambiguous perceptual signal than visually familiar faces — consistent with "pop-out" and attentional capture accounts [@johnstonAttentionCaptureNovel1990; @lev-ariEcologicalViewSelective2022; @lubowVisualSearchFunction1997]. In contrast, visually familiar faces may generate noisier representations due to interference from accumulated but imperfectly consolidated memory traces [@rapcsakFaceRecognition2019].
 
-The smaller but reliable threshold effect reflects a qualitatively different influence on performance. In a yes/no recognition task, participants must set separate response criteria for the "familiar" and "novel" responses, and the higher threshold for the novel response is consistent with a well-documented conservative rejection bias in recognition memory [@glanzerMirrorEffectRecognition1985; @stretchWixtedWhyPositive1998]: participants are more willing to endorse familiarity than to endorse novelty, requiring more evidence before committing to a rejection. Because the drift rate advantage is substantially larger, the net behavioural outcome remains a novel face advantage in speed and accuracy — the signal quality benefit outweighs the response caution cost.
+The smaller but reliable threshold effect reflects a qualitatively different influence on performance. In a yes/no recognition task, participants must set separate response criteria for the "familiar" and "novel" responses, and the higher threshold for the novel response is consistent with a well-documented conservative rejection bias in recognition memory [ CITE glanzerMirrorEffectRecognition1985; stretchWixtedWhyPositive1998]: participants are more willing to endorse familiarity than to endorse novelty, requiring more evidence before committing to a rejection. Because the drift rate advantage is substantially larger, the net behavioural outcome remains a novel face advantage in speed and accuracy — the signal quality benefit outweighs the response caution cost.
 
 ## The impact of person knowledge 
 
@@ -1476,336 +1212,24 @@ Previous evidence accumulation model development studies have emphasised how the
 
 ## Future directions
 
-We can think of several relevant future directions in addition to the ones already mentioned. First, a learning curve design that tracks LBA parameters across repeated exposure sessions would address at which stage of familiarity drift rate changes occur, and would provide a more dynamic account of how computational processes change as familiarity is acquired [@ramonFamiliarityMattersReview2018]. Second, to more directly link together computational processes and neural architectures, future research might use a joint-modelling approach [@palestroTutorialJointModels2018; @voDeepLatentVariable2024]. Joint-modelling integrates different sources of data (e.g. behavioural and neuroimaging data) to estimate the relationship between responses in particular brain regions, such as core and extended face networks, and latent computational parameters. Third, individual differences in face recognition ability represent a natural and important extension. Super-recognisers and individuals with developmental prosopagnosia differ dramatically in recognition performance [@duchaine2006], and drift rate — as the primary carrier of familiarity effects here — may be the parameter that most cleanly differentiates these groups. Fourth, testing the domain-specificity of these effects would be valuable to determine whether the effects of visual familiarity apply to other categories of visual stimuli, such as objects or scenes.
+We can think of several relevant future directions in addition to the ones already mentioned. First, a learning curve design that tracks LBA parameters across repeated exposure sessions would address at which stage of familiarity drift rate changes occur, and would provide a more dynamic account of how computational processes change as familiarity is acquired [@ramonFamiliarityMattersReview2018]. Second, to more directly link together computational processes and neural architectures, future research might use a joint-modelling approach [@palestroTutorialJointModels2018; @voDeepLatentVariable2024]. Joint-modelling integrates different sources of data (e.g. behavioural and neuroimaging data) to estimate the relationship between responses in particular brain regions, such as core and extended face networks, and latent computational parameters. Third, individual differences in face recognition ability represent a natural and important extension. Super-recognisers and individuals with developmental prosopagnosia differ dramatically in recognition performance [CITE duchaine2006 or similar??], and drift rate — as the primary carrier of familiarity effects here — may be the parameter that most cleanly differentiates these groups. Fourth, testing the domain-specificity of these effects would be valuable to determine whether the effects of visual familiarity apply to other categories of visual stimuli, such as objects or scenes.
 
 
 {{< pagebreak >}}
 
 # References
 
-::: {#refs}
+:::{#refs}
 :::
 
-```{=typst}
-#show: appendix.with()
-```
-# Appendix content here
+::: {.content-visible when-format="html"}
 
-# Supplementary Materials
+# Appendix A: Supplementary Materials {.appendix}
 
--   Parameter recovery study
+## Parameter recovery study
 
-## Separate analysis of response times and accuracy
+## Priors 
 
-```{r}
-#| label: rt-acc-all
-#| include: false
+## Exploratory models
 
-#Load the RT and accuracy data for each experiment
-data_1 <- read_csv(here("Exp_1", "data", "data.csv"))
-data_2 <- read_csv(here("Exp_2", "data", "data_exp_2.csv"))
-data_3 <- read_csv(here("Exp_3", "data", "data_exp_3.csv"))
-data_4 <- read_csv(here("Exp_4", "data", "data_exp_4.csv")) %>%
-  mutate(cond = fct_recode(cond, Famous = "familiar", Novel = "novel"))
-
-#Create plots for accuracy for each experiment
-#Exp1
-acc_pid_1 <- data_1%>% 
-  group_by(pid, block, cond) %>% 
-  summarise(sum = sum(acc),
-            n = n(), 
-            perc = sum/n*100)
-
-acc_group_wblock_1 <- acc_pid_1 %>% 
-  group_by(cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc)
-
-acc_pid_wblock_1 <- acc_pid_1 %>%
-  mutate(pid = as.character(as.factor(pid))) %>%
-  group_by(pid,cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc) %>%
-  left_join(acc_group_wblock_1, by = join_by(cond)) %>%
-  mutate(Experiment = "Experiment 1")
-
-#Exp2
-acc_pid_2 <- data_2 %>% 
-  group_by(pid, block, cond) %>% 
-  summarise(sum = sum(acc),
-            n = n(), 
-            perc = sum/n*100)
-
-acc_group_wblock_2 <- acc_pid_2 %>% 
-  group_by(cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc)
-
-acc_pid_wblock_2 <- acc_pid_2 %>% 
-  group_by(pid,cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc) %>%
-  left_join(acc_group_wblock_2, by = join_by(cond))%>%
-  mutate(Experiment = "Experiment 2")
-
-#Exp3
-acc_pid_3 <- data_3 %>% 
-  group_by(pid, block, cond) %>% 
-  summarise(sum = sum(acc),
-            n = n(), 
-            perc = sum/n*100)
-
-acc_group_wblock_3 <- acc_pid_3 %>% 
-  group_by(cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc)
-
-acc_pid_wblock_3 <- acc_pid_3 %>%
-  mutate(pid = as.character(as.factor(pid))) %>%
-  group_by(pid,cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc) %>%
-  left_join(acc_group_wblock_3, by = join_by(cond))%>%
-  mutate(Experiment = "Experiment 3")
-
-#Exp4
-acc_pid_4 <- data_4 %>% 
-  group_by(pid, block, cond) %>% 
-  summarise(sum = sum(acc),
-            n = n(), 
-            perc = sum/n*100)
-
-acc_group_wblock_4 <- acc_pid_4 %>% 
-  group_by(cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc)
-
-acc_pid_wblock_4 <- acc_pid_4 %>%
-  mutate(pid = as.character(as.factor(pid))) %>%
-  group_by(pid,cond) %>% 
-  summarise(mean_sum = mean(sum),
-            n = n(), 
-            mean_perc = mean(perc),
-            sd=sd(perc),
-            sem = (sd/sqrt(n))) %>% 
-  rename(sum=mean_sum, perc=mean_perc) %>%
-  left_join(acc_group_wblock_4, by = join_by(cond))%>%
-  mutate(Experiment = "Experiment 4")
-
-#Create plots for RT for each experiment
-#Exp1
-rt_group_wblock_1 <- data_1 %>% 
-  group_by(cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96)
-
-rt_pid_wblock_1 <- data_1 %>% 
-  mutate(pid = as.character(as.factor(pid))) %>%
-  group_by(pid,cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96) %>%
-  left_join(rt_group_wblock_1, by = join_by(cond)) %>%
-  mutate(Experiment = "Experiment 1")
-
-rt_density_1 <- data_1 %>%
-  select(cond, rt) %>%
-  mutate(Experiment = "Experiment 1")
-#Exp2
-rt_group_wblock_2 <- data_2 %>% 
-  group_by(cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96)
-
-rt_pid_wblock_2 <- data_2 %>% 
-  group_by(pid,cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96) %>%
-  left_join(rt_group_wblock_2, by = join_by(cond)) %>%
-  mutate(Experiment = "Experiment 2")
-
-rt_density_2 <- data_2 %>%
-  select(cond, rt) %>%
-  mutate(Experiment = "Experiment 2")
-#Exp3
-rt_group_wblock_3 <- data_3 %>% 
-  group_by(cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96)
-
-rt_pid_wblock_3 <- data_3 %>% 
-  mutate(pid = as.character(as.factor(pid))) %>%
-  group_by(pid,cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96) %>%
-  left_join(rt_group_wblock_3, by = join_by(cond)) %>%
-  mutate(Experiment = "Experiment 3")
-
-rt_density_3 <- data_3 %>%
-  select(cond, rt) %>%
-  mutate(Experiment = "Experiment 3")
-
-#Exp4
-rt_group_wblock_4 <- data_4 %>% 
-  group_by(cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96)
-
-rt_pid_wblock_4 <- data_4 %>% 
-  group_by(pid,cond) %>% 
-  drop_na(rt) %>%
-  summarise(mean = mean(rt),
-            sd = sd(rt),
-            n = length(unique(pid)), # n here is the total subjs
-            sem = (sd/sqrt(n)),
-            ci = sem*1.96) %>%
-  left_join(rt_group_wblock_4, by = join_by(cond)) %>%
-  mutate(Experiment = "Experiment 4")
-
-rt_density_4 <- data_4 %>%
-  select(cond, rt) %>%
-  mutate(Experiment = "Experiment 4")
-#Joining experiments data
-
-acc_all <- acc_pid_wblock_1 %>%
-  bind_rows(acc_pid_wblock_2) %>%
-  bind_rows(acc_pid_wblock_3) %>%
-  bind_rows(acc_pid_wblock_4)
-
-rt_all <- rt_pid_wblock_1 %>%
-  bind_rows(rt_pid_wblock_2) %>%
-  bind_rows(rt_pid_wblock_3) %>%
-  bind_rows(rt_pid_wblock_4)
-
-rt_density <- rt_density_1 %>%
-  bind_rows(rt_density_2) %>%
-  bind_rows(rt_density_3) %>%
-  bind_rows(rt_density_4)
-
-#plot acc by experiment
-plot_acc <- ggplot(acc_all, aes(x = factor(cond),y=perc.y, 
-                           fill=cond, colour=cond)) +
-   geom_col() +
-   geom_errorbar(aes(ymin = perc.y-sem.y, ymax = perc.y+sem.y), col = "black",
-                width=.2, position=pd2) +
-   geom_point(aes(y = perc.x),
-             colour = "black",
-             stat = "identity",
-             position=pd2,
-             alpha = .7)+
-   scale_fill_manual(values = myColors_3) +
-   scale_color_manual(values = myColors_3) +
-   xlab("Conditions") +
-   ylab("Proportion correct [%]") +
-   ylim(0,100) +
-   facet_grid(~Experiment, scales = "free_x") +
-   theme(legend.position = "none")
-
-plot_rt <- ggplot(rt_all, aes(x = cond,y=mean.y, 
-                           fill=cond, colour=cond)) +
-   geom_bar(stat="summary") +
-   geom_errorbar(aes(ymin = mean.y-sem.y, ymax = mean.y+sem.y), col = "black",
-                width=.2, position=pd2) +
-  geom_point(aes(y = mean.x),
-             colour = "black",
-             stat = "identity",
-             position=pd2,
-             alpha = .7)+
-   scale_fill_manual(values = myColors_3) +
-   scale_color_manual(values = myColors_3) +
-   xlab("Conditions") +
-   ylab("Mean response times [s]") +
-   ylim(0,1.75)+
-   theme(legend.position = "none") +
-   facet_grid(~Experiment, scales = "free_x")
-
-plot_rt_density_cond <- ggplot(rt_density, aes(x=rt, fill=cond, colour=cond)) +
-  geom_density(alpha=0.5) +
-  scale_fill_manual(values = myColors_3) +
-  scale_colour_manual(values = myColors_3)  +
-  facet_wrap(~block) +
-  labs(fill = "Conditions", colour = "Conditions") +
-  xlab("Response time [s]") +
-  ylab("Density") +
-  facet_grid(~Experiment, scales = "free_x") +
-  theme(legend.position = c(.92,.82),
-        legend.text = element_text(size = 7),
-        legend.title = element_text(size = 8))
-```
-
-```{r}
-#| label: fig-acc_rt
-#| fig-cap: "Proportion of correct response [%] and Response times [s] across condition for the four experiments. (a) Barplots representing the mean proportion of correct reponse per condtition and the mean reponse times per condition of Experiment 1. (b) Barplots representing the mean proportion of correct reponse per condtition and the mean reponse times per condition of Experiment 2. (c) Barplots representing the mean proportion of correct reponse per condtition and the mean reponse times per condition of Experiment 3. (d) Barplots representing the mean proportion of correct reponse per condtition and the mean reponse times per condition of Experiment 4. In all graphs black points denote the subject means, and error bars represent within subjects standard error of the mean."
-#| fig-subcap: 
-#|  - "Proportion of correct responses [%] accross experiments"
-#|  - "Mean response times [s] accross experiments"
-#|  - "Density of response times [s]"
-#| fig-alt: "" 
-#| layout-ncol: 1
-#| warning: false
-#| fig-width: 7
-#| fig-height: 4
-
-plot_acc
-plot_rt
-plot_rt_density_cond
-```
-
--   Priors used for preregistered model
-
--   Models with other parameters
+:::

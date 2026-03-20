@@ -1,0 +1,17 @@
+{
+  "hash": "31dd5d2fd7994ab2ae46778e24f50118",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Supplementary Materials\"\nsubtitle: \"How does familiarity impact the computational processes that support face recognition?\"\nrunning-head: \"Decision models of face memory\"\nauthor:\n  - name: Raphaël Fournier\n    email: rfournier@ethz.ch\n    orcid: 0000-0002-5135-4066\n    affiliation:\n      - ref: 1\n  - name: Paul Downing\n    affiliation: \n      - ref: 2\n  - name: Richard Ramsey\n    email: rramsey@ethz.ch\n    orcid: 0000-0002-0329-2112\n    corresponding: true\n    affiliation:\n      - ref: 1\n      - ref: 3\naffiliations:\n  - id: 1\n    name: Neural Control of Movement Laboratory\n    department: Department of Health Sciences and Technology, ETH Zurich\n  - id: 2\n    name: \n    department: School of Psychology and Sports Science, Bangor University\n  - id: 3\n    name: Social Brain Sciences Laboratory\n    department: Department of Humanities, Social and Political Sciences, ETH Zurich\nkeywords: [face perception, memory, familiarity, person knowledge, decision models, evidence accumulation modelling]\nbibliography: bibliography.bib\nfunctions: [place, appendix]\nformat:\n  preprint-typst:\n    output-file: supplementary.pdf\n    fontsize: 11pt\n    mainfont: Libertinus Serif\n    toc: true\n    toc-depth: 3\neditor_options: \n  chunk_output_type: console\n---\n\n\n\n\n::: {.appendix}\n\n# Appendix A: Supplementary Materials {.appendix}\n\n## Parameter recovery study\n\n## Priors\n\n## Exploratory models\n\n:::",
+    "supporting": [
+      "supplementary_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": null,
+    "postProcess": false
+  }
+}

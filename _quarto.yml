@@ -1,4 +1,5 @@
 project:
+  title: "How does familiarity impact the computational processes that support face recognition?"
   render:
     - manuscript/manuscript.qmd
     - manuscript/supplementary.qmd

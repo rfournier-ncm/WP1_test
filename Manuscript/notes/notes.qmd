@@ -153,3 +153,22 @@ Ratcliff, Sheu & Gronlund (1992) — specifically links diffusion model paramete
 Verde & Rotello (2007) — shows that the criterion for "new" responses is systematically higher than for "old" responses across a range of conditions
 
 The Ratcliff et al. (1992) paper is probably the most directly relevant given your EAM framing — it explicitly discusses how threshold asymmetries emerge in recognition memory tasks using a drift diffusion framework, which maps directly onto your LBA threshold results.
+
+# March 19th onwards #
+
+- In the manuscript file, I am not sure we need all of the packages that are loaded. Maybe check this so we don't load unnecessary packages.
+- I changed the magrittr pipe %>% to the newer native pipe |> so that we are consistent throughout.
+- I would be far more consistent with file names and folder structures. e.g., /data/ folders sometimes have subfolders and sometimes they do not. And the demographics file names all have different names. I have tried to change it whenever I can to standardise things. It makes it easier for us to use the project and for anyone else also.
+
+## list of edits to demographics and exclusions chunks ##
+
+- Switched from xlsx to csv throughout
+- Fixed the rt_OSF bug (rt < 2.0 | rt < 0.2 → correct exclusion logic) in Exp 2 and 4
+- Fixed the participant_n_exp2 bug that was using Exp 1 values
+- Replaced all length(x$col[condition]) patterns with filter() |> pull()
+- Collapsed multi-step summarise pipelines into single pipelines
+- Used mean(acc, na.rm = TRUE) consistently for accuracy computation
+- Used row_number() instead of hardcoded c(1:40) for Exp 3 pid assignment
+- Removed unused intermediate objects throughout
+- Used map() |> list_rbind() instead of deprecated map_dfr() for Exp 3 ratings
+- Consistent naming convention (exclude_rt_expN, exclude_acc_expN, exp N_demo_stats) across all experiments
