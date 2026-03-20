@@ -1,0 +1,297 @@
+---
+title: "wrangle"
+author: "Raph & Rich"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+This file wrangles data for Exp 1 in the face familiarity study.
+
+```{r}
+#| label: setup
+#| include: false
+
+pkgs <- c(
+  "tidyverse", "here"
+  )
+vapply(
+  pkgs, library, logical(1), character.only = TRUE, logical.return = TRUE
+  )
+
+theme_set(
+  theme_bw() +
+    theme(
+      text  = element_text(size = 15, face = "bold"),
+      title = element_text(size = 15, face = "bold"),
+      legend.position = "none"
+    )
+)
+
+safe_pal  <- paletteer::paletteer_d("rcartocolor::Safe", 4)
+
+myColors_1 <- c("Novel" = safe_pal[1], "Learned" = safe_pal[2])
+
+pd2 <- position_dodge(1)
+```
+
+# 1. Read in raw data
+
+The raw data per participant are not stored in the repo. This section reads
+them in and saves combined files. Skip to section 2 if the combined files
+already exist.
+
+```{r}
+#| label: read-raw
+#| eval: false
+
+raw <- list.files(
+  path       = here("exp_1", "data", "raw"),
+  pattern    = "^raw.*csv",
+  full.names = TRUE,
+  recursive  = TRUE
+) |>
+  set_names() |>
+  map(read_csv,
+      col_names = c("subj", "block", "trial", "keypress", "rt", "ori", "stim")
+  ) |>
+  list_rbind(names_to = "file") |>
+  mutate(
+    pid = as.integer(str_sub(subj, 2, -1))
+  ) |>
+  select(pid, block, trial, keypress, rt, ori, stim)
+
+write_csv(raw, here("exp_1", "data", "raw_data_exp_1.csv"))
+
+# stimulus coding for familiar stimuli
+fstim <- list.files(
+  path       = here("exp_1", "data", "raw"),
+  pattern    = "^S.*csv",
+  full.names = TRUE,
+  recursive  = TRUE
+) |>
+  set_names() |>
+  map(read_csv, col_names = TRUE) |>
+  list_rbind() |>
+  mutate(pid = row_number()) |>
+  pivot_longer(cols = -pid, names_to = "ftrial", values_to = "fstim") |>
+  select(pid, fstim)
+
+write_csv(fstim, here("exp_1", "data", "fam_stim_exp_1.csv"))
+```
+
+# 2. Wrangle
+
+```{r}
+#| label: read-combined
+
+fstim <- read_csv(here("exp_1", "data", "fam_stim_exp_1.csv"))
+head(fstim)
+
+raw   <- read_csv(here("exp_1", "data", "raw_data_exp_1.csv"))
+head(raw)
+```
+
+```{r}
+#| label: wrangle
+
+# Get the full set of familiar stim IDs per pid
+fstim_lookup <- fstim |>
+  distinct(pid, fstim)
+
+# wrangle
+data <- raw |>
+  left_join(
+    fstim |>
+      bind_rows(fstim) |>
+      arrange(pid) |>
+      group_by(pid) |>
+      mutate(trial = row_number()) |>
+      select(pid, trial, fstim),
+    join_by(pid, trial)
+  ) |>
+  group_by(pid) |>
+  mutate(
+    fam  = if_else(stim %in% fstim_lookup$fstim[fstim_lookup$pid == first(pid)], 1L, 0L),
+    cond = if_else(fam == 1, "Learned", "Novel"),
+    cond = factor(cond, levels = c("Learned", "Novel")),
+    acc  = case_when(
+      cond == "Learned" & keypress == "q" ~ 1L,
+      cond == "Novel"   & keypress == "p" ~ 1L,
+      TRUE                                ~ 0L
+    ),
+    rt_excluded = rt > 2.5 | is.na(rt)
+  ) |>
+  ungroup()
+
+#head(data)
+#glimpse(data)
+```
+
+```{r}
+#| label: data-check
+
+# trials per pid, block, condition
+data |>
+  group_by(pid, block, cond) |>
+  summarise(n = n(), .groups = "drop")
+
+# accuracy per pid, block, condition
+data |>
+  group_by(pid, block, cond) |>
+  summarise(acc = mean(acc), .groups = "drop")
+
+# RT exclusions per pid
+data |>
+  group_by(pid) |>
+  summarise(
+    n_excluded  = sum(rt_excluded),
+    perc_excluded = mean(rt_excluded) * 100,
+    .groups = "drop"
+  ) |>
+  arrange(desc(perc_excluded))
+```
+
+# 3. Exclusions
+
+```{r}
+#| label: exclusions
+
+# pid 1 excluded: 59% of trials > 2.5s
+data <- data |>
+  filter(pid != 1, !rt_excluded)
+```
+
+# 4. Summary statistics
+
+```{r}
+#| label: summary-rt-acc
+
+# RT
+rt_pid <- data |>
+  group_by(pid, block, cond) |>
+  summarise(
+    mean = mean(rt),
+    sd   = sd(rt),
+    n    = n(),
+    sem  = sd / sqrt(n),
+    .groups = "drop"
+  )
+
+rt_group <- data |>
+  group_by(cond) |>
+  summarise(
+    mean = mean(rt),
+    sd   = sd(rt),
+    n    = length(unique(pid)),
+    sem  = sd / sqrt(n),
+    .groups = "drop"
+  )
+
+# Accuracy
+acc_pid <- data |>
+  group_by(pid, block, cond) |>
+  summarise(
+    sum  = sum(acc),
+    n    = n(),
+    perc = sum / n * 100,
+    .groups = "drop"
+  )
+
+acc_group <- acc_pid |>
+  group_by(cond) |>
+  summarise(
+    mean_perc = mean(perc),
+    sd        = sd(perc),
+    n         = n(),
+    sem       = sd / sqrt(n),
+    .groups = "drop"
+  )
+```
+
+# 5. Plots
+
+```{r}
+#| label: plot-rt-bar
+
+p_rt <- ggplot(rt_group, aes(x = cond, y = mean, fill = cond, colour = cond)) +
+  geom_col() +
+  geom_errorbar(
+    aes(ymin = mean - sem, ymax = mean + sem),
+    colour = "black", width = 0.2
+  ) +
+  geom_point(
+    data     = rt_pid |> group_by(pid, cond) |> summarise(mean = mean(mean), .groups = "drop"),
+    aes(y    = mean),
+    colour   = "black",
+    alpha    = 0.7,
+    position = pd2
+  ) +
+  scale_fill_manual(values   = myColors_1) +
+  scale_colour_manual(values = myColors_1) +
+  coord_cartesian(ylim = c(0, 2)) +
+  labs(x = "Condition", y = "Mean RT [s]")
+
+p_rt
+
+# ggsave(here("exp_1", "figures", "rt_barplot.jpeg"), width = 4, height = 4)
+```
+
+```{r}
+#| label: plot-acc-bar
+
+p_acc <- ggplot(acc_group, aes(x = cond, y = mean_perc, fill = cond, colour = cond)) +
+  geom_col() +
+  geom_errorbar(
+    aes(ymin = mean_perc - sem, ymax = mean_perc + sem),
+    colour = "black", width = 0.2
+  ) +
+  geom_point(
+    data     = acc_pid |> group_by(pid, cond) |> summarise(mean_perc = mean(perc), .groups = "drop"),
+    aes(y    = mean_perc),
+    colour   = "black",
+    alpha    = 0.7,
+    position = pd2
+  ) +
+  scale_fill_manual(values   = myColors_1) +
+  scale_colour_manual(values = myColors_1) +
+  coord_cartesian(ylim = c(0, 100)) +
+  labs(x = "Condition", y = "Accuracy [%]")
+
+p_acc
+
+#ggsave(here("exp_1", "figures", "acc_barplot.jpeg"), width = 4, height = 4)
+
+```
+
+```{r}
+#| label: plot-rt-density
+
+p_rt_density <- ggplot(data, aes(x = rt, fill = cond, colour = cond)) +
+  geom_density(alpha = 0.7) +
+  scale_fill_manual(values   = myColors_1) +
+  scale_colour_manual(values = myColors_1) +
+  labs(x = "RT [s]")
+
+p_rt_density
+
+# ggsave(here("exp_1", "figures", "rt_density.jpeg"), width = 4, height = 4)
+```
+
+```{r}
+#| label: combined-plots
+
+(p_rt | p_acc) / p_rt_density
+
+ggsave(here("exp_1", "figures", "rt_acc.jpeg"), width = 8, height = 6)
+```
+
+# 6. Save
+
+```{r}
+#| label: save
+
+write_csv(data, here("exp_1", "data", "data_exp_1.csv"))
+```
+

@@ -1,0 +1,249 @@
+---
+title: "effects - experiment 1"
+author: "Raph & Rich"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+This file visualises and summarises parameters from the posterior distribution of the pre-registered LBA model for Exp 1 in the face familiarity study.
+
+```{r}
+#| label: setup
+#| include: false
+
+pkgs <- c(
+  "EMC2", "tidyverse", "tidybayes", "patchwork", "paletteer", "here"
+  )
+vapply(
+  pkgs, library, logical(1), character.only = TRUE, logical.return = TRUE
+  )
+
+theme_set(
+  theme_bw() +
+    theme(
+      text  = element_text(size = 15, face = "bold"),
+      title = element_text(size = 15, face = "bold"),
+      legend.position = "none"
+    )
+)
+
+safe_pal   <- paletteer_d("rcartocolor::Safe", 4)
+myColors_1 <- c("novel" = safe_pal[1], "learned" = safe_pal[2])
+```
+
+# 1. Load model
+
+```{r}
+#| label: load-model
+
+if (Sys.getenv("OSF_PAT") != "") osfr::osf_auth(Sys.getenv("OSF_PAT"))
+
+# download if missing
+if (!file.exists(here("exp_1", "models", "LBA_exp1_v1.RData"))) {
+  osfr::osf_retrieve_node("65bt2") |>
+    osfr::osf_ls_files() |>
+    dplyr::filter(name == "exp_1") |>
+    osfr::osf_ls_files() |>
+    osfr::osf_ls_files() |>
+    dplyr::filter(name == "LBA_exp1_v1.RData") |>
+    osfr::osf_download(path = here("exp_1", "models"), conflicts = "overwrite")
+}
+
+load(here("exp_1", "models", "LBA_exp1_v1.RData"))
+```
+
+# 2. Wrangle posteriors
+
+```{r}
+#| label: wrangle
+
+param_cols <- c(
+  "v_SNovel:lMTRUE", "v_SNovel:lMFALSE",
+  "v_SLearned:lMTRUE", "v_SLearned:lMFALSE",
+  "sv_lMTRUE", "B_lRNovel", "B_lRLearned", "A", "t0"
+)
+
+params <- EMC2::parameters(LBA_exp1_v1, selection = "alpha", N = NULL)
+
+n_pids  <- length(unique(params$subjects))
+n_draws <- nrow(params) / n_pids
+
+# pid-level posteriors
+theta_pid <- params |>
+  as_tibble() |>
+  pivot_longer(cols = all_of(param_cols), names_to = "param", values_to = "value") |>
+  rename(pid = subjects) |>
+  mutate(.draw = rep(1:n_draws, each = length(param_cols), times = n_pids))
+
+# group-level posteriors (average across pids)
+theta_group <- theta_pid |>
+  group_by(.draw, param) |>
+  summarise(value = mean(value, na.rm = TRUE), .groups = "drop")
+
+# quantiles
+theta_group_q <- theta_group |>
+  group_by(param) |>
+  median_qi(value)
+
+theta_pid_q <- theta_pid |>
+  group_by(pid, param) |>
+  median_qi(value)
+
+```
+
+# 3. All parameters overview
+
+```{r}
+#| label: fig-all-params
+#| fig-width: 8
+#| fig-height: 6
+
+ggplot(theta_group, aes(x = value, y = fct_rev(param))) +
+  stat_halfeye(alpha = 0.9) +
+  labs(x = "Parameter estimate", y = NULL)
+
+ggsave(here("exp_1", "figures", "all_params.jpeg"), width = 8, height = 6)
+```
+
+# 4. Threshold
+
+```{r}
+#| label: wrangle-threshold
+
+thresh_group <- theta_group |>
+  filter(str_detect(param, "B_")) |>
+  mutate(
+    response = if_else(str_detect(param, "lRLearned"), "learned", "novel"),
+    response = factor(response, levels = c("novel", "learned"))
+  )
+
+thresh_pid <- theta_pid |>
+  filter(str_detect(param, "B_")) |>
+  mutate(
+    response = if_else(str_detect(param, "lRLearned"), "learned", "novel"),
+    response = factor(response, levels = c("novel", "learned"))
+  )
+
+thresh_diff_group <- thresh_group |>
+  pivot_wider(id_cols = c(.draw), names_from = response, values_from = value) |>
+  mutate(diff = novel - learned)
+
+thresh_diff_pid <- thresh_pid |>
+  pivot_wider(id_cols = c(pid, .draw), names_from = response, values_from = value) |>
+  mutate(diff = novel - learned)
+
+# quantiles
+thresh_diff_group_q <- thresh_diff_group |> median_qi(diff)
+thresh_diff_pid_q   <- thresh_diff_pid   |> group_by(pid) |> median_qi(diff)
+```
+
+```{r}
+#| label: fig-threshold
+#| fig-width: 12
+#| fig-height: 6
+
+p_thresh_dist <- ggplot(thresh_group, aes(x = value, y = fct_rev(response), fill = response)) +
+  stat_halfeye(alpha = 0.7) +
+  scale_fill_manual(values = myColors_1) +
+  geom_vline(xintercept = 0, colour = "darkgrey") +
+  labs(x = "Threshold", y = "Response")
+
+p_thresh_diff <- ggplot(thresh_diff_group, aes(x = diff, y = "")) +
+  stat_halfeye(alpha = 0.9, fill = "firebrick") +
+  geom_vline(xintercept = 0, colour = "darkgrey") +
+  labs(x = "Threshold (novel - learned)", y = NULL)
+
+p_thresh_pid <- ggplot(
+  thresh_diff_pid |> mutate(pid = reorder(pid, diff, mean)),
+  aes(x = diff, y = pid)
+) +
+  stat_halfeye(alpha = 0.7) +
+  geom_vline(xintercept = 0, colour = "darkgrey") +
+  labs(x = "Threshold (novel - learned)", y = "Participant")
+
+p_thresh_dist | p_thresh_diff | p_thresh_pid
+
+ggsave(here("exp_1", "figures", "threshold.jpeg"), width = 15, height = 6)
+```
+
+# 5. Drift rate
+
+```{r}
+#| label: wrangle-drift
+
+drift_group <- theta_group |>
+  filter(str_detect(param, "v_S")) |>
+  mutate(
+    condition = if_else(str_detect(param, "Novel"), "novel", "learned"),
+    accuracy  = if_else(str_detect(param, "TRUE"), "true", "false"),
+    condition = factor(condition, levels = c("novel", "learned")),
+    accuracy  = factor(accuracy,  levels = c("false", "true"))
+  )
+
+drift_pid <- theta_pid |>
+  filter(str_detect(param, "v_S")) |>
+  mutate(
+    condition = if_else(str_detect(param, "Novel"), "novel", "learned"),
+    accuracy  = if_else(str_detect(param, "TRUE"), "true", "false"),
+    condition = factor(condition, levels = c("novel", "learned")),
+    accuracy  = factor(accuracy,  levels = c("false", "true"))
+  )
+
+# true - false per condition
+drift_acc_diff_group <- drift_group |>
+  pivot_wider(id_cols = c(.draw, condition), names_from = accuracy, values_from = value) |>
+  mutate(diff = true - false)
+
+drift_acc_diff_pid <- drift_pid |>
+  pivot_wider(id_cols = c(pid, .draw, condition), names_from = accuracy, values_from = value) |>
+  mutate(diff = true - false)
+
+# novel - learned contrast
+drift_cond_diff_group <- drift_acc_diff_group |>
+  pivot_wider(id_cols = .draw, names_from = condition, values_from = diff) |>
+  mutate(diff = novel - learned)
+
+drift_cond_diff_pid <- drift_acc_diff_pid |>
+  pivot_wider(id_cols = c(pid, .draw), names_from = condition, values_from = diff) |>
+  mutate(diff = novel - learned)
+
+# quantiles
+drift_acc_diff_group_q  <- drift_acc_diff_group  |> group_by(condition) |> median_qi(diff)
+drift_cond_diff_group_q <- drift_cond_diff_group |> median_qi(diff)
+drift_cond_diff_pid_q   <- drift_cond_diff_pid   |> group_by(pid) |> median_qi(diff)
+```
+
+```{r}
+#| label: fig-drift
+#| fig-width: 12
+#| fig-height: 6
+
+p_drift_dist <- ggplot(
+  drift_acc_diff_group,
+  aes(x = diff, y = fct_rev(condition), fill = condition)
+) +
+  stat_halfeye(alpha = 0.7) +
+  scale_fill_manual(values = myColors_1) +
+  geom_vline(xintercept = 0, colour = "darkgrey") +
+  labs(x = "Drift rate (true - false)", y = "Condition")
+
+p_drift_diff <- ggplot(drift_cond_diff_group, aes(x = diff, y = "")) +
+  stat_halfeye(alpha = 0.9, fill = "firebrick") +
+  geom_vline(xintercept = 0, colour = "darkgrey") +
+  labs(x = "Drift rate (novel - learned)", y = NULL)
+
+p_drift_pid <- ggplot(
+  drift_cond_diff_pid |> mutate(pid = reorder(pid, diff, mean)),
+  aes(x = diff, y = pid)
+) +
+  stat_halfeye(alpha = 0.7) +
+  geom_vline(xintercept = 0, colour = "darkgrey") +
+  labs(x = "Drift rate (novel - learned)", y = "Participant")
+
+p_drift_dist | p_drift_diff | p_drift_pid
+
+ggsave(here("exp_1", "figures", "drift_rate.jpeg"), width = 15, height = 6)
+```
+

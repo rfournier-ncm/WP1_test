@@ -1068,6 +1068,21 @@
       ],
       "Hash": "df58958f293b166e4ab885ebcad90e02"
     },
+    "paletteer": {
+      "Package": "paletteer",
+      "Version": "1.7.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "cli",
+        "prismatic",
+        "rematch2",
+        "rlang",
+        "rstudioapi"
+      ],
+      "Hash": "5b86075818c0c358ad49b8e210610109"
+    },
     "palmerpenguins": {
       "Package": "palmerpenguins",
       "Version": "0.1.1",
@@ -1254,6 +1269,16 @@
       ],
       "Hash": "5e3c5dc0b071b21fa128676560dbe94d"
     },
+    "rematch2": {
+      "Package": "rematch2",
+      "Version": "2.1.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "tibble"
+      ],
+      "Hash": "76c9e04c712a05848ae7a23d2f170a40"
+    },
     "remotes": {
       "Package": "remotes",
       "Version": "2.5.0",
@@ -1371,6 +1396,13 @@
         "utils"
       ],
       "Hash": "23813e635fcd210c33e154aa46d0a21a"
+    },
+    "rstudioapi": {
+      "Package": "rstudioapi",
+      "Version": "0.17.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5f90cd73946d706cfe26024294236113"
     },
     "sass": {
       "Package": "sass",

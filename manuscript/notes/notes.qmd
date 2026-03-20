@@ -154,7 +154,7 @@ Verde & Rotello (2007) — shows that the criterion for "new" responses is syste
 
 The Ratcliff et al. (1992) paper is probably the most directly relevant given your EAM framing — it explicitly discusses how threshold asymmetries emerge in recognition memory tasks using a drift diffusion framework, which maps directly onto your LBA threshold results.
 
-# March 19th onwards #
+# March 19th #
 
 - In the manuscript file, I am not sure we need all of the packages that are loaded. Maybe check this so we don't load unnecessary packages.
 - I changed the magrittr pipe %>% to the newer native pipe |> so that we are consistent throughout.
@@ -172,3 +172,8 @@ The Ratcliff et al. (1992) paper is probably the most directly relevant given yo
 - Removed unused intermediate objects throughout
 - Used map() |> list_rbind() instead of deprecated map_dfr() for Exp 3 ratings
 - Consistent naming convention (exclude_rt_expN, exclude_acc_expN, exp N_demo_stats) across all experiments
+
+# March 20th onwards #
+
+- In exp 1 what is the difference between data_exp_1.csv (previously data.csv) and raw_data_exp_1.csv?
+- And in the /data/ folder, we do not have raw participant data as .csv files at the moment. So we need to decide if the wrangle script has the raw data. Or we supply the already slightly wrangled data files. I hope this makes sense.
