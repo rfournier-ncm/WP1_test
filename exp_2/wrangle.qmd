@@ -1,0 +1,320 @@
+---
+title: "wrangle"
+author: "Raph & Rich"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+This file wrangles data for Experiment 2 in the face familiarity study.
+
+```{r}
+#| label: setup
+#| include: false
+
+pkgs <- c(
+  "tidyverse","patchwork","here"
+  )
+vapply(
+  pkgs, library, logical(1), character.only = TRUE, logical.return = TRUE
+  )
+
+theme_set(
+  theme_bw() +
+    theme(
+      text  = element_text(size = 15, face = "bold"),
+      title = element_text(size = 15, face = "bold"),
+      legend.position = "none"
+    )
+)
+
+safe_pal   <- paletteer::paletteer_d("rcartocolor::Safe", 4)
+
+myColors_1 <- c("Novel" = safe_pal[1], "Learned" = safe_pal[2])
+
+pd2        <- position_dodge(1)
+```
+
+# 1. Read in raw data
+
+Raw data files are not stored in the repo. This section reads them in and
+saves a combined file. Skip to section 2 if the combined file already exists.
+
+```{r}
+#| label: read-raw
+#| eval: false
+
+raw <- list.files(
+  path       = here("exp_2", "data", "raw"),
+  pattern    = "*csv",
+  full.names = TRUE,
+  recursive  = TRUE
+) |>
+  set_names() |>
+  map(read_csv) |>
+  list_rbind(names_to = "file")
+
+write_csv(raw, here("exp_2", "data", "raw_data_exp_2.csv"))
+```
+
+# 2. Wrangle
+
+```{r}
+#| label: read-combined
+
+raw <- read_csv(here("exp_2", "data", "raw_data_exp_2.csv"))
+```
+
+```{r}
+#| label: wrangle
+
+data <- raw |>
+  # keep only recognition task trials
+  filter(!is.na(recognition_loop.thisRepN)) |>
+  rename(
+    pid      = participant,
+    keypress = response_recog.keys,
+    acc      = response_recog.corr,
+    rt       = response_recog.rt
+  ) |>
+  mutate(
+    block    = rep(1:3, each = 60, times = n_distinct(pid)),
+    keypress = as.factor(keypress),
+    # condition inferred from keypress + accuracy
+    cond     = case_when(
+      keypress == "q" & acc == 1 ~ "Learned",
+      keypress == "p" & acc == 0 ~ "Learned",
+      keypress == "p" & acc == 1 ~ "Novel",
+      keypress == "q" & acc == 0 ~ "Novel"
+    ),
+    cond     = factor(cond, levels = c("Learned", "Novel")),
+    block    = as.integer(block)
+  ) |>
+  select(pid, block, cond, keypress, acc, rt) |>
+  arrange(pid)
+
+write_csv(data, here("exp_2", "data", "wrangle_data_exp_2.csv"))
+```
+
+# 3. Exclusions
+
+```{r}
+#| label: exclusions
+
+# RT exclusion — participants with >25% missed/out-of-range trials
+exclude_rt <- data |>
+  group_by(pid) |>
+  summarise(perc_excluded = mean(is.na(rt) | rt > 2.0) * 100) |>
+  filter(perc_excluded > 25) |>
+  pull(pid)
+
+# Accuracy exclusion — on remaining participants
+exclude_acc <- data |>
+  filter(!pid %in% exclude_rt) |>
+  drop_na(rt) |>
+  group_by(pid) |>
+  summarise(perc_acc = mean(acc) * 100) |>
+  filter(perc_acc < 55) |>
+  pull(pid)
+
+# Apply exclusions and remove missed trials
+data <- data |>
+  filter(
+    !pid %in% exclude_rt,
+    !pid %in% exclude_acc,
+    !is.na(rt),
+    rt <= 2.0,
+    #rt >= 0.2 ## this may need adding eventually.
+  )
+```
+
+```{r}
+# check the old data
+#old_data <- read_csv(here("exp_2", "data", "from_raph", "data_exp_2.csv"))
+
+# old_data |>
+#   filter(rt > 2.0) |>
+#   nrow()
+# 
+# raw_check <- read_csv(here("exp_2", "data", "from_raph", "wrangle_data_exp_2.csv"))
+# raw_check |> filter(rt > 2.0) |> nrow()
+# 
+# # compare row counts
+# nrow(old_data)
+# nrow(data)
+# 
+# # compare n participants
+# n_distinct(old_data$pid)
+# n_distinct(data$pid)
+# 
+# data |>
+#   filter(rt < 0.2)
+# 
+# old_data |>
+#   filter(rt < 0.2)
+
+## check the model data
+# load(here("exp_2", "models", "LBA_exp2_v1.RData"))
+# 
+# # check structure of first participant
+# str(LBA_exp2_v1[[1]]$data[[1]], max.level = 1)
+# 
+# # check the expand attribute
+# attr(LBA_exp2_v1[[1]]$data[[1]], "expand") |> length()
+# 
+# # total unique trials via expand attribute
+# map_int(LBA_exp2_v1[[1]]$data, ~ length(attr(.x, "expand"))) |> sum()
+```
+
+
+```{r}
+#| label: data-check
+
+# trials per pid, block, condition
+data |>
+  group_by(pid, block, cond) |>
+  summarise(n = n(), .groups = "drop")
+
+# accuracy per pid, block, condition
+data |>
+  group_by(pid, block, cond) |>
+  summarise(acc = mean(acc), .groups = "drop")
+
+# exclusion summary
+cat("RT exclusions:", length(exclude_rt), "\n")
+cat("Accuracy exclusions:", length(exclude_acc), "\n")
+cat("Final n:", n_distinct(data$pid), "\n")
+```
+
+# 4. Summary statistics
+
+```{r}
+#| label: summary-rt-acc
+
+# RT
+rt_pid <- data |>
+  group_by(pid, block, cond) |>
+  summarise(
+    mean = mean(rt),
+    sd   = sd(rt),
+    n    = n(),
+    sem  = sd / sqrt(n),
+    .groups = "drop"
+  )
+
+rt_group <- data |>
+  group_by(cond) |>
+  summarise(
+    mean = mean(rt),
+    sd   = sd(rt),
+    n    = length(unique(pid)),
+    sem  = sd / sqrt(n),
+    .groups = "drop"
+  )
+
+# Accuracy
+acc_pid <- data |>
+  group_by(pid, block, cond) |>
+  summarise(
+    sum  = sum(acc),
+    n    = n(),
+    perc = sum / n * 100,
+    .groups = "drop"
+  )
+
+acc_group <- acc_pid |>
+  group_by(cond) |>
+  summarise(
+    mean_perc = mean(perc),
+    sd        = sd(perc),
+    n         = n(),
+    sem       = sd / sqrt(n),
+    .groups = "drop"
+  )
+```
+
+# 5. Plots
+
+```{r}
+#| label: plot-rt-bar
+
+if (!dir.exists(here("exp_2", "figures"))) {
+  dir.create(here("exp_2", "figures"), recursive = TRUE)
+}
+
+p_rt <- ggplot(rt_group, aes(x = cond, y = mean, fill = cond, colour = cond)) +
+  geom_col() +
+  geom_errorbar(
+    aes(ymin = mean - sem, ymax = mean + sem),
+    colour = "black", width = 0.2
+  ) +
+  geom_point(
+    data     = rt_pid |> group_by(pid, cond) |> summarise(mean = mean(mean), .groups = "drop"),
+    aes(y    = mean),
+    colour   = "black",
+    alpha    = 0.7,
+    position = pd2
+  ) +
+  scale_fill_manual(values   = myColors_1) +
+  scale_colour_manual(values = myColors_1) +
+  coord_cartesian(ylim = c(0, 2)) +
+  labs(x = "Condition", y = "Mean RT [s]")
+
+p_rt
+
+```
+
+```{r}
+#| label: plot-acc-bar
+
+p_acc <- ggplot(acc_group, aes(x = cond, y = mean_perc, fill = cond, colour = cond)) +
+  geom_col() +
+  geom_errorbar(
+    aes(ymin = mean_perc - sem, ymax = mean_perc + sem),
+    colour = "black", width = 0.2
+  ) +
+  geom_point(
+    data     = acc_pid |> group_by(pid, cond) |> summarise(mean_perc = mean(perc), .groups = "drop"),
+    aes(y    = mean_perc),
+    colour   = "black",
+    alpha    = 0.7,
+    position = pd2
+  ) +
+  scale_fill_manual(values   = myColors_1) +
+  scale_colour_manual(values = myColors_1) +
+  coord_cartesian(ylim = c(0, 100)) +
+  labs(x = "Condition", y = "Accuracy [%]")
+
+p_acc
+
+```
+
+```{r}
+#| label: plot-rt-density
+
+p_rt_density <- ggplot(data, aes(x = rt, fill = cond, colour = cond)) +
+  geom_density(alpha = 0.7) +
+  scale_fill_manual(values   = myColors_1) +
+  scale_colour_manual(values = myColors_1) +
+  labs(x = "RT [s]")
+
+p_rt_density
+
+```
+
+```{r}
+#| label: combined-plots
+
+(p_rt | p_acc) / p_rt_density
+
+ggsave(here("exp_2", "figures", "rt_acc.jpeg"), width = 8, height = 6)
+```
+
+# 6. Save
+
+```{r}
+#| label: save
+
+write_csv(data, here("exp_2", "data", "data_exp_2.csv"))
+```

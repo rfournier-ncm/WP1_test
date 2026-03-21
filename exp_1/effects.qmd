@@ -247,3 +247,12 @@ p_drift_dist | p_drift_diff | p_drift_pid
 ggsave(here("exp_1", "figures", "drift_rate.jpeg"), width = 15, height = 6)
 ```
 
+# 6. Summary quantiles
+
+```{r}
+#| label: quantiles
+
+thresh_diff_group_q
+drift_acc_diff_group_q
+drift_cond_diff_group_q
+```

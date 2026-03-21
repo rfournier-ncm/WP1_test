@@ -7,7 +7,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-This file wrangles data for Exp 1 in the face familiarity study.
+This file wrangles data for Experiment 1 in the face familiarity study.
 
 ```{r}
 #| label: setup
@@ -158,7 +158,7 @@ data |>
 ```{r}
 #| label: exclusions
 
-# pid 1 excluded: 59% of trials > 2.5s
+# pid 1 excluded: 59% of trials > 2.5s (unusually high, identified by inspection)
 data <- data |>
   filter(pid != 1, !rt_excluded)
 ```
@@ -235,7 +235,6 @@ p_rt <- ggplot(rt_group, aes(x = cond, y = mean, fill = cond, colour = cond)) +
 
 p_rt
 
-# ggsave(here("exp_1", "figures", "rt_barplot.jpeg"), width = 4, height = 4)
 ```
 
 ```{r}
@@ -261,8 +260,6 @@ p_acc <- ggplot(acc_group, aes(x = cond, y = mean_perc, fill = cond, colour = co
 
 p_acc
 
-#ggsave(here("exp_1", "figures", "acc_barplot.jpeg"), width = 4, height = 4)
-
 ```
 
 ```{r}
@@ -276,7 +273,6 @@ p_rt_density <- ggplot(data, aes(x = rt, fill = cond, colour = cond)) +
 
 p_rt_density
 
-# ggsave(here("exp_1", "figures", "rt_density.jpeg"), width = 4, height = 4)
 ```
 
 ```{r}

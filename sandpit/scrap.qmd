@@ -11,6 +11,122 @@ Scrap.
 ## from Rich
 
 ```{r}
+```{r}
+# check old data
+old_data <- read_csv(here("exp_4", "data", "from_raph", "data_exp_4.csv"))
+nrow(old_data)
+n_distinct(old_data$pid)
+
+nrow(data)
+n_distinct(data$pid)
+
+## check ratings
+# replicate manuscript approach exactly
+check_ratings <- read_csv(here("exp_4", "data", "raw_exp_4.csv")) |>
+  filter(!is.na(familiarity_rating)) |>
+  rename(pid = participant) |>
+  mutate(familiarity_rating = as.numeric(familiarity_rating)) |>
+  group_by(pid) |>
+  summarise(n_fam = sum(familiarity_rating > 6)) |>
+  filter(n_fam < 30)
+
+nrow(check_ratings)
+check_ratings
+
+old_data |> distinct(pid) |> arrange(pid) |> print(n=Inf)
+data |> distinct(pid) |> arrange(pid) |> print(n=Inf)
+
+
+# check their ratings
+check_ratings |> 
+  filter(pid %in% c("595398234d56070001645fd9",
+                    "5cae5f9c48514600183d8fac",
+                    "6609c596ac6ba651a47a15de",
+                    "6706af217ea3142dd07d1e83"))
+
+# check their RT exclusion rates
+data |>
+  filter(pid %in% c("595398234d56070001645fd9",
+                    "5cae5f9c48514600183d8fac",
+                    "6609c596ac6ba651a47a15de",
+                    "6706af217ea3142dd07d1e83")) |>
+  group_by(pid) |>
+  summarise(perc_excluded = mean(is.na(rt)) * 100)
+
+# check their accuracy
+data |>
+  filter(pid %in% c("595398234d56070001645fd9",
+                    "5cae5f9c48514600183d8fac",
+                    "6609c596ac6ba651a47a15de",
+                    "6706af217ea3142dd07d1e83")) |>
+  group_by(pid) |>
+  summarise(perc_acc = mean(acc) * 100)
+
+
+# with drop_na
+data |>
+  filter(!pid %in% exclude_ratings) |>
+  drop_na(rt) |>
+  group_by(pid) |>
+  summarise(perc_acc = mean(acc) * 100) |>
+  filter(pid %in% c("595398234d56070001645fd9",
+                    "5cae5f9c48514600183d8fac",
+                    "6706af217ea3142dd07d1e83"))
+
+# without drop_na
+data |>
+  filter(!pid %in% exclude_ratings) |>
+  group_by(pid) |>
+  summarise(perc_acc = mean(acc) * 100) |>
+  filter(pid %in% c("595398234d56070001645fd9",
+                    "5cae5f9c48514600183d8fac",
+                    "6706af217ea3142dd07d1e83"))
+
+
+## look at the model object data
+
+load(here("exp_4", "models", "LBA_exp4_v1.RData"))
+
+# extract all participant data and combine
+model_data_all <- LBA_exp4_v1[[1]]$data |>
+  bind_rows()
+
+# total rows and trial counts per participant
+nrow(model_data_all)
+
+model_data_all |>
+  filter(winner == TRUE) |>
+  group_by(subjects) |>
+  tally() |>
+  print(n = Inf)
+
+
+model_pids <- model_data_all |>
+  filter(winner == TRUE) |>
+  distinct(subjects) |>
+  arrange(subjects) |>
+  pull(subjects) |>
+  as.character()
+
+data_pids <- data |>
+  distinct(pid) |>
+  arrange(pid) |>
+  pull(pid)
+
+identical(model_pids, data_pids)
+
+# check structure of first participant
+str(LBA_exp4_v1[[1]]$data[[1]], max.level = 1)
+
+# check the expand attribute
+attr(LBA_exp4_v1[[1]]$data[[1]], "expand") |> length()
+
+# total unique trials via expand attribute
+map_int(LBA_exp4_v1[[1]]$data, ~ length(attr(.x, "expand"))) |> sum()
+```
+
+
+```{r}
 #| label: tbl-participants
 #| tbl-cap: "Participant summary across experiments. RT = response time; — = criterion not applicable."
 
@@ -114,7 +230,6 @@ acc_paired
 rt_paired
 rt_density
 ```
-
 
 ```{r}
 #| label: demo-exp1
@@ -399,7 +514,6 @@ ratings_only_4            <- length(exclude_ratings_exp4)
 number_participant_analysis_4 <- length(list_participant_analysis_4)
 ```
 
-
 ```{r}
 #| label: demo-exp4
 #| include: false
@@ -438,7 +552,6 @@ sd_age_exp4           <- exp4_demo_stats$sd_age
 min_age_exp4          <- exp4_demo_stats$min_age
 max_age_exp4          <- exp4_demo_stats$max_age
 ```
-
 
 ## from Raph
 

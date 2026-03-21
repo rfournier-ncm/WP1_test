@@ -177,3 +177,14 @@ The Ratcliff et al. (1992) paper is probably the most directly relevant given yo
 
 - In exp 1 what is the difference between data_exp_1.csv (previously data.csv) and raw_data_exp_1.csv?
 - And in the /data/ folder, we do not have raw participant data as .csv files at the moment. So we need to decide if the wrangle script has the raw data. Or we supply the already slightly wrangled data files. I hope this makes sense.
+
+- Exp 2 data has **I think** 3 trials below 0.2 s rt. These maybe need removing and fit the models against to follow our pre-reg pipeline.
+- Also, the modelling files for Exp 2 say "novel" and "famous" which is not correct. That's Exp3 and 4. But the model object has novel and learned in it, which IS correct. So the model was not created with this code. This needs fixing for sure. And the data file in the model script for Exp2 does not exist in the repo. So, I'm not sure what is going on here. Was there a copy and paste error? ANd then a filename change. Anyway, let's clarify this asap.
+
+- Exp 3. Let's check the exclusion criteria together for exp 3 and all the others, just so we get the right exclusions.
+
+ok, a bunch of things to check:
+
+- Exp 4 — original data pipeline to verify whether final n should be 30 or 31?
+- Exp 3/4 exclusion ordering — confirm ratings-first (Exp 3) vs RT-first (Exp 4) is scientifically justified, or standardise to a common workflow
+- Exp 2/4 models may need refitting once original data files are confirmed.

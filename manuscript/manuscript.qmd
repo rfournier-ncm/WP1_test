@@ -204,24 +204,21 @@ We report how we determined our sample size, all data exclusions (if any), all m
 For each experiment, the research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered. The preregistration, raw data, stimuli, data wrangling and analysis code as well as the evidence-accumulation models outputs are available on the Open Science Framework: Experiment 1 (<https://osf.io/azyvu/overview>), Experiment 2 (<https://osf.io/tu2eh/overview>), Experiment 3 (<https://osf.io/ut78f/overview>) and Experiment 4 (<https://osf.io/vj2aq/overview>).
 
 ```{r}
-#| label: load-all-demographics
+#| label: exclusions-all
 #| include: false
 
 # ── Experiment 1 ─────────────────────────────────────────────────────────────
-demo_exp1 <- read_csv(here("exp_1", "data", "demo_exp_1.csv")) |>
-  mutate(
-    Index           = as.factor(Index),
-    Gender          = as.factor(Gender),
-    Date_of_birth   = lubridate::my(Date_of_birth),
-    Date_of_testing = lubridate::dmy(`Date of testing`),
-    Age             = floor(age_calc(Date_of_birth,
-                                     enddate = Date_of_testing,
-                                     units = "years"))
-  )
+# pid 1 excluded by inspection: 59% of trials > 2.5s
+# no formal threshold applied (preregistered threshold introduced from Exp 2 onwards)
+data_exp1 <- read_csv(here("exp_1", "data", "data_exp_1.csv"))
+
+list_participant_analysis_1 <- data_exp1 |>
+  distinct(pid) |>
+  pull(pid)
 
 # ── Experiment 2 ─────────────────────────────────────────────────────────────
 data_exp2 <- read_csv(here(
-  "exp_2", "data", "data_exp_2", "wrangle_data_exp_2.csv"
+  "exp_2", "data", "wrangle_data_exp_2.csv"
 )) |>
   mutate(rt_excluded = is.na(rt) | rt > 2.0)
 
@@ -243,32 +240,10 @@ list_participant_analysis_2 <- data_exp2 |>
   distinct(pid) |>
   pull(pid)
 
-demo_exp2 <- read_csv(here("exp_2", "data", "demo_exp_2.csv")) |>
-  mutate(
-    `Participant id` = as.factor(`Participant id`),
-    Sex              = as.factor(Sex),
-    Age              = as.numeric(Age)
-  )
-
 # ── Experiment 3 ─────────────────────────────────────────────────────────────
 data_exp3 <- read_csv(here("exp_3", "data", "raw_data_exp_3.csv"))
 
-acc_check_exp3 <- data_exp3 |>
-  mutate(
-    cond = if_else(fam == 1, "famous", "novel"),
-    acc  = case_when(
-      cond == "famous" & keypress == "q" ~ 1,
-      cond == "novel"  & keypress == "p" ~ 1,
-      TRUE                               ~ 0
-    )
-  ) |>
-  drop_na(rt) |>
-  group_by(pid) |>
-  summarise(perc_acc = mean(acc) * 100)
-
-over_95_pid <- acc_check_exp3 |> filter(perc_acc > 95) |> pull(pid)
-under_55_pid <- acc_check_exp3 |> filter(perc_acc < 55) |> pull(pid)
-
+# ratings exclusion first
 data_ratings_exp3 <- list.files(
   here("exp_3", "data"),
   pattern    = "Ratings.*csv",
@@ -284,18 +259,100 @@ data_ratings_exp3 <- list.files(
 exclude_ratings_exp3 <- data_ratings_exp3 |>
   group_by(pid) |>
   summarise(n_fam = sum(Fam_ratings > 6)) |>
-  filter(n_fam < 30, !pid %in% under_55_pid) |>
+  filter(n_fam < 30) |>
   pull(pid)
+
+# accuracy on remaining participants only
+acc_check_exp3 <- data_exp3 |>
+  filter(!pid %in% exclude_ratings_exp3) |>
+  mutate(
+    cond = if_else(fam == 1, "famous", "novel"),
+    acc  = case_when(
+      cond == "famous" & keypress == "q" ~ 1,
+      cond == "novel"  & keypress == "p" ~ 1,
+      TRUE                               ~ 0
+    )
+  ) |>
+  drop_na(rt) |>
+  group_by(pid) |>
+  summarise(perc_acc = mean(acc) * 100)
+
+over_95_pid  <- acc_check_exp3 |> filter(perc_acc > 95) |> pull(pid)
+under_55_pid <- acc_check_exp3 |> filter(perc_acc < 55) |> pull(pid)
 
 list_participant_analysis_3 <- data_exp3 |>
   filter(
+    !pid %in% exclude_ratings_exp3,
     !pid %in% over_95_pid,
-    !pid %in% under_55_pid,
-    !pid %in% exclude_ratings_exp3
+    !pid %in% under_55_pid
   ) |>
   distinct(pid) |>
   pull(pid)
 
+# ── Experiment 4 ─────────────────────────────────────────────────────────────
+data_exp4 <- read_csv(here("exp_4", "data", "wrangle_exp_4.csv")) |>
+  mutate(rt_excluded = is.na(rt))
+
+# ratings exclusion first
+exclude_ratings_exp4 <- read_csv(here("exp_4", "data", "raw_exp_4.csv")) |>
+  filter(!is.na(familiarity_rating)) |>
+  rename(pid = participant) |>
+  group_by(pid) |>
+  summarise(n_fam = sum(familiarity_rating > 6)) |>
+  filter(n_fam < 30) |>
+  pull(pid)
+
+# RT exclusion on remaining participants
+exclude_rt_exp4 <- data_exp4 |>
+  filter(!pid %in% exclude_ratings_exp4) |>
+  group_by(pid) |>
+  summarise(perc_excluded = mean(rt_excluded) * 100) |>
+  filter(perc_excluded > 25) |>
+  pull(pid)
+
+# accuracy exclusion on remaining participants
+exclude_acc_exp4 <- data_exp4 |>
+  filter(!pid %in% exclude_ratings_exp4, !pid %in% exclude_rt_exp4) |>
+  group_by(pid) |>
+  summarise(perc_acc = mean(acc, na.rm = TRUE) * 100) |>
+  filter(perc_acc < 55) |>
+  pull(pid)
+
+list_participant_analysis_4 <- data_exp4 |>
+  filter(
+    !pid %in% exclude_ratings_exp4,
+    !pid %in% exclude_rt_exp4,
+    !pid %in% exclude_acc_exp4
+  ) |>
+  distinct(pid) |>
+  pull(pid)
+```
+
+```{r}
+#| label: demographics-all
+#| include: false
+
+# ── Experiment 1 ─────────────────────────────────────────────────────────────
+demo_exp1 <- read_csv(here("exp_1", "data", "demo_exp_1.csv")) |>
+  mutate(
+    Index           = as.factor(Index),
+    Gender          = as.factor(Gender),
+    Date_of_birth   = lubridate::my(Date_of_birth),
+    Date_of_testing = lubridate::dmy(`Date of testing`),
+    Age             = floor(age_calc(Date_of_birth,
+                                     enddate = Date_of_testing,
+                                     units = "years"))
+  )
+
+# ── Experiment 2 ─────────────────────────────────────────────────────────────
+demo_exp2 <- read_csv(here("exp_2", "data", "demo_exp_2.csv")) |>
+  mutate(
+    `Participant id` = as.factor(`Participant id`),
+    Sex              = as.factor(Sex),
+    Age              = as.numeric(Age)
+  )
+
+# ── Experiment 3 ─────────────────────────────────────────────────────────────
 demo_exp3 <- read_csv(here("exp_3", "data", "demo_exp_3.csv")) |>
   mutate(
     Index  = as.factor(Index),
@@ -305,39 +362,6 @@ demo_exp3 <- read_csv(here("exp_3", "data", "demo_exp_3.csv")) |>
   )
 
 # ── Experiment 4 ─────────────────────────────────────────────────────────────
-data_exp4 <- read_csv(here("exp_4", "data", "wrangle_exp_4.csv")) |>
-  mutate(rt_excluded = is.na(rt))
-
-exclude_rt_exp4 <- data_exp4 |>
-  group_by(pid) |>
-  summarise(perc_excluded = mean(rt_excluded) * 100) |>
-  filter(perc_excluded > 25) |>
-  pull(pid)
-
-exclude_acc_exp4 <- data_exp4 |>
-  filter(!pid %in% exclude_rt_exp4) |>
-  group_by(pid) |>
-  summarise(perc_acc = mean(acc, na.rm = TRUE) * 100) |>
-  filter(perc_acc < 55) |>
-  pull(pid)
-
-exclude_ratings_exp4 <- read_csv(here("exp_4", "data", "raw_exp_4.csv")) |>
-  filter(!is.na(familiarity_rating)) |>
-  rename(pid = participant) |>
-  group_by(pid) |>
-  summarise(n_fam = sum(familiarity_rating > 6)) |>
-  filter(n_fam < 30, !pid %in% exclude_acc_exp4) |>
-  pull(pid)
-
-list_participant_analysis_4 <- data_exp4 |>
-  filter(
-    !pid %in% exclude_rt_exp4,
-    !pid %in% exclude_acc_exp4,
-    !pid %in% exclude_ratings_exp4
-  ) |>
-  distinct(pid) |>
-  pull(pid)
-
 demo_exp4 <- read_csv(here("exp_4", "data", "demo_exp_4.csv")) |>
   mutate(
     `Participant id` = as.factor(`Participant id`),
@@ -345,7 +369,7 @@ demo_exp4 <- read_csv(here("exp_4", "data", "demo_exp_4.csv")) |>
     Age              = as.numeric(Age)
   )
 
-# ── Exp 1 inline text scalars ─────────────────────────────────────────────────
+# ── Exp 1 inline text scalar ──────────────────────────────────────────────────
 rt_exp_1 <- read_csv(here("exp_1", "data", "raw_data_exp_1.csv"))
 perc_rt_1 <- rt_exp_1 |>
   filter(pid != "1") |>
@@ -367,13 +391,13 @@ participant_summary <- bind_rows(
       Setting                  = "Lab",
       Started                  = nrow(demo_exp1),
       Withdrew                 = 0,
-      Completed                = nrow(demo_exp1) - 1L,  # 1 excluded for RT
+      Completed                = nrow(demo_exp1) - 1L,
       `RT exclusions`          = 1,
       `Accuracy exclusions`    = 0,
       `Familiarity exclusions` = "—",
       `Final n`                = n(),
-      Female                    = sum(gender == "Female"),
-      Male                      = sum(gender == "Male"),
+      Female                   = sum(gender == "Female"),
+      Male                     = sum(gender == "Male"),
       `Mean age (SD)`          = paste0(round(mean(Age), 1), " (", round(sd(Age), 1), ")")
     ),
 
@@ -435,67 +459,66 @@ participant_summary <- bind_rows(
     )
 )
 
-
-# Extract scalars for inline text from the table
+# Extract scalars for inline text
 # Exp 1
-exp1_row <- participant_summary |> filter(Experiment == "Experiment 1")
+exp1_row           <- participant_summary |> filter(Experiment == "Experiment 1")
 participant_n_exp1 <- nrow(demo_exp1)
 total_part_exp1    <- exp1_row$`Final n`
-male_exp1          <- exp1_row$Men
-female_exp1        <- exp1_row$Women
+male_exp1          <- exp1_row$Male
+female_exp1        <- exp1_row$Female
 mean_age_exp1      <- as.numeric(str_extract(exp1_row$`Mean age (SD)`, "^[0-9.]+"))
 sd_age_exp1        <- as.numeric(str_extract(exp1_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
 min_age_exp1       <- min(demo_exp1$Age[demo_exp1$Index != "1.1-RF-01"])
 max_age_exp1       <- max(demo_exp1$Age[demo_exp1$Index != "1.1-RF-01"])
 
 # Exp 2
-exp2_row           <- participant_summary |> filter(Experiment == "Experiment 2")
-total_number_part  <- exp2_row$Started
-inform_consent     <- exp2_row$Withdrew
-number_part_compl  <- exp2_row$Completed
-part_trial_25      <- exp2_row$`RT exclusions`
-part_acc_55        <- exp2_row$`Accuracy exclusions`
+exp2_row                      <- participant_summary |> filter(Experiment == "Experiment 2")
+total_number_part             <- exp2_row$Started
+inform_consent                <- exp2_row$Withdrew
+number_part_compl             <- exp2_row$Completed
+part_trial_25                 <- exp2_row$`RT exclusions`
+part_acc_55                   <- exp2_row$`Accuracy exclusions`
 number_participant_analysis_2 <- exp2_row$`Final n`
-male_exp2          <- exp2_row$Men
-female_exp2        <- exp2_row$Women
-mean_age_exp2      <- as.numeric(str_extract(exp2_row$`Mean age (SD)`, "^[0-9.]+"))
-sd_age_exp2        <- as.numeric(str_extract(exp2_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
-min_age_exp2       <- min(demo_exp2$Age[demo_exp2$Status != "RETURNED" & 
-                          demo_exp2$`Participant id` %in% list_participant_analysis_2])
-max_age_exp2       <- max(demo_exp2$Age[demo_exp2$Status != "RETURNED" & 
-                          demo_exp2$`Participant id` %in% list_participant_analysis_2])
+male_exp2                     <- exp2_row$Male
+female_exp2                   <- exp2_row$Female
+mean_age_exp2                 <- as.numeric(str_extract(exp2_row$`Mean age (SD)`, "^[0-9.]+"))
+sd_age_exp2                   <- as.numeric(str_extract(exp2_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
+min_age_exp2                  <- min(demo_exp2$Age[demo_exp2$Status != "RETURNED" &
+                                    demo_exp2$`Participant id` %in% list_participant_analysis_2])
+max_age_exp2                  <- max(demo_exp2$Age[demo_exp2$Status != "RETURNED" &
+                                    demo_exp2$`Participant id` %in% list_participant_analysis_2])
 
 # Exp 3
-exp3_row           <- participant_summary |> filter(Experiment == "Experiment 3")
-participant_n_exp3 <- exp3_row$Started
+exp3_row             <- participant_summary |> filter(Experiment == "Experiment 3")
+participant_n_exp3   <- exp3_row$Started
 number_participant_3 <- exp3_row$`Final n`
-over_95            <- length(over_95_pid)
-under_55           <- length(under_55_pid)
-ratings_only       <- length(exclude_ratings_exp3)
-male_exp3          <- exp3_row$Men
-female_exp3        <- exp3_row$Women
-mean_age_exp3      <- as.numeric(str_extract(exp3_row$`Mean age (SD)`, "^[0-9.]+"))
-sd_age_exp3        <- as.numeric(str_extract(exp3_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
-min_age_exp3       <- min(demo_exp3$Age[demo_exp3$pid %in% list_participant_analysis_3])
-max_age_exp3       <- max(demo_exp3$Age[demo_exp3$pid %in% list_participant_analysis_3])
+over_95              <- length(over_95_pid)
+under_55             <- length(under_55_pid)
+ratings_only         <- length(exclude_ratings_exp3)
+male_exp3            <- exp3_row$Male
+female_exp3          <- exp3_row$Female
+mean_age_exp3        <- as.numeric(str_extract(exp3_row$`Mean age (SD)`, "^[0-9.]+"))
+sd_age_exp3          <- as.numeric(str_extract(exp3_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
+min_age_exp3         <- min(demo_exp3$Age[demo_exp3$pid %in% list_participant_analysis_3])
+max_age_exp3         <- max(demo_exp3$Age[demo_exp3$pid %in% list_participant_analysis_3])
 
 # Exp 4
-exp4_row           <- participant_summary |> filter(Experiment == "Experiment 4")
-total_number_part_4  <- exp4_row$Started
-inform_consent_4     <- exp4_row$Withdrew
-number_part_compl_4  <- exp4_row$Completed
-part_trial_25_4      <- exp4_row$`RT exclusions`
-part_acc_55_4        <- exp4_row$`Accuracy exclusions`
-ratings_only_4       <- as.integer(exp4_row$`Familiarity exclusions`)
+exp4_row                      <- participant_summary |> filter(Experiment == "Experiment 4")
+total_number_part_4           <- exp4_row$Started
+inform_consent_4              <- exp4_row$Withdrew
+number_part_compl_4           <- exp4_row$Completed
+part_trial_25_4               <- exp4_row$`RT exclusions`
+part_acc_55_4                 <- exp4_row$`Accuracy exclusions`
+ratings_only_4                <- as.integer(exp4_row$`Familiarity exclusions`)
 number_participant_analysis_4 <- exp4_row$`Final n`
-male_exp4            <- exp4_row$Men
-female_exp4          <- exp4_row$Women
-mean_age_exp4        <- as.numeric(str_extract(exp4_row$`Mean age (SD)`, "^[0-9.]+"))
-sd_age_exp4          <- as.numeric(str_extract(exp4_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
-min_age_exp4         <- min(demo_exp4$Age[demo_exp4$Status != "RETURNED" & 
-                            demo_exp4$`Participant id` %in% list_participant_analysis_4])
-max_age_exp4         <- max(demo_exp4$Age[demo_exp4$Status != "RETURNED" & 
-                            demo_exp4$`Participant id` %in% list_participant_analysis_4])
+male_exp4                     <- exp4_row$Male
+female_exp4                   <- exp4_row$Female
+mean_age_exp4                 <- as.numeric(str_extract(exp4_row$`Mean age (SD)`, "^[0-9.]+"))
+sd_age_exp4                   <- as.numeric(str_extract(exp4_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
+min_age_exp4                  <- min(demo_exp4$Age[demo_exp4$Status != "RETURNED" &
+                                    demo_exp4$`Participant id` %in% list_participant_analysis_4])
+max_age_exp4                  <- max(demo_exp4$Age[demo_exp4$Status != "RETURNED" &
+                                    demo_exp4$`Participant id` %in% list_participant_analysis_4])
 ```
 
 ## Experiment 1
@@ -943,7 +966,7 @@ thresh_all <- theta_all |>
       str_detect(param, "lRLearned") ~ "learned",
       str_detect(param, "lRFamous")  ~ "famous"
     ),
-    response   = factor(response, levels = c("novel", "learned", "famous"))
+    response = factor(response, levels = c("novel", "learned", "famous")) |> droplevels()
     #experiment = factor(experiment, labels = c("Experiment 1", "Experiment 2", "Experiment 4"))
   )
 
@@ -982,7 +1005,7 @@ drift_all <- theta_all |>
       str_detect(param, "Famous")  ~ "famous"
     ),
     accuracy  = if_else(str_detect(param, "TRUE"), "true", "false"),
-    condition = factor(condition, levels = c("novel", "learned", "famous")),
+    condition = factor(condition, levels = c("novel", "learned", "famous")) |> droplevels(),
     accuracy  = factor(accuracy,  levels = c("false", "true"))
   )
 
@@ -1036,8 +1059,10 @@ ggplot(thresh_all, aes(x = value, y = fct_rev(response), fill = response)) +
   stat_halfeye(alpha = 0.7) +
   geom_vline(xintercept = 0, colour = "darkgrey") +
   scale_fill_manual(values = myColors_3) +
+  scale_y_discrete(drop = TRUE) +
   facet_grid(experiment ~ .,
-             labeller = labeller(experiment = ~ paste("Experiment", .x))) +
+             labeller = labeller(experiment = ~ paste("Experiment", .x)),
+             scales = "free_y") +
   labs(x = "Threshold", y = "Response") +
   theme(
     text       = element_text(size = 20, face = "bold"),
@@ -1076,8 +1101,10 @@ ggplot(drift_acc_diff_all, aes(x = diff, y = fct_rev(condition), fill = conditio
   stat_halfeye(alpha = 0.7) +
   geom_vline(xintercept = 0, colour = "darkgrey") +
   scale_fill_manual(values = myColors_3) +
+  scale_y_discrete(drop = TRUE) +
   facet_grid(experiment ~ .,
-             labeller = labeller(experiment = ~ paste("Experiment", .x))) +
+             labeller = labeller(experiment = ~ paste("Experiment", .x)),
+             scales = "free_y") +
   labs(x = "Drift rate (TRUE - FALSE)", y = "Condition") +
   theme(
     text       = element_text(size = 20, face = "bold"),
