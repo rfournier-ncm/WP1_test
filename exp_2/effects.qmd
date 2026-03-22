@@ -81,7 +81,10 @@ theta_pid <- params |>
   as_tibble() |>
   pivot_longer(cols = all_of(param_cols), names_to = "param", values_to = "value") |>
   rename(pid = subjects) |>
-  mutate(.draw = rep(1:n_draws, each = length(param_cols), times = n_pids))
+  mutate(
+    pid   = as.integer(factor(pid)),  # recode Prolific IDs to integers
+    .draw = rep(1:n_draws, each = length(param_cols), times = n_pids)
+  )
 
 # group-level posteriors
 theta_group <- theta_pid |>

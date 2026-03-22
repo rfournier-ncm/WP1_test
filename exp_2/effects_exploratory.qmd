@@ -1,0 +1,469 @@
+---
+title: "effects - exploratory models - experiment 2"
+author: "Raph & Rich"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+This file visualises posterior distributions for the three exploratory LBA
+models for Experiment 2: bias (A varies by response), t0 (non-decision time
+varies by condition), and full (both A and t0 vary).
+
+```{r}
+#| label: setup
+#| include: false
+
+pkgs <- c(
+  "EMC2", "tidyverse", "tidybayes", "patchwork", "paletteer", "here"
+  )
+vapply(
+  pkgs, library, logical(1), character.only = TRUE, logical.return = TRUE
+  )
+
+theme_set(
+  theme_bw() +
+    theme(
+      text  = element_text(size = 15, face = "bold"),
+      title = element_text(size = 15, face = "bold"),
+      legend.position = "none"
+    )
+)
+
+safe_pal   <- paletteer_d("rcartocolor::Safe", 4)
+
+myColors_1 <- c("novel" = safe_pal[1], "learned" = safe_pal[2])
+```
+
+# 1. Load models
+
+```{r}
+#| label: load-models
+
+if (Sys.getenv("OSF_PAT") != "") osfr::osf_auth(Sys.getenv("OSF_PAT"))
+
+exp2_models <- osfr::osf_retrieve_node("65bt2") |>
+  osfr::osf_ls_files() |>
+  dplyr::filter(name == "exp_2") |>
+  osfr::osf_ls_files() |>
+  osfr::osf_ls_files()
+
+local_dir <- here("exp_2", "models")
+if (!dir.exists(local_dir)) dir.create(local_dir, recursive = TRUE)
+
+model_files <- c(
+  "LBA_exp2_bias.RData",
+  "LBA_exp2_t0.RData",
+  "LBA_exp2_full.RData"
+)
+
+walk(model_files, ~ {
+  if (!file.exists(here(local_dir, .x))) {
+    exp2_models |>
+      dplyr::filter(name == .x) |>
+      osfr::osf_download(path = local_dir, conflicts = "overwrite")
+  }
+})
+
+load(here("exp_2", "models", "LBA_exp2_bias.RData"))
+load(here("exp_2", "models", "LBA_exp2_t0.RData"))
+load(here("exp_2", "models", "LBA_exp2_full.RData"))
+```
+
+# 2. Wrangling function
+
+```{r}
+#| label: wrangle-fn
+
+wrangle_model <- function(model, param_cols, cond_label = "learned") {
+  params  <- EMC2::parameters(model, selection = "alpha", N = NULL)
+  n_pids  <- length(unique(params$subjects))
+  n_draws <- nrow(params) / n_pids
+
+  theta_pid <- params |>
+    as_tibble() |>
+    pivot_longer(
+      cols      = all_of(param_cols),
+      names_to  = "param",
+      values_to = "value"
+    ) |>
+    rename(pid = subjects) |>
+    mutate(
+      pid   = as.integer(factor(pid)),
+      .draw = rep(1:n_draws, each = length(param_cols), times = n_pids)
+    )
+
+  theta_group <- theta_pid |>
+    group_by(.draw, param) |>
+    summarise(value = mean(value, na.rm = TRUE), .groups = "drop")
+
+  recode_response <- function(param) {
+    case_when(
+      str_detect(param, "lRNovel")   ~ "novel",
+      str_detect(param, "lRLearned") ~ "learned"
+    )
+  }
+
+  recode_condition <- function(param) {
+    case_when(
+      str_detect(param, "SNovel")   ~ "novel",
+      str_detect(param, "SLearned") ~ "learned"
+    )
+  }
+
+  # ── threshold ──────────────────────────────────────────────────────────────
+  thresh_group <- theta_group |>
+    filter(str_detect(param, "B_")) |>
+    mutate(
+      response = recode_response(param),
+      response = factor(response, levels = c("novel", cond_label))
+    )
+
+  thresh_diff_group <- thresh_group |>
+    pivot_wider(id_cols = .draw, names_from = response, values_from = value) |>
+    mutate(diff = novel - .data[[cond_label]])
+
+  thresh_diff_pid <- theta_pid |>
+    filter(str_detect(param, "B_")) |>
+    mutate(
+      response = recode_response(param),
+      response = factor(response, levels = c("novel", cond_label))
+    ) |>
+    pivot_wider(id_cols = c(pid, .draw), names_from = response, values_from = value) |>
+    mutate(diff = novel - .data[[cond_label]])
+
+  # ── drift rate ─────────────────────────────────────────────────────────────
+  drift_group <- theta_group |>
+    filter(str_detect(param, "v_S")) |>
+    mutate(
+      condition = recode_condition(param),
+      accuracy  = if_else(str_detect(param, "TRUE"), "true", "false"),
+      condition = factor(condition, levels = c("novel", cond_label)),
+      accuracy  = factor(accuracy,  levels = c("false", "true"))
+    )
+
+  drift_acc_diff_group <- drift_group |>
+    pivot_wider(
+      id_cols     = c(.draw, condition),
+      names_from  = accuracy,
+      values_from = value
+    ) |>
+    mutate(diff = true - false)
+
+  drift_cond_diff_group <- drift_acc_diff_group |>
+    pivot_wider(id_cols = .draw, names_from = condition, values_from = diff) |>
+    mutate(diff = novel - .data[[cond_label]])
+
+  drift_cond_diff_pid <- theta_pid |>
+    filter(str_detect(param, "v_S")) |>
+    mutate(
+      condition = recode_condition(param),
+      accuracy  = if_else(str_detect(param, "TRUE"), "true", "false"),
+      condition = factor(condition, levels = c("novel", cond_label)),
+      accuracy  = factor(accuracy,  levels = c("false", "true"))
+    ) |>
+    pivot_wider(
+      id_cols     = c(pid, .draw, condition),
+      names_from  = accuracy,
+      values_from = value
+    ) |>
+    mutate(diff = true - false) |>
+    pivot_wider(id_cols = c(pid, .draw), names_from = condition, values_from = diff) |>
+    mutate(diff = novel - .data[[cond_label]])
+
+  # ── optional: bias (A) ─────────────────────────────────────────────────────
+  bias <- NULL
+  if (any(str_detect(param_cols, "A_"))) {
+    bias_group <- theta_group |>
+      filter(str_detect(param, "A_")) |>
+      mutate(
+        response = recode_response(param),
+        response = factor(response, levels = c("novel", cond_label))
+      )
+    bias_diff_group <- bias_group |>
+      pivot_wider(id_cols = .draw, names_from = response, values_from = value) |>
+      mutate(diff = novel - .data[[cond_label]])
+    bias_diff_pid <- theta_pid |>
+      filter(str_detect(param, "A_")) |>
+      mutate(
+        response = recode_response(param),
+        response = factor(response, levels = c("novel", cond_label))
+      ) |>
+      pivot_wider(id_cols = c(pid, .draw), names_from = response, values_from = value) |>
+      mutate(diff = novel - .data[[cond_label]])
+    bias <- list(
+      group    = bias_group,
+      diff     = bias_diff_group,
+      diff_pid = bias_diff_pid,
+      diff_q   = bias_diff_group |> median_qi(diff)
+    )
+  }
+
+  # ── optional: t0 ───────────────────────────────────────────────────────────
+  t0 <- NULL
+  if (any(str_detect(param_cols, "t0_"))) {
+    t0_group <- theta_group |>
+      filter(str_detect(param, "t0_")) |>
+      mutate(
+        condition = recode_condition(param),
+        condition = factor(condition, levels = c("novel", cond_label))
+      )
+    t0_diff_group <- t0_group |>
+      pivot_wider(id_cols = .draw, names_from = condition, values_from = value) |>
+      mutate(diff = novel - .data[[cond_label]])
+    t0_diff_pid <- theta_pid |>
+      filter(str_detect(param, "t0_")) |>
+      mutate(
+        condition = recode_condition(param),
+        condition = factor(condition, levels = c("novel", cond_label))
+      ) |>
+      pivot_wider(id_cols = c(pid, .draw), names_from = condition, values_from = value) |>
+      mutate(diff = novel - .data[[cond_label]])
+    t0 <- list(
+      group    = t0_group,
+      diff     = t0_diff_group,
+      diff_pid = t0_diff_pid,
+      diff_q   = t0_diff_group |> median_qi(diff)
+    )
+  }
+
+  list(
+    thresh = list(
+      group    = thresh_group,
+      diff     = thresh_diff_group,
+      diff_pid = thresh_diff_pid,
+      diff_q   = thresh_diff_group |> median_qi(diff)
+    ),
+    drift = list(
+      acc_diff      = drift_acc_diff_group,
+      cond_diff     = drift_cond_diff_group,
+      cond_diff_pid = drift_cond_diff_pid,
+      acc_diff_q    = drift_acc_diff_group  |> group_by(condition) |> median_qi(diff),
+      cond_diff_q   = drift_cond_diff_group |> median_qi(diff)
+    ),
+    bias = bias,
+    t0   = t0
+  )
+}
+```
+
+# 3. Plotting function
+
+```{r}
+#| label: plot-fn
+
+plot_effects <- function(res, model_name, cond_label = "learned",
+                         fig_dir = here("exp_2", "figures", "exploratory")) {
+
+  if (!dir.exists(fig_dir)) dir.create(fig_dir, recursive = TRUE)
+
+  p_thresh_dist <- ggplot(
+    res$thresh$group,
+    aes(x = value, y = fct_rev(response), fill = response)
+  ) +
+    stat_halfeye(alpha = 0.7) +
+    scale_fill_manual(values = myColors_1) +
+    geom_vline(xintercept = 0, colour = "darkgrey") +
+    labs(x = "Threshold", y = "Response",
+         title = paste(model_name, "— threshold"))
+
+  p_thresh_diff <- ggplot(res$thresh$diff, aes(x = diff, y = "")) +
+    stat_halfeye(alpha = 0.9, fill = "firebrick") +
+    geom_vline(xintercept = 0, colour = "darkgrey") +
+    labs(x = paste0("Threshold (novel - ", cond_label, ")"), y = NULL)
+
+  p_thresh_pid <- ggplot(
+    res$thresh$diff_pid |> mutate(pid = reorder(pid, diff, mean)),
+    aes(x = diff, y = pid)
+  ) +
+    stat_halfeye(alpha = 0.7) +
+    geom_vline(xintercept = 0, colour = "darkgrey") +
+    labs(x = paste0("Threshold (novel - ", cond_label, ")"), y = "Participant")
+
+  p_thresh <- p_thresh_dist | p_thresh_diff | p_thresh_pid
+  ggsave(file.path(fig_dir, paste0("threshold_", model_name, ".jpeg")),
+         p_thresh, width = 15, height = 6)
+
+  p_drift_dist <- ggplot(
+    res$drift$acc_diff,
+    aes(x = diff, y = fct_rev(condition), fill = condition)
+  ) +
+    stat_halfeye(alpha = 0.7) +
+    scale_fill_manual(values = myColors_1) +
+    geom_vline(xintercept = 0, colour = "darkgrey") +
+    labs(x = "Drift rate (true - false)", y = "Condition",
+         title = paste(model_name, "— drift rate"))
+
+  p_drift_diff <- ggplot(res$drift$cond_diff, aes(x = diff, y = "")) +
+    stat_halfeye(alpha = 0.9, fill = "firebrick") +
+    geom_vline(xintercept = 0, colour = "darkgrey") +
+    labs(x = paste0("Drift rate (novel - ", cond_label, ")"), y = NULL)
+
+  p_drift_pid <- ggplot(
+    res$drift$cond_diff_pid |> mutate(pid = reorder(pid, diff, mean)),
+    aes(x = diff, y = pid)
+  ) +
+    stat_halfeye(alpha = 0.7) +
+    geom_vline(xintercept = 0, colour = "darkgrey") +
+    labs(x = paste0("Drift rate (novel - ", cond_label, ")"), y = "Participant")
+
+  p_drift <- p_drift_dist | p_drift_diff | p_drift_pid
+  ggsave(file.path(fig_dir, paste0("drift_rate_", model_name, ".jpeg")),
+         p_drift, width = 15, height = 6)
+
+  if (!is.null(res$bias)) {
+    p_bias_dist <- ggplot(
+      res$bias$group,
+      aes(x = value, y = fct_rev(response), fill = response)
+    ) +
+      stat_halfeye(alpha = 0.7) +
+      scale_fill_manual(values = myColors_1) +
+      geom_vline(xintercept = 0, colour = "darkgrey") +
+      labs(x = "Starting point (A)", y = "Response",
+           title = paste(model_name, "— bias"))
+
+    p_bias_diff <- ggplot(res$bias$diff, aes(x = diff, y = "")) +
+      stat_halfeye(alpha = 0.9, fill = "firebrick") +
+      geom_vline(xintercept = 0, colour = "darkgrey") +
+      labs(x = paste0("Bias (novel - ", cond_label, ")"), y = NULL)
+
+    p_bias_pid <- ggplot(
+      res$bias$diff_pid |> mutate(pid = reorder(pid, diff, mean)),
+      aes(x = diff, y = pid)
+    ) +
+      stat_halfeye(alpha = 0.7) +
+      geom_vline(xintercept = 0, colour = "darkgrey") +
+      labs(x = paste0("Bias (novel - ", cond_label, ")"), y = "Participant")
+
+    p_bias <- p_bias_dist | p_bias_diff | p_bias_pid
+    ggsave(file.path(fig_dir, paste0("bias_", model_name, ".jpeg")),
+           p_bias, width = 15, height = 6)
+  }
+
+  if (!is.null(res$t0)) {
+    p_t0_dist <- ggplot(
+      res$t0$group,
+      aes(x = value, y = fct_rev(condition), fill = condition)
+    ) +
+      stat_halfeye(alpha = 0.7) +
+      scale_fill_manual(values = myColors_1) +
+      geom_vline(xintercept = 0, colour = "darkgrey") +
+      labs(x = "Non-decision time (t0)", y = "Condition",
+           title = paste(model_name, "— t0"))
+
+    p_t0_diff <- ggplot(res$t0$diff, aes(x = diff, y = "")) +
+      stat_halfeye(alpha = 0.9, fill = "firebrick") +
+      geom_vline(xintercept = 0, colour = "darkgrey") +
+      labs(x = paste0("t0 (novel - ", cond_label, ")"), y = NULL)
+
+    p_t0_pid <- ggplot(
+      res$t0$diff_pid |> mutate(pid = reorder(pid, diff, mean)),
+      aes(x = diff, y = pid)
+    ) +
+      stat_halfeye(alpha = 0.7) +
+      geom_vline(xintercept = 0, colour = "darkgrey") +
+      labs(x = paste0("t0 (novel - ", cond_label, ")"), y = "Participant")
+
+    p_t0 <- p_t0_dist | p_t0_diff | p_t0_pid
+    ggsave(file.path(fig_dir, paste0("t0_", model_name, ".jpeg")),
+           p_t0, width = 15, height = 6)
+  }
+
+  print(p_thresh)
+  print(p_drift)
+  if (!is.null(res$bias)) print(p_bias)
+  if (!is.null(res$t0))   print(p_t0)
+}
+```
+
+# 4. Run for each model
+
+```{r}
+#| label: effects-bias
+
+res_bias <- wrangle_model(
+  model      = LBA_exp2_bias,
+  param_cols = c(
+    "v_SNovel:lMTRUE", "v_SNovel:lMFALSE",
+    "v_SLearned:lMTRUE", "v_SLearned:lMFALSE",
+    "sv_lMTRUE", "B_lRNovel", "B_lRLearned",
+    "A_lRNovel", "A_lRLearned", "t0"
+  )
+)
+plot_effects(res_bias, model_name = "bias")
+```
+
+```{r}
+#| label: effects-t0
+
+res_t0 <- wrangle_model(
+  model      = LBA_exp2_t0,
+  param_cols = c(
+    "v_SNovel:lMTRUE", "v_SNovel:lMFALSE",
+    "v_SLearned:lMTRUE", "v_SLearned:lMFALSE",
+    "sv_lMTRUE", "B_lRNovel", "B_lRLearned",
+    "A", "t0_SNovel", "t0_SLearned"
+  )
+)
+plot_effects(res_t0, model_name = "t0")
+```
+
+```{r}
+#| label: effects-full
+
+res_full <- wrangle_model(
+  model      = LBA_exp2_full,
+  param_cols = c(
+    "v_SNovel:lMTRUE", "v_SNovel:lMFALSE",
+    "v_SLearned:lMTRUE", "v_SLearned:lMFALSE",
+    "sv_lMTRUE", "B_lRNovel", "B_lRLearned",
+    "A_lRNovel", "A_lRLearned",
+    "t0_SNovel", "t0_SLearned"
+  )
+)
+plot_effects(res_full, model_name = "full")
+```
+
+# 5. Summary quantiles
+
+```{r}
+#| label: quantiles
+
+# threshold
+bind_rows(
+  res_bias$thresh$diff_q |> mutate(model = "bias"),
+  res_t0$thresh$diff_q   |> mutate(model = "t0"),
+  res_full$thresh$diff_q |> mutate(model = "full")
+) |>
+  select(model, median = diff, lower = .lower, upper = .upper)
+
+# drift rate contrast
+bind_rows(
+  res_bias$drift$cond_diff_q |> mutate(model = "bias"),
+  res_t0$drift$cond_diff_q   |> mutate(model = "t0"),
+  res_full$drift$cond_diff_q |> mutate(model = "full")
+) |>
+  select(model, median = diff, lower = .lower, upper = .upper)
+```
+
+# 6. Model comparison
+
+```{r}
+#| label: model-comparison
+
+load(here("exp_2", "models", "LBA_exp2_v1.RData"))
+load(here("exp_2", "models", "LBA_exp2_bias.RData"))
+load(here("exp_2", "models", "LBA_exp2_t0.RData"))
+load(here("exp_2", "models", "LBA_exp2_full.RData"))
+
+compare(
+  list(
+    preregistered = LBA_exp2_v1,
+    bias          = LBA_exp2_bias,
+    t0            = LBA_exp2_t0,
+    full          = LBA_exp2_full
+  ),
+  cores_per_prop = 2
+)
+```
