@@ -14,11 +14,22 @@ This file fits the pre-registered LBA model for Exp 1 in the face familiarity st
 #| include: false
 
 pkgs <- c(
-  "EMC2", "tidyverse", "RColorBrewer", "patchwork", "here"
+  "EMC2", "tidyverse", "here", "parallel", "future"
   )
 vapply(
   pkgs, library, logical(1), character.only = TRUE, logical.return = TRUE
   )
+
+## set options
+options(mc.cores = parallel::detectCores(),
+        future.fork.enable = TRUE,
+        future.rng.onMisuse = "ignore") ## automatically set in RStudio
+
+supportsMulticore()
+
+detectCores()
+
+plan(multicore)
 
 ```
 
@@ -27,7 +38,7 @@ vapply(
 raw data
 
 ```{r}
-raw <- read_csv("exp_1/data/data_exp_1.csv")
+raw <- read_csv(here("exp_1", "data", "data_exp_1.csv"))
 head(raw)
 glimpse(raw)
 ```
@@ -48,98 +59,158 @@ data_emc <- raw |>
       levels = c("Novel", "Learned")
     )
   ) |>
-  as.data.frame() ## in DMC, post predict need a df and not a tibble. Same for EMC2 I think.
+  as.data.frame() ## in EMC, post predict needs a df and not a tibble..
 head(data_emc)
-str(data_emc)
+glimpse(data_emc)
 ```
 
-# 2. Preregistered model #
+# 2. Preregistered model
 
-# 2.1 build model #
-
-## set the match factor  ##
+## 2.1 Build model
 
 ```{r}
-matchfun=function(d)d$S==d$lR
+#| label: matchfun
+
+matchfun <- function(d) d$S == d$lR
 ```
 
 ```{r}
+#| label: design
+
 design_exp1_v1 <- design(
-  data = data_emc, model = LBA, matchfun = matchfun,
-  formula = list(v ~ 0 + S:lM, sv ~ 0 + lM, B ~ 0 + lR, A ~ 1, t0 ~ 1),
+  data      = data_emc,
+  model     = LBA,
+  matchfun  = matchfun,
+  formula   = list(v ~ 0 + S:lM, sv ~ 0 + lM, B ~ 0 + lR, A ~ 1, t0 ~ 1),
   constants = c(sv_lMFALSE = log(1))
 )
 ```
 
 ```{r}
+#| label: p-vector
+
 p_vector <- c(
-  "v_SNovel:lMFALSE" = 4, "v_SLearned:lMFALSE" = 4, "v_SNovel:lMTRUE" = 4, "v_SLearned:lMTRUE" = 4,
-  sv_lMTRUE = log(.5),
-  B_lNovel = log(2), B_lRLearned = log(2),
-  A = log(.5), t0 = log(.3)
+  "v_SNovel:lMFALSE"   = 4, "v_SLearned:lMFALSE" = 4,
+  "v_SNovel:lMTRUE"    = 4, "v_SLearned:lMTRUE"  = 4,
+  sv_lMTRUE            = log(.5),
+  B_lRNovel            = log(2), B_lRLearned = log(2),
+  A                    = log(.5), t0 = log(.3)
 )
 
 mapped_pars(p_vector, x = design_exp1_v1)
 ```
 
-## set priors ##
-
-I made the A and t0 sd priors smaller as they are fixed values and it seemed odd to sample a wide range when they are fixed at .5 and .3, respectively.
-
 ```{r}
+#| label: priors
+
 mu_mean <- c(
-  "v_SNovel:lMFALSE" = 0, "v_SLearned:lMFALSE" = 0, "v_SNovel:lMTRUE" = 1, "v_SLearned:lMTRUE" = 1,
-  sv_lMTRUE = log(.5),
-  B_lRNovel = log(1), B_lRLearned = log(1),
-  A = log(.5), t0 = log(.3)
+  "v_SNovel:lMFALSE"   = 0, "v_SLearned:lMFALSE" = 0,
+  "v_SNovel:lMTRUE"    = 1, "v_SLearned:lMTRUE"  = 1,
+  sv_lMTRUE            = log(.5),
+  B_lRNovel            = log(1), B_lRLearned = log(1),
+  A                    = log(.5), t0 = log(.3)
 )
 
 mu_sd <- c(
-  "v_SNovel:lMFALSE" = 2, "v_SLearned:lMFALSE" = 2, "v_SNovel:lMTRUE" = 2, "v_SLearned:lMTRUE" = 2,
-  sv_lMTRUE = .5,
-  B_lRNovel = .5, B_lRLearned = .5,
-  A = .3, t0 = .3
+  "v_SNovel:lMFALSE"   = 2, "v_SLearned:lMFALSE" = 2,
+  "v_SNovel:lMTRUE"    = 2, "v_SLearned:lMTRUE"  = 2,
+  sv_lMTRUE            = .5,
+  B_lRNovel            = .5, B_lRLearned = .5,
+  A                    = .3, t0 = .3
 )
 
-prior_exp1_v1 <- prior(design_exp1_v1, type = "standard", mu_mean = mu_mean, mu_sd = mu_sd)
+# prior_exp1_v1 <- prior(design_exp1_v1, type = "standard",
+#                        mu_mean = mu_mean, mu_sd = mu_sd)
+
+prior_exp1_v1 <- prior(
+  design_exp1_v1,
+  type  = "standard",
+  pmean = mu_mean,
+  psd   = mu_sd
+)
 
 plot(x = prior_exp1_v1)
-```            
+```
 
-## fit the model ##
-
-Note that I changed iter and step_size to make the model fit better and sample quicker.
+## 2.2 Fit model
 
 ```{r}
-LBA_exp1_v1 <- make_emc(data_emc, design_exp1_v1, type = "standard", prior = prior_exp1_v1)
-LBA_exp1_v1 <- fit(LBA_exp1_v1,
-  cores_per_chain = 3, fileName = "exp_1/models/tmp.RData",
-  iter = 10000, step_size = 500
+#| label: fit
+#| eval: false
+
+LBA_exp1_v1 <- make_emc(
+  data_emc, 
+  design_exp1_v1,
+  type = "standard", 
+  prior = prior_exp1_v1,
+  compress = TRUE
 )
-save(LBA_exp1_v1, file = "exp_1/models/LBA_exp1_v1.RData")
-load("exp_1/models/LBA_exp1_v1.RData")
+
+LBA_exp1_v1 <- fit(
+  LBA_exp1_v1,
+  cores_for_chains = 1,
+  cores_per_chain = 24,
+  iter            = 5000,
+  step_size       = 500,
+  verbose         = TRUE,
+  fileName        = here("exp_1", "models", "tmp.RData")
+)
+
+save(LBA_exp1_v1, file = here("exp_1", "models", "LBA_exp1_v1.RData"))
+
 ```
 
-# 2.2 check the model #
+```{r}
+#| label: load
 
-convergence 
-efficiency
+load(here("exp_1", "models", "LBA_exp1_v1.RData"))
+```
+
+## 2.3 Check model
 
 ```{r}
+#| label: check
+
 check(LBA_exp1_v1)
-get_pars(LBA_exp1_v1, map = TRUE)
+summary(LBA_exp1_v1)
+#plot(LBA_exp1_v1)
+#get_pars(LBA_exp1_v1, map = TRUE)
 ```
 
-plot pars
-
 ```{r}
-plot_pars(LBA_exp1_v1,selection="mu",layout=c(2,5))
+#| label: plot-pars
+
+plot_pars(LBA_exp1_v1, selection = "mu", layout = c(2, 5))
 ```
 
-# 2.3 calculate and plot posterior predictions #
+## 2.4 Posterior predictions
 
 ```{r}
-pp_LBA_exp1_v1 <- predict(LBA_exp1_v1, n_cores = 10)
-save(pp_LBA_exp1_v1, file = "exp_1/models/pp_LBA_exp1_v1.RData")
-plot_fit(data_emc, pp_LBA_exp1_v1, factors = c("S"), layout = c(2, 3))
+#| label: posterior-predictions
+#| eval: false
+
+pp_LBA_exp1_v1 <- predict(LBA_exp1_v1, n_cores = 24)
+save(pp_LBA_exp1_v1, file = here("exp_1", "models", "pp_LBA_exp1_v1.RData"))
+```
+
+```{r}
+#| label: plot-fit
+
+load(here("exp_1", "models", "pp_LBA_exp1_v1.RData"))
+
+pdf("exp_1/figures/pp_density.pdf", width = 10, height = 7)
+plot_density(
+  data_emc, 
+  pp_LBA_exp1_v1, 
+  factors = "S"
+)
+dev.off()
+
+pdf("exp_1/figures/pp_cdf.pdf", width = 10, height = 7)
+plot_cdf(
+  data_emc,
+  pp_LBA_exp1_v1,  
+  factors = "S"
+)
+dev.off()
 ```

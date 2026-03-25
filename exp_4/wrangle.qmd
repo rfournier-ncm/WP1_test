@@ -14,7 +14,7 @@ This file wrangles data for Exp 4 in the face familiarity study.
 #| include: false
 
 pkgs <- c(
-  "tidyverse", "here"
+  "tidyverse", "here", "patchwork"
   )
 vapply(
   pkgs, library, logical(1), character.only = TRUE, logical.return = TRUE
@@ -138,7 +138,9 @@ data <- data |>
     !pid %in% exclude_ratings,
     !pid %in% exclude_rt,
     !pid %in% exclude_acc,
-    !is.na(rt)
+    !is.na(rt),
+    rt <= 1.1,  # enforced live in PsychoPy/Pavlovia
+    rt >= 0.2   # preregistered lower bound 
   )
 ```
 
@@ -209,10 +211,6 @@ acc_group <- acc_pid |>
 ```{r}
 #| label: plot-rt-bar
 
-if (!dir.exists(here("exp_4", "figures"))) {
-  dir.create(here("exp_4", "figures"), recursive = TRUE)
-}
-
 p_rt <- ggplot(rt_group, aes(x = cond, y = mean, fill = cond, colour = cond)) +
   geom_col() +
   geom_errorbar(
@@ -278,13 +276,54 @@ p_rt_density
 
 (p_rt | p_acc) / p_rt_density
 
+if (!dir.exists(here("exp_4", "figures"))) {
+  dir.create(here("exp_4", "figures"), recursive = TRUE)
+}
+
 ggsave(here("exp_4", "figures", "rt_acc.jpeg"), width = 8, height = 6)
 ```
 
-# 6. Save
+# 6. Demographics 
+
+```{r}
+#| label: demographics
+
+demo_exp4 <- read_csv(here("exp_4", "data", "demo_exp_4.csv")) |>
+  filter(
+    Status != "RETURNED",
+    `Participant id` %in% unique(data$pid)
+  ) |>
+  mutate(
+    pid    = as.character(`Participant id`),
+    age    = as.numeric(Age),
+    gender = as.character(Sex)
+  ) |>
+  select(pid, age, gender)
+
+```
+
+# 7. Save
 
 ```{r}
 #| label: save
 
+# save data to model
 write_csv(data, here("exp_4", "data", "data_exp_4.csv"))
+
+# save exclusion counts as a small csv
+exclusions <- tibble(
+  started         = 58L,
+  withdrew        = 12L,
+  completed       = 46L,
+  exclude_rt      = length(exclude_rt),
+  exclude_acc     = length(exclude_acc),
+  over_95         = NA_integer_,
+  under_55        = NA_integer_,
+  exclude_ratings = length(exclude_ratings),
+  final_n         = n_distinct(data$pid)
+)
+write_csv(exclusions, here("exp_4", "data", "exclusions_exp_4.csv"))
+
+# save cleaned demographics as a small csv
+write_csv(demo_exp4, here("exp_4", "data", "demo_exp_4_clean.csv"))
 ```

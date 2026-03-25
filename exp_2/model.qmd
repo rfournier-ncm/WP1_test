@@ -14,11 +14,24 @@ This file fits the pre-registered LBA model for Exp 2 in the face familiarity st
 #| include: false
 
 pkgs <- c(
-  "EMC2", "tidyverse", "here"
+  "EMC2", "tidyverse", "here", "parallel", "future", "styler"
   )
 vapply(
   pkgs, library, logical(1), character.only = TRUE, logical.return = TRUE
   )
+
+## set options
+options(mc.cores = parallel::detectCores(),
+        future.fork.enable = TRUE,
+        future.rng.onMisuse = "ignore") ## automatically set in RStudio
+
+supportsMulticore()
+
+detectCores()
+
+plan(multicore)
+
+plan(multisession, workers = 24)
 ```
 
 # 1. Read in data and wrangle
@@ -27,6 +40,8 @@ vapply(
 #| label: read-data
 
 raw <- read_csv(here("exp_2", "data", "data_exp_2.csv"))
+head(raw)
+glimpse(raw)
 ```
 
 ```{r}
@@ -36,12 +51,16 @@ data_emc <- raw |>
   select(pid, cond, keypress, rt) |>
   rename(subjects = pid, S = cond, R = keypress) |>
   mutate(
-    subjects = factor(subjects),
-    S = factor(S, levels = c("Novel", "Learned")),
-    R = if_else(R == "q", "Learned", "Novel"),
-    R = factor(R, levels = c("Novel", "Learned"))
+    subjects = factor(as.integer(factor(subjects))),
+    S        = factor(S, levels = c("Novel", "Learned")),
+    R        = if_else(R == "q", "Learned", "Novel"),
+    R        = factor(R, levels = c("Novel", "Learned"))
   ) |>
   as.data.frame()
+
+head(data_emc)
+glimpse(data_emc)
+summary(data_emc)
 ```
 
 # 2. Preregistered model
@@ -99,8 +118,16 @@ mu_sd <- c(
   A                    = .3, t0 = .3
 )
 
-prior_exp2_v1 <- prior(design_exp2_v1, type = "standard",
-                       mu_mean = mu_mean, mu_sd = mu_sd)
+# prior_exp2_v1 <- prior(design_exp2_v1, type = "standard",
+#                        mu_mean = mu_mean, mu_sd = mu_sd)
+
+prior_exp2_v1 <- prior(
+  design_exp2_v1,
+  type  = "standard",
+  pmean = mu_mean,
+  psd   = mu_sd
+)
+
 plot(x = prior_exp2_v1)
 ```
 
@@ -110,14 +137,24 @@ plot(x = prior_exp2_v1)
 #| label: fit
 #| eval: false
 
-LBA_exp2_v1 <- make_emc(data_emc, design_exp2_v1,
-                         type = "standard", prior = prior_exp2_v1)
-LBA_exp2_v1 <- fit(LBA_exp2_v1,
-  cores_per_chain = 3,
-  fileName        = here("exp_2", "models", "tmp.RData"),
-  iter            = 10000,
-  step_size       = 500
+LBA_exp2_v1 <- make_emc(
+  data_emc, 
+  design_exp2_v1,
+  type = "standard", 
+  prior = prior_exp2_v1,
+  compress = TRUE
 )
+
+LBA_exp2_v1 <- fit(
+  LBA_exp2_v1,
+  cores_for_chains = 1,
+  cores_per_chain = 24,
+  iter            = 5000,
+  step_size       = 500,
+  verbose         = TRUE,
+  fileName        = here("exp_2", "models", "tmp.RData")
+)
+
 save(LBA_exp2_v1, file = here("exp_2", "models", "LBA_exp2_v1.RData"))
 ```
 
@@ -133,7 +170,9 @@ load(here("exp_2", "models", "LBA_exp2_v1.RData"))
 #| label: check
 
 check(LBA_exp2_v1)
-get_pars(LBA_exp2_v1, map = TRUE)
+summary(LBA_exp2_v1)
+#plot(LBA_exp2_v1)
+#get_pars(LBA_exp2_v1, map = TRUE)
 ```
 
 ```{r}
@@ -148,7 +187,7 @@ plot_pars(LBA_exp2_v1, selection = "mu", layout = c(2, 5))
 #| label: posterior-predictions
 #| eval: false
 
-pp_LBA_exp2_v1 <- predict(LBA_exp2_v1, n_cores = 10)
+pp_LBA_exp2_v1 <- predict(LBA_exp2_v1, n_cores = 24)
 save(pp_LBA_exp2_v1, file = here("exp_2", "models", "pp_LBA_exp2_v1.RData"))
 ```
 
@@ -156,5 +195,20 @@ save(pp_LBA_exp2_v1, file = here("exp_2", "models", "pp_LBA_exp2_v1.RData"))
 #| label: plot-fit
 
 load(here("exp_2", "models", "pp_LBA_exp2_v1.RData"))
-plot_fit(data_emc, pp_LBA_exp2_v1, factors = c("S"), layout = c(2, 3))
+
+pdf("exp_2/figures/pp_density.pdf", width = 10, height = 7)
+plot_density(
+  data_emc, 
+  pp_LBA_exp2_v1, 
+  factors = "S"
+)
+dev.off()
+
+pdf("exp_2/figures/pp_cdf.pdf", width = 10, height = 7)
+plot_cdf(
+  data_emc,
+  pp_LBA_exp2_v1,  
+  factors = "S"
+)
+dev.off()
 ```

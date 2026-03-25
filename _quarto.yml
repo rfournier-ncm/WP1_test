@@ -4,6 +4,10 @@ project:
     - manuscript/manuscript.qmd
     - manuscript/supplementary.qmd
   output-dir: docs
+  #site-url: https://rfournier-ncm.github.io/face-familiarity-eam
+  #repo-url: https://github.com/rfournier-ncm/face-familiarity-eam
+  #archive-url: 
+  #preprint-url: 
   
 execute:
   cache: false

@@ -14,7 +14,7 @@ This file wrangles data for Experiment 1 in the face familiarity study.
 #| include: false
 
 pkgs <- c(
-  "tidyverse", "here"
+  "tidyverse", "here", "patchwork"
   )
 vapply(
   pkgs, library, logical(1), character.only = TRUE, logical.return = TRUE
@@ -120,9 +120,8 @@ data <- raw |>
       cond == "Learned" & keypress == "q" ~ 1L,
       cond == "Novel"   & keypress == "p" ~ 1L,
       TRUE                                ~ 0L
-    ),
-    rt_excluded = rt > 2.5 | is.na(rt)
-  ) |>
+    )
+  ) |> 
   ungroup()
 
 #head(data)
@@ -142,14 +141,13 @@ data |>
   group_by(pid, block, cond) |>
   summarise(acc = mean(acc), .groups = "drop")
 
-# RT exclusions per pid
+# RT exclusion check
 data |>
   group_by(pid) |>
   summarise(
-    n_excluded  = sum(rt_excluded),
-    perc_excluded = mean(rt_excluded) * 100,
+    perc_excluded = mean(is.na(rt) | rt > 2.5) * 100,
     .groups = "drop"
-  ) |>
+    ) |>
   arrange(desc(perc_excluded))
 ```
 
@@ -159,8 +157,26 @@ data |>
 #| label: exclusions
 
 # pid 1 excluded: 59% of trials > 2.5s (unusually high, identified by inspection)
+# no formal threshold applied — preregistered threshold introduced from Exp 2 onwards
+exclude_rt <- c(1L)
+
+# accuracy exclusion — none in Exp 1 (all participants within 55-95% range)
+exclude_acc <- data |>
+  filter(!pid %in% exclude_rt) |>
+  drop_na(rt) |>
+  group_by(pid) |>
+  summarise(perc_acc = mean(acc) * 100) |>
+  filter(perc_acc < 55 | perc_acc > 95) |>
+  pull(pid)
+
 data <- data |>
-  filter(pid != 1, !rt_excluded)
+  filter(
+    !pid %in% exclude_rt,
+    !pid %in% exclude_acc,
+    !is.na(rt),
+    rt <= 2.5,  # preregistered deadline
+    rt >= 0.2   # preregistered lower bound
+  )
 ```
 
 # 4. Summary statistics
@@ -280,14 +296,54 @@ p_rt_density
 
 (p_rt | p_acc) / p_rt_density
 
+if (!dir.exists(here("exp_1", "figures"))) {
+  dir.create(here("exp_1", "figures"), recursive = TRUE)
+}
+
 ggsave(here("exp_1", "figures", "rt_acc.jpeg"), width = 8, height = 6)
 ```
 
-# 6. Save
+# 6. Demographics 
+
+```{r}
+#| label: demographics
+
+demo_exp1 <- read_csv(here("exp_1", "data", "demo_exp_1.csv")) |>
+  mutate(
+    Date_of_birth   = lubridate::my(Date_of_birth),
+    Date_of_testing = lubridate::dmy(`Date of testing`),
+    age             = floor(eeptools::age_calc(Date_of_birth,
+                            enddate = Date_of_testing, units = "years")),
+    gender          = if_else(Gender == "F", "Female", "Male"),
+    pid             = row_number()
+  ) |>
+  filter(Index != "1.1-RF-01") |>
+  select(pid, age, gender)
+```
+
+# 7. Save
 
 ```{r}
 #| label: save
 
+# save data to model
 write_csv(data, here("exp_1", "data", "data_exp_1.csv"))
+
+# save exclusion counts as a small csv
+exclusions <- tibble(
+  started         = 31L,
+  withdrew        = 0L,
+  completed       = 31L,
+  exclude_rt      = 1L,
+  exclude_acc     = 0L,
+  over_95         = NA_integer_,
+  under_55        = NA_integer_,
+  exclude_ratings = NA_integer_,
+  final_n         = n_distinct(data$pid)
+)
+write_csv(exclusions, here("exp_1", "data", "exclusions_exp_1.csv"))
+
+# save cleaned demographics as a small csv
+write_csv(demo_exp1, here("exp_1", "data", "demo_exp_1_clean.csv"))
 ```
 

@@ -3,7 +3,6 @@ title: "How does familiarity impact the computational processes that support fac
 running-head: "Decision models of face memory"
 author:
   - name: Raphaël Fournier
-    email: rfournier@ethz.ch
     orcid: 0000-0002-5135-4066
     affiliation:
       - ref: 1
@@ -17,21 +16,23 @@ author:
     affiliation:
       - ref: 1
       - ref: 3
+      - ref: 4
 affiliations:
   - id: 1
-    name: Neural Control of Movement Laboratory
-    department: Department of Health Sciences and Technology, ETH Zurich
+    name: ETH Zürich
+    department: Neural Control of Movement Laboratory, Department of Health Sciences and Technology
   - id: 2
-    name: 
-    department: School of Psychology and Sports Science, Bangor University
+    name: Bangor University
+    department: School of Psychology and Sports Science
   - id: 3
-    name: Social Brain Sciences Laboratory
-    department: Department of Humanities, Social and Political Sciences, ETH Zurich
+    name: ETH Zürich
+    department: Social Brain Sciences Laboratory, Department of Humanities, Social and Political Sciences
+  - id: 4
+    name: ETH Zürich
+    department: Learning and Instruction Laboratory, Department of Humanities, Social and Political Sciences
 abstract: |
   Recognising a familiar face is a fundamental social cognitive ability, yet the computational mechanisms that underlie this capacity remain poorly understood. Prior research has established that familiarity affects face recognition performance, but has relied primarily on manifest measures — accuracy and response time — that cannot distinguish between qualitatively different sources of performance change. Here, we used evidence accumulation modelling across four experiments to ask not merely whether familiarity affects face recognition, but how — specifically, which latent computational processes are modulated. Experiments 1 and 2 examined visual familiarity (briefly learned faces versus novel faces) and Experiments 3 and 4 examined person knowledge (famous versus novel faces). Fitting linear ballistic accumulator models to recognition data revealed a consistent computational signature across experiments: novel faces produced substantially higher drift rates than familiar faces, accompanied by a smaller but reliable increase in response caution. The dominance of the drift rate effect localises familiarity's primary influence to the quality of evidence accumulation — how cleanly the perceptual system extracts decision-relevant information — rather than to response bias. We interpret this as reflecting a novelty pop-out effect combined with unstable memory traces for familiar faces, alongside a conservative rejection bias in recognition memory. These findings demonstrate that computational modelling reveals dissociable mechanisms underlying face recognition that are invisible to manifest measures alone, and provide a foundation for understanding how familiarity shapes the decision processes that support social perception.
 keywords: [face perception, memory, familiarity, person knowledge, decision models, evidence accumulation modelling]
-authornote: |
-  Author notes go here.
 wordcount: true
 date: last-modified
 bibliography: bibliography.bib
@@ -79,7 +80,8 @@ editor_options:
 #| include: false
 
 pkgs <- c(
-  "tidyverse", "RColorBrewer", "patchwork", "gtsummary", "paletteer", "eeptools", "here", "gridExtra", "EMC2", "tidybayes", "styler", "tinytable", "osfr"
+  "tidyverse", "RColorBrewer", "patchwork", "gtsummary", "paletteer", "eeptools", 
+  "here", "gridExtra", "EMC2", "tidybayes", "tinytable", "osfr"
 )
 vapply(
   pkgs, library, logical(1),
@@ -207,170 +209,33 @@ For each experiment, the research question, hypotheses, experimental design, pla
 #| label: exclusions-all
 #| include: false
 
-# ── Experiment 1 ─────────────────────────────────────────────────────────────
-# pid 1 excluded by inspection: 59% of trials > 2.5s
-# no formal threshold applied (preregistered threshold introduced from Exp 2 onwards)
 data_exp1 <- read_csv(here("exp_1", "data", "data_exp_1.csv"))
+data_exp2 <- read_csv(here("exp_2", "data", "data_exp_2.csv"))
+data_exp3 <- read_csv(here("exp_3", "data", "data_exp_3.csv"))
+data_exp4 <- read_csv(here("exp_4", "data", "data_exp_4.csv"))
 
-list_participant_analysis_1 <- data_exp1 |>
-  distinct(pid) |>
-  pull(pid)
+excl_exp1 <- read_csv(here("exp_1", "data", "exclusions_exp_1.csv"))
+excl_exp2 <- read_csv(here("exp_2", "data", "exclusions_exp_2.csv"))
+excl_exp3 <- read_csv(here("exp_3", "data", "exclusions_exp_3.csv"))
+excl_exp4 <- read_csv(here("exp_4", "data", "exclusions_exp_4.csv"))
 
-# ── Experiment 2 ─────────────────────────────────────────────────────────────
-data_exp2 <- read_csv(here(
-  "exp_2", "data", "wrangle_data_exp_2.csv"
-)) |>
-  mutate(rt_excluded = is.na(rt) | rt > 2.0)
-
-exclude_rt_exp2 <- data_exp2 |>
-  group_by(pid) |>
-  summarise(perc_excluded = mean(rt_excluded) * 100) |>
-  filter(perc_excluded > 25) |>
-  pull(pid)
-
-exclude_acc_exp2 <- data_exp2 |>
-  filter(!pid %in% exclude_rt_exp2) |>
-  group_by(pid) |>
-  summarise(perc_acc = mean(acc, na.rm = TRUE) * 100) |>
-  filter(perc_acc < 55) |>
-  pull(pid)
-
-list_participant_analysis_2 <- data_exp2 |>
-  filter(!pid %in% exclude_rt_exp2, !pid %in% exclude_acc_exp2) |>
-  distinct(pid) |>
-  pull(pid)
-
-# ── Experiment 3 ─────────────────────────────────────────────────────────────
-data_exp3 <- read_csv(here("exp_3", "data", "raw_data_exp_3.csv"))
-
-# ratings exclusion first
-data_ratings_exp3 <- list.files(
-  here("exp_3", "data"),
-  pattern    = "Ratings.*csv",
-  full.names = TRUE,
-  recursive  = TRUE
-) |>
-  set_names() |>
-  map(read_csv, col_names = c("Image_ID", "Fam_ratings", "Val_ratings", "Chosen_name")) |>
-  list_rbind(names_to = "file") |>
-  mutate(pid = rep(1:40, each = 60)) |>
-  select(-file)
-
-exclude_ratings_exp3 <- data_ratings_exp3 |>
-  group_by(pid) |>
-  summarise(n_fam = sum(Fam_ratings > 6)) |>
-  filter(n_fam < 30) |>
-  pull(pid)
-
-# accuracy on remaining participants only
-acc_check_exp3 <- data_exp3 |>
-  filter(!pid %in% exclude_ratings_exp3) |>
-  mutate(
-    cond = if_else(fam == 1, "famous", "novel"),
-    acc  = case_when(
-      cond == "famous" & keypress == "q" ~ 1,
-      cond == "novel"  & keypress == "p" ~ 1,
-      TRUE                               ~ 0
-    )
-  ) |>
-  drop_na(rt) |>
-  group_by(pid) |>
-  summarise(perc_acc = mean(acc) * 100)
-
-over_95_pid  <- acc_check_exp3 |> filter(perc_acc > 95) |> pull(pid)
-under_55_pid <- acc_check_exp3 |> filter(perc_acc < 55) |> pull(pid)
-
-list_participant_analysis_3 <- data_exp3 |>
-  filter(
-    !pid %in% exclude_ratings_exp3,
-    !pid %in% over_95_pid,
-    !pid %in% under_55_pid
-  ) |>
-  distinct(pid) |>
-  pull(pid)
-
-# ── Experiment 4 ─────────────────────────────────────────────────────────────
-data_exp4 <- read_csv(here("exp_4", "data", "wrangle_exp_4.csv")) |>
-  mutate(rt_excluded = is.na(rt))
-
-# ratings exclusion first
-exclude_ratings_exp4 <- read_csv(here("exp_4", "data", "raw_exp_4.csv")) |>
-  filter(!is.na(familiarity_rating)) |>
-  rename(pid = participant) |>
-  group_by(pid) |>
-  summarise(n_fam = sum(familiarity_rating > 6)) |>
-  filter(n_fam < 30) |>
-  pull(pid)
-
-# RT exclusion on remaining participants
-exclude_rt_exp4 <- data_exp4 |>
-  filter(!pid %in% exclude_ratings_exp4) |>
-  group_by(pid) |>
-  summarise(perc_excluded = mean(rt_excluded) * 100) |>
-  filter(perc_excluded > 25) |>
-  pull(pid)
-
-# accuracy exclusion on remaining participants
-exclude_acc_exp4 <- data_exp4 |>
-  filter(!pid %in% exclude_ratings_exp4, !pid %in% exclude_rt_exp4) |>
-  group_by(pid) |>
-  summarise(perc_acc = mean(acc, na.rm = TRUE) * 100) |>
-  filter(perc_acc < 55) |>
-  pull(pid)
-
-list_participant_analysis_4 <- data_exp4 |>
-  filter(
-    !pid %in% exclude_ratings_exp4,
-    !pid %in% exclude_rt_exp4,
-    !pid %in% exclude_acc_exp4
-  ) |>
-  distinct(pid) |>
-  pull(pid)
+list_participant_analysis_1 <- data_exp1 |> distinct(pid) |> pull(pid)
+list_participant_analysis_2 <- data_exp2 |> distinct(pid) |> pull(pid)
+list_participant_analysis_3 <- data_exp3 |> distinct(pid) |> pull(pid)
+list_participant_analysis_4 <- data_exp4 |> distinct(pid) |> pull(pid)
 ```
 
 ```{r}
 #| label: demographics-all
 #| include: false
 
-# ── Experiment 1 ─────────────────────────────────────────────────────────────
-demo_exp1 <- read_csv(here("exp_1", "data", "demo_exp_1.csv")) |>
-  mutate(
-    Index           = as.factor(Index),
-    Gender          = as.factor(Gender),
-    Date_of_birth   = lubridate::my(Date_of_birth),
-    Date_of_testing = lubridate::dmy(`Date of testing`),
-    Age             = floor(age_calc(Date_of_birth,
-                                     enddate = Date_of_testing,
-                                     units = "years"))
-  )
+demo_exp1 <- read_csv(here("exp_1", "data", "demo_exp_1_clean.csv"))
+demo_exp2 <- read_csv(here("exp_2", "data", "demo_exp_2_clean.csv"))
+demo_exp3 <- read_csv(here("exp_3", "data", "demo_exp_3_clean.csv"))
+demo_exp4 <- read_csv(here("exp_4", "data", "demo_exp_4_clean.csv"))
 
-# ── Experiment 2 ─────────────────────────────────────────────────────────────
-demo_exp2 <- read_csv(here("exp_2", "data", "demo_exp_2.csv")) |>
-  mutate(
-    `Participant id` = as.factor(`Participant id`),
-    Sex              = as.factor(Sex),
-    Age              = as.numeric(Age)
-  )
-
-# ── Experiment 3 ─────────────────────────────────────────────────────────────
-demo_exp3 <- read_csv(here("exp_3", "data", "demo_exp_3.csv")) |>
-  mutate(
-    Index  = as.factor(Index),
-    Gender = as.factor(Gender),
-    Age    = as.numeric(Age),
-    pid    = row_number()
-  )
-
-# ── Experiment 4 ─────────────────────────────────────────────────────────────
-demo_exp4 <- read_csv(here("exp_4", "data", "demo_exp_4.csv")) |>
-  mutate(
-    `Participant id` = as.factor(`Participant id`),
-    Sex              = as.factor(Sex),
-    Age              = as.numeric(Age)
-  )
-
-# ── Exp 1 inline text scalar ──────────────────────────────────────────────────
-rt_exp_1 <- read_csv(here("exp_1", "data", "raw_data_exp_1.csv"))
+# Exp 1 inline text scalar
+rt_exp_1  <- read_csv(here("exp_1", "data", "raw_data_exp_1.csv"))
 perc_rt_1 <- rt_exp_1 |>
   filter(pid != "1") |>
   summarise(perc = round(mean(rt > 2, na.rm = TRUE) * 100, 3)) |>
@@ -382,150 +247,140 @@ perc_rt_1 <- rt_exp_1 |>
 #| include: false
 
 participant_summary <- bind_rows(
-  # Exp 1
-  demo_exp1 |>
-    filter(Index != "1.1-RF-01") |>
-    mutate(gender = if_else(Gender == "F", "Female", "Male")) |>
-    summarise(
-      Experiment               = "Experiment 1",
-      Setting                  = "Lab",
-      Started                  = nrow(demo_exp1),
-      Withdrew                 = 0,
-      Completed                = nrow(demo_exp1) - 1L,
-      `RT exclusions`          = 1,
-      `Accuracy exclusions`    = 0,
-      `Familiarity exclusions` = "—",
-      `Final n`                = n(),
-      Female                   = sum(gender == "Female"),
-      Male                     = sum(gender == "Male"),
-      `Mean age (SD)`          = paste0(round(mean(Age), 1), " (", round(sd(Age), 1), ")")
-    ),
-
-  # Exp 2
-  demo_exp2 |>
-    filter(Status != "RETURNED",
-           `Participant id` %in% list_participant_analysis_2) |>
-    summarise(
-      Experiment               = "Experiment 2",
-      Setting                  = "Online",
-      Started                  = nrow(demo_exp2),
-      Withdrew                 = sum(demo_exp2$Status == "RETURNED"),
-      Completed                = sum(demo_exp2$Status != "RETURNED"),
-      `RT exclusions`          = length(exclude_rt_exp2),
-      `Accuracy exclusions`    = length(exclude_acc_exp2),
-      `Familiarity exclusions` = "—",
-      `Final n`                = n(),
-      Female                   = sum(Sex == "Female"),
-      Male                     = sum(Sex == "Male"),
-      `Mean age (SD)`          = paste0(round(mean(Age), 1), " (", round(sd(Age), 1), ")")
-    ),
-
-  # Exp 3
-  demo_exp3 |>
-    filter(pid %in% list_participant_analysis_3) |>
-    mutate(gender = if_else(Gender == "F", "Female", "Male")) |>
-    summarise(
-      Experiment               = "Experiment 3",
-      Setting                  = "Lab",
-      Started                  = nrow(demo_exp3),
-      Withdrew                 = 0,
-      Completed                = nrow(demo_exp3),
-      `RT exclusions`          = 0,
-      `Accuracy exclusions`    = length(over_95_pid) + length(under_55_pid),
-      `Familiarity exclusions` = as.character(length(exclude_ratings_exp3)),
-      `Final n`                = n(),
-      Female                   = sum(gender == "Female"),
-      Male                     = sum(gender == "Male"),
-      `Mean age (SD)`          = paste0(round(mean(Age), 1), " (", round(sd(Age), 1), ")")
-    ),
-
-  # Exp 4
-  demo_exp4 |>
-    filter(Status != "RETURNED",
-           `Participant id` %in% list_participant_analysis_4) |>
-    summarise(
-      Experiment               = "Experiment 4",
-      Setting                  = "Online",
-      Started                  = nrow(demo_exp4),
-      Withdrew                 = sum(demo_exp4$Status == "RETURNED"),
-      Completed                = sum(demo_exp4$Status != "RETURNED"),
-      `RT exclusions`          = length(exclude_rt_exp4),
-      `Accuracy exclusions`    = length(exclude_acc_exp4),
-      `Familiarity exclusions` = as.character(length(exclude_ratings_exp4)),
-      `Final n`                = n(),
-      Female                   = sum(Sex == "Female"),
-      Male                     = sum(Sex == "Male"),
-      `Mean age (SD)`          = paste0(round(mean(Age), 1), " (", round(sd(Age), 1), ")")
-    )
+  tibble(
+    Experiment               = "Experiment 1",
+    Setting                  = "Lab",
+    Started                  = excl_exp1$started,
+    Withdrew                 = excl_exp1$withdrew,
+    Completed                = excl_exp1$completed,
+    `RT exclusions`          = excl_exp1$exclude_rt,
+    `Accuracy exclusions`    = excl_exp1$exclude_acc,
+    `Familiarity exclusions` = "—",
+    `Final n`                = excl_exp1$final_n,
+    Female                   = sum(demo_exp1$gender == "Female"),
+    Male                     = sum(demo_exp1$gender == "Male"),
+    `Mean age (SD)`          = paste0(round(mean(demo_exp1$age), 1), " (",
+                                      round(sd(demo_exp1$age), 1), ")")
+  ),
+  tibble(
+    Experiment               = "Experiment 2",
+    Setting                  = "Online",
+    Started                  = excl_exp2$started,
+    Withdrew                 = excl_exp2$withdrew,
+    Completed                = excl_exp2$completed,
+    `RT exclusions`          = excl_exp2$exclude_rt,
+    `Accuracy exclusions`    = excl_exp2$exclude_acc,
+    `Familiarity exclusions` = "—",
+    `Final n`                = excl_exp2$final_n,
+    Female                   = sum(demo_exp2$gender == "Female"),
+    Male                     = sum(demo_exp2$gender == "Male"),
+    `Mean age (SD)`          = paste0(round(mean(demo_exp2$age), 1), " (",
+                                      round(sd(demo_exp2$age), 1), ")")
+  ),
+  tibble(
+    Experiment               = "Experiment 3",
+    Setting                  = "Lab",
+    Started                  = excl_exp3$started,
+    Withdrew                 = excl_exp3$withdrew,
+    Completed                = excl_exp3$completed,
+    `RT exclusions`          = excl_exp3$exclude_rt,
+    `Accuracy exclusions`    = excl_exp3$exclude_acc,
+    `Familiarity exclusions` = as.character(excl_exp3$exclude_ratings),
+    `Final n`                = excl_exp3$final_n,
+    Female                   = sum(demo_exp3$gender == "Female"),
+    Male                     = sum(demo_exp3$gender == "Male"),
+    `Mean age (SD)`          = paste0(round(mean(demo_exp3$age), 1), " (",
+                                      round(sd(demo_exp3$age), 1), ")")
+  ),
+  tibble(
+    Experiment               = "Experiment 4",
+    Setting                  = "Online",
+    Started                  = excl_exp4$started,
+    Withdrew                 = excl_exp4$withdrew,
+    Completed                = excl_exp4$completed,
+    `RT exclusions`          = excl_exp4$exclude_rt,
+    `Accuracy exclusions`    = excl_exp4$exclude_acc,
+    `Familiarity exclusions` = as.character(excl_exp4$exclude_ratings),
+    `Final n`                = excl_exp4$final_n,
+    Female                   = sum(demo_exp4$gender == "Female"),
+    Male                     = sum(demo_exp4$gender == "Male"),
+    `Mean age (SD)`          = paste0(round(mean(demo_exp4$age), 1), " (",
+                                      round(sd(demo_exp4$age), 1), ")")
+  )
 )
 
-# Extract scalars for inline text
+# ── Extract scalars for inline text ──────────────────────────────────────────
+exp1_row <- participant_summary |> filter(Experiment == "Experiment 1")
+exp2_row <- participant_summary |> filter(Experiment == "Experiment 2")
+exp3_row <- participant_summary |> filter(Experiment == "Experiment 3")
+exp4_row <- participant_summary |> filter(Experiment == "Experiment 4")
+
 # Exp 1
-exp1_row           <- participant_summary |> filter(Experiment == "Experiment 1")
-participant_n_exp1 <- nrow(demo_exp1)
-total_part_exp1    <- exp1_row$`Final n`
-male_exp1          <- exp1_row$Male
-female_exp1        <- exp1_row$Female
-mean_age_exp1      <- as.numeric(str_extract(exp1_row$`Mean age (SD)`, "^[0-9.]+"))
-sd_age_exp1        <- as.numeric(str_extract(exp1_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
-min_age_exp1       <- min(demo_exp1$Age[demo_exp1$Index != "1.1-RF-01"])
-max_age_exp1       <- max(demo_exp1$Age[demo_exp1$Index != "1.1-RF-01"])
+started_exp1        <- as.integer(exp1_row$Started)
+withdrew_exp1       <- as.integer(exp1_row$Withdrew)
+completed_exp1      <- as.integer(exp1_row$Completed)
+exclude_rt_exp1     <- as.integer(exp1_row$`RT exclusions`)
+exclude_acc_exp1    <- as.integer(exp1_row$`Accuracy exclusions`)
+final_n_exp1        <- as.integer(exp1_row$`Final n`)
+male_exp1           <- as.integer(exp1_row$Male)
+female_exp1         <- as.integer(exp1_row$Female)
+mean_age_exp1       <- as.numeric(str_extract(exp1_row$`Mean age (SD)`, "^[0-9.]+"))
+sd_age_exp1         <- as.numeric(str_extract(exp1_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
+min_age_exp1        <- min(demo_exp1$age)
+max_age_exp1        <- max(demo_exp1$age)
 
 # Exp 2
-exp2_row                      <- participant_summary |> filter(Experiment == "Experiment 2")
-total_number_part             <- exp2_row$Started
-inform_consent                <- exp2_row$Withdrew
-number_part_compl             <- exp2_row$Completed
-part_trial_25                 <- exp2_row$`RT exclusions`
-part_acc_55                   <- exp2_row$`Accuracy exclusions`
-number_participant_analysis_2 <- exp2_row$`Final n`
-male_exp2                     <- exp2_row$Male
-female_exp2                   <- exp2_row$Female
-mean_age_exp2                 <- as.numeric(str_extract(exp2_row$`Mean age (SD)`, "^[0-9.]+"))
-sd_age_exp2                   <- as.numeric(str_extract(exp2_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
-min_age_exp2                  <- min(demo_exp2$Age[demo_exp2$Status != "RETURNED" &
-                                    demo_exp2$`Participant id` %in% list_participant_analysis_2])
-max_age_exp2                  <- max(demo_exp2$Age[demo_exp2$Status != "RETURNED" &
-                                    demo_exp2$`Participant id` %in% list_participant_analysis_2])
+started_exp2        <- as.integer(exp2_row$Started)
+withdrew_exp2       <- as.integer(exp2_row$Withdrew)
+completed_exp2      <- as.integer(exp2_row$Completed)
+exclude_rt_exp2     <- as.integer(exp2_row$`RT exclusions`)
+exclude_acc_exp2    <- as.integer(exp2_row$`Accuracy exclusions`)
+final_n_exp2        <- as.integer(exp2_row$`Final n`)
+male_exp2           <- as.integer(exp2_row$Male)
+female_exp2         <- as.integer(exp2_row$Female)
+mean_age_exp2       <- as.numeric(str_extract(exp2_row$`Mean age (SD)`, "^[0-9.]+"))
+sd_age_exp2         <- as.numeric(str_extract(exp2_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
+min_age_exp2        <- min(demo_exp2$age)
+max_age_exp2        <- max(demo_exp2$age)
 
 # Exp 3
-exp3_row             <- participant_summary |> filter(Experiment == "Experiment 3")
-participant_n_exp3   <- exp3_row$Started
-number_participant_3 <- exp3_row$`Final n`
-over_95              <- length(over_95_pid)
-under_55             <- length(under_55_pid)
-ratings_only         <- length(exclude_ratings_exp3)
-male_exp3            <- exp3_row$Male
-female_exp3          <- exp3_row$Female
+started_exp3         <- as.integer(exp3_row$Started)
+withdrew_exp3        <- as.integer(exp3_row$Withdrew)
+completed_exp3       <- as.integer(exp3_row$Completed)
+exclude_rt_exp3      <- as.integer(exp3_row$`RT exclusions`)
+exclude_acc_exp3     <- as.integer(exp3_row$`Accuracy exclusions`)
+exclude_ratings_exp3 <- as.integer(exp3_row$`Familiarity exclusions`)
+over_95_exp3         <- as.integer(excl_exp3$over_95)
+under_55_exp3        <- as.integer(excl_exp3$under_55)
+final_n_exp3         <- as.integer(exp3_row$`Final n`)
+male_exp3            <- as.integer(exp3_row$Male)
+female_exp3          <- as.integer(exp3_row$Female)
 mean_age_exp3        <- as.numeric(str_extract(exp3_row$`Mean age (SD)`, "^[0-9.]+"))
 sd_age_exp3          <- as.numeric(str_extract(exp3_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
-min_age_exp3         <- min(demo_exp3$Age[demo_exp3$pid %in% list_participant_analysis_3])
-max_age_exp3         <- max(demo_exp3$Age[demo_exp3$pid %in% list_participant_analysis_3])
+min_age_exp3         <- min(demo_exp3$age)
+max_age_exp3         <- max(demo_exp3$age)
 
 # Exp 4
-exp4_row                      <- participant_summary |> filter(Experiment == "Experiment 4")
-total_number_part_4           <- exp4_row$Started
-inform_consent_4              <- exp4_row$Withdrew
-number_part_compl_4           <- exp4_row$Completed
-part_trial_25_4               <- exp4_row$`RT exclusions`
-part_acc_55_4                 <- exp4_row$`Accuracy exclusions`
-ratings_only_4                <- as.integer(exp4_row$`Familiarity exclusions`)
-number_participant_analysis_4 <- exp4_row$`Final n`
-male_exp4                     <- exp4_row$Male
-female_exp4                   <- exp4_row$Female
-mean_age_exp4                 <- as.numeric(str_extract(exp4_row$`Mean age (SD)`, "^[0-9.]+"))
-sd_age_exp4                   <- as.numeric(str_extract(exp4_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
-min_age_exp4                  <- min(demo_exp4$Age[demo_exp4$Status != "RETURNED" &
-                                    demo_exp4$`Participant id` %in% list_participant_analysis_4])
-max_age_exp4                  <- max(demo_exp4$Age[demo_exp4$Status != "RETURNED" &
-                                    demo_exp4$`Participant id` %in% list_participant_analysis_4])
+started_exp4         <- as.integer(exp4_row$Started)
+withdrew_exp4        <- as.integer(exp4_row$Withdrew)
+completed_exp4       <- as.integer(exp4_row$Completed)
+exclude_rt_exp4      <- as.integer(exp4_row$`RT exclusions`)
+exclude_acc_exp4     <- as.integer(exp4_row$`Accuracy exclusions`)
+exclude_ratings_exp4 <- as.integer(exp4_row$`Familiarity exclusions`)
+final_n_exp4         <- as.integer(exp4_row$`Final n`)
+male_exp4            <- as.integer(exp4_row$Male)
+female_exp4          <- as.integer(exp4_row$Female)
+mean_age_exp4        <- as.numeric(str_extract(exp4_row$`Mean age (SD)`, "^[0-9.]+"))
+sd_age_exp4          <- as.numeric(str_extract(exp4_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
+min_age_exp4         <- min(demo_exp4$age)
+max_age_exp4         <- max(demo_exp4$age)
 ```
 
 ## Experiment 1
 
 ### Participants
 
-All participants were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. Sample size was determined in advance. Following previous suggestions from @heathcoteDynamicModelsChoice2019, a parameter recovery study was run to estimate if 30 usable participant datasets were sufficient to accurately recover the parameter estimates. The parameter recovery study included 30 participant datasets, each with 180 trials (90 trials "familiar" and 90 trials "unfamiliar") and with our selected model parameterisation. The data-generated parameters were sufficiently well-recovered (See Supplementary Materials). `r participant_n_exp1` healthy participants took part in Experiment 1. All participants reported normal or corrected-to-normal vision and received payment (20 CHF) for participating in the experiment. Based on our preregistration, response times longer than 2.5 seconds were removed from the analysis. However, this cutoff value led to the the removal of 59% of the trials of one participant. Given the recommendation of having a certain number of trials per condition per participant when using evidence-accumulation models [@heathcoteDynamicModelsChoice2019; @parker2024], this participant was excluded from the data analysis. In the end, the data of `r total_part_exp1` participants (`r male_exp1` men and `r female_exp1` women) was retained for the analysis and the LBA modeling. Ages ranged from `r min_age_exp1` to `r max_age_exp1` years old ($M_{age} =$ `r mean_age_exp1`, $SD_{age} =$ `r sd_age_exp1`). This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.
+All participants were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. Sample size was determined in advance. Following previous suggestions from @heathcoteDynamicModelsChoice2019, a parameter recovery study was run to estimate if 30 usable participant datasets were sufficient to accurately recover the parameter estimates. The parameter recovery study included 30 participant datasets, each with 180 trials (90 trials "familiar" and 90 trials "unfamiliar") and with our selected model parameterisation. The data-generated parameters were sufficiently well-recovered (See Supplementary Materials). `r started_exp1` healthy participants took part in Experiment 1. All participants reported normal or corrected-to-normal vision and received payment (20 CHF) for participating in the experiment. Based on our preregistration, response times longer than 2.5 seconds were removed from the analysis. However, this cutoff value led to the the removal of 59% of the trials of one participant. Given the recommendation of having a certain number of trials per condition per participant when using evidence-accumulation models [@heathcoteDynamicModelsChoice2019; @parker2024], this participant was excluded from the data analysis. In the end, the data of `r final_n_exp1` participants (`r male_exp1` men and `r female_exp1` women) was retained for the analysis and the LBA modeling. Ages ranged from `r min_age_exp1` to `r max_age_exp1` years old ($M_{age} =$ `r mean_age_exp1`, $SD_{age} =$ `r sd_age_exp1`). This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.
 
 ```{r}
 #| label: tbl-participants
@@ -563,7 +418,7 @@ In the recognition part, participants completed three blocks of 90 recognition t
 
 ### Participants
 
-All participant were recruited on the Prolific platform (<https://www.prolific.com>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. Furthermore, Prolific offers the option to chose the approval rate of the participants willing to take part in the study. The approval rate is the percentage for which participants has been approved in previous experiment. A approval rate between 95% and 100% was established in our study to ensure data quality. `r total_number_part` participants started the experiment. After reading the inform consent, `r inform_consent` participants decided to not continue the experimental procedure and withdraw from the experiment. In the end, `r number_part_compl` participants completed the experiment and gave their informed consent. Following our preregistration exclusion criterion, `r part_trial_25` participants were excluded because their percentage of missed trials was higher lower than 25% and `r part_acc_55` was removed because the overall accuracy was lower than 55%. In the end, the data of `r number_participant_analysis_2` participants (`r male_exp2` men and `r female_exp2` women) was retained for the analysis and the LBA modeling. Ages ranged from `r min_age_exp2` to `r max_age_exp2` ($M_{age} =$ `r mean_age_exp2`, $SD_{age} =$ `r sd_age_exp2`). Following Prolific payment principles, each participant received 9£ for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.
+All participant were recruited on the Prolific platform (<https://www.prolific.com>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. Furthermore, Prolific offers the option to chose the approval rate of the participants willing to take part in the study. The approval rate is the percentage for which participants has been approved in previous experiment. A approval rate between 95% and 100% was established in our study to ensure data quality. `r started_exp2` participants started the experiment. After reading the inform consent, `r withdrew_exp2` participants decided to not continue the experimental procedure and withdraw from the experiment. In the end, `r completed_exp2` participants completed the experiment and gave their informed consent. Following our preregistration exclusion criterion, `r exclude_rt_exp2` participants were excluded because their percentage of missed trials was higher lower than 25% and `r exclude_acc_exp2` was removed because the overall accuracy was lower than 55%. In the end, the data of `r final_n_exp2` participants (`r male_exp2` men and `r female_exp2` women) was retained for the analysis and the LBA modeling. Ages ranged from `r min_age_exp2` to `r max_age_exp2` ($M_{age} =$ `r mean_age_exp2`, $SD_{age} =$ `r sd_age_exp2`). Following Prolific payment principles, each participant received 9£ for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.
 
 ### Stimuli
 
@@ -583,7 +438,7 @@ Regarding the experimental procedure, it was almost identical to the one used in
 
 ### Participants
 
-All participant were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. `r participant_n_exp3` healthy participants took part in Experiment 3. Based on our preregistration criterion, 3 participants were excluded from the data analysis: `r over_95` of them had an overall recognition accuracy larger than 95% and `r under_55` of them had a overall accuracy lower than 55% (chance at 50%). We deviated from our preregistration in one way. Since this experiment was conducted to investigate how highly familiar faces affect the computational processes of face recognition, we had to remove `r ratings_only` more participants who did not show a level of familiarity high enough with the presented faces in the first part of the experiment. This scenario did not occur during the pilot experiments we conducted and thus was not part of our preregistration. In the end, the data of `r number_participant_3` participants (`r male_exp3` men and `r female_exp3` women) was retained for the analysis and the LBA modeling. Ages ranged from `r min_age_exp3` to `r max_age_exp3` years old ($M_{age} =$ `r mean_age_exp3`, $SD_{age} =$ `r sd_age_exp3`). All participants reported normal or corrected-to-normal vision and received payment (25 CHF) for participating in the experiment. This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.
+All participant were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. `r started_exp3` healthy participants took part in Experiment 3. Based on our preregistration criterion, 3 participants were excluded from the data analysis: `r over_95_exp3` of them had an overall recognition accuracy larger than 95% and `r under_55_exp3` of them had a overall accuracy lower than 55% (chance at 50%). We deviated from our preregistration in one way. Since this experiment was conducted to investigate how highly familiar faces affect the computational processes of face recognition, we had to remove `r exclude_ratings_exp3` more participants who did not show a level of familiarity high enough with the presented faces in the first part of the experiment. This scenario did not occur during the pilot experiments we conducted and thus was not part of our preregistration. In the end, the data of `r final_n_exp3` participants (`r male_exp3` men and `r female_exp3` women) was retained for the analysis and the LBA modeling. Ages ranged from `r min_age_exp3` to `r max_age_exp3` years old ($M_{age} =$ `r mean_age_exp3`, $SD_{age} =$ `r sd_age_exp3`). All participants reported normal or corrected-to-normal vision and received payment (25 CHF) for participating in the experiment. This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.
 
 ### Stimuli
 
@@ -617,7 +472,7 @@ The experimental task was divided into two distinct parts: a rating part and a r
 
 ### Participants
 
-All participant were recruited on the Prolific platform (<https://www.prolific.com>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. An approval rate between 95% and 100% was established in our study to ensure data quality. `r total_number_part_4` participants started the experiment. After reading the inform consent, `r inform_consent_4` participants decided to not continue the experimental procedure and withdraw from the experiment. `r number_part_compl_4` participants completed the experiment. Following our preregistration exclusion criterion, `r part_trial_25_4` participant was excluded because the percentage of missed trials was higher than 25% and `r part_acc_55_4` were removed because the overall accuracy was lower than 55%. Furthermore, `r ratings_only_4` did not show a level of familiarity high enough with the presented faces in the first part of the experiment. In the end, the data of `r number_participant_analysis_4` participants (`r male_exp4` men and `r female_exp4` women) was retained for further analysis and the LBA modeling. Ages ranged from `r min_age_exp4` to `r max_age_exp4` ($M_{age} =$ `r mean_age_exp4`, $SD_{age} =$ `r sd_age_exp4`). Following Prolific payment principles, each participant received 9£ for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.
+All participant were recruited on the Prolific platform (<https://www.prolific.com>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. An approval rate between 95% and 100% was established in our study to ensure data quality. `r started_exp4` participants started the experiment. After reading the inform consent, `r withdrew_exp4` participants decided to not continue the experimental procedure and withdraw from the experiment. `r completed_exp4` participants completed the experiment. Following our preregistration exclusion criterion, `r exclude_rt_exp4` participant was excluded because the percentage of missed trials was higher than 25% and `r exclude_acc_exp4` were removed because the overall accuracy was lower than 55%. Furthermore, `r exclude_ratings_exp4` did not show a level of familiarity high enough with the presented faces in the first part of the experiment. In the end, the data of `r final_n_exp4` participants (`r male_exp4` men and `r female_exp4` women) was retained for further analysis and the LBA modeling. Ages ranged from `r min_age_exp4` to `r max_age_exp4` ($M_{age} =$ `r mean_age_exp4`, $SD_{age} =$ `r sd_age_exp4`). Following Prolific payment principles, each participant received 9£ for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.
 
 ### Stimuli
 
@@ -637,9 +492,35 @@ The experimental procedure was similar to the one used for Experiment 3 (see Met
 
 ### Model specification
 
-A LBA model was fit to each participant's data for both face conditions: for "Learned" vs. "Novel" in Experiment 1 and 2, and for "Famous" vs. "Novel" for Experiment 3 and 4. LBA models have one accumulator for each response option, with potentially different parameter values. In our design, that meant that for Experiment 1 and 3, there was one accumulator for the "Learned" response and another for the "Novel" response. For Experiment 3 and 4, there was one accumulator for the "Famous" response and another for the "Novel" response. Separate models were fit for each experiment and model specifications were outline in our preregistrations. More specifically, for experiment 1 and 2, threshold were allowed to vary by participants' response (Learned/Novel) whereas mean drift rate was allowed to vary by the stimulus condition (Learned/Novel) and the match between the accumulator and the stimulus. If the stimulus was "Learned", then the accumulator for the "Learned" response would be TRUE, whereas the accumulator for the "Novel" response would be FALSE. The difference between the TRUE and FALSE accumulator represented both, the quantity and quality of the information processing about a decision [@lewandowskyComputationalModelingCognition2018]. A greater difference between these accumulators means a greater quality of evidence accumulating towards that decision.
+A hierarchical LBA model was fit to the data for each experiment separately with model specifications outlines in our preregistrations (@tbl-model-formula). LBA models have one accumulator for each response option, with potentially different parameter values. In our design, that meant that for Experiment 1 and 2, there was one accumulator for the "Learned" response and another for the "Novel" response. For Experiment 3 and 4, there was one accumulator for the "Famous" response and another for the "Novel" response. More specifically, for Experiment 1 and 2, threshold was allowed to vary by participants' response (Learned/Novel) whereas mean drift rate was allowed to vary by the stimulus condition (Learned/Novel) and the match between the accumulator and the stimulus (TRUE/FALSE). If the stimulus was "Learned", then the accumulator for the "Learned" response would be TRUE, whereas the accumulator for the "Novel" response would be FALSE. The difference between the TRUE and FALSE accumulator represents the quality of the information processing about a decision [@lewandowskyComputationalModelingCognition2018]. A greater difference between these accumulators means a greater quality of evidence accumulating towards that decision.
 
 For every model, threshold was allowed to vary by response (Novel/Learned for Experiment 1 and 2, Novel/Famous for Experiment 3 and 4). The standard deviation for the true accumulator was allowed to vary by the match factor whereas the the standard deviation for the false accumulator was kept uniform to make the model identifiable [@donkinGettingMoreAccuracy2009]. A single value for the start point (A) and non-decision time (t0) was estimated for our preregistered models but model estimations where these parameters were allowed to vary are described in supplementary materials.
+
+```{r}
+#| label: data-model-formula
+#| include: false
+
+# create a df
+lba_formula <- tribble(
+  ~Parameter, ~Label, ~Condition, ~Response, ~Accuracy, ~Fixed,
+  "Start point", "A", "-", "-", "-", "1",
+  "Mean drift rate", "v", "yes", "no", "yes", "-",
+  "SD drift rate", "sd_v", "no", "no", "yes", "-",
+  "SD false drift rate", "false.sd_v", "-", "-", "-", "1",
+  "Threshold", "b", "yes", "yes", "no", "-",
+  "Non-decision time", "t0", "yes", "no", "no", "-",
+  "SD Non-decision time", "st_0", "-", "-", "-", "0",
+)
+```
+
+```{r}
+#| label: tbl-model-formula
+#| tbl-cap: "Formula specification for the pre-registered linear ballistic accumulator model."
+#| include: true
+
+lba_formula |>
+   tt(notes = "Condition = training condition (Learned vs. Novel or Famous vs. Novel); Response = key-press response (same vs. different); Accuracy = (true/correct vs false/incorrect); SD = standard deviation.")
+```
 
 ### Model estimation
 
@@ -942,9 +823,9 @@ wrangle_lba <- function(model, exp_num, cond_label) {
 }
 
 # Load models and wrangle
-load(here("Exp_1/models/LBA_exp1_v1.RData"))
-load(here("Exp_2/models/LBA_exp2_v1.RData"))
-load(here("Exp_4/models/LBA_exp4_v1.RData"))
+load(here("exp_1/models/LBA_exp1_v1.RData"))
+load(here("exp_2/models/LBA_exp2_v1.RData"))
+load(here("exp_4/models/LBA_exp4_v1.RData"))
 
 theta_all <- bind_rows(
   wrangle_lba(LBA_exp1_v1, 1, "Learned"),
@@ -1072,7 +953,7 @@ ggplot(thresh_all, aes(x = value, y = fct_rev(response), fill = response)) +
 
 # Right panel: contrast
 ggplot(thresh_diff_all, aes(x = diff, y = "")) +
-  stat_halfeye(alpha = 0.9, fill = "firebrick") +
+  stat_halfeye(alpha = 0.7, fill = "#1A7A7A") +
   geom_vline(xintercept = 0, colour = "darkgrey") +
   facet_grid(experiment ~ .,
              labeller = labeller(experiment = ~ paste("Experiment", .x))) +
@@ -1114,7 +995,7 @@ ggplot(drift_acc_diff_all, aes(x = diff, y = fct_rev(condition), fill = conditio
 
 # Right panel: contrast
 ggplot(drift_cond_diff_all, aes(x = diff, y = "")) +
-  stat_halfeye(alpha = 0.9, fill = "firebrick") +
+  stat_halfeye(alpha = 0.7, fill = "#1A7A7A") +
   geom_vline(xintercept = 0, colour = "darkgrey") +
   facet_grid(experiment ~ .,
              labeller = labeller(experiment = ~ paste("Experiment", .x))) +
@@ -1128,7 +1009,7 @@ ggplot(drift_cond_diff_all, aes(x = diff, y = "")) +
 
 ```{r}
 #| label: tbl-lba-params
-#| tbl-cap: "Posterior median and 95% credible intervals for threshold and drift rate parameters across experiments. Positive contrast values indicate a novel face advantage."
+#| tbl-cap: "Posterior median and 95% quantile intervals for threshold and drift rate parameters across experiments."
 #| include: true
 
 # Build table
@@ -1168,7 +1049,7 @@ drift_diff_table <- drift_cond_diff_all |>
   ) |>
   select(experiment, parameter, condition, median = diff, lower = .lower, upper = .upper)
 
-# Combine
+## Combine
 lba_table <- bind_rows(
   thresh_cond_table,
   thresh_table,
@@ -1192,9 +1073,78 @@ lba_table <- bind_rows(
     Median     = median,
     `95% QI`   = qi
   )
+# 
+# # lba_table |>
+# #   tt()
+# 
+# 
+# find first row of each experiment group
+exp1_start <- which(lba_table$Experiment == "Experiment 1")[1]
+exp2_start <- which(lba_table$Experiment == "Experiment 2")[1]
+exp4_start <- which(lba_table$Experiment == "Experiment 4")[1]
 
-lba_table |> 
-  tt()
+lba_table |>
+  select(-Experiment) |>
+  tt(
+    notes = "QI = quantile interval."
+  ) |>
+  format_tt(j = "Median", digits = 2, num_fmt = "decimal") |>
+  group_tt(
+    i = list(
+      "Experiment 1" = exp1_start,
+      "Experiment 2" = exp2_start,
+      "Experiment 4" = exp4_start
+    )
+  ) |>
+  style_tt(fontsize = 0.85)
+
+# Reshape to wide format — one row per parameter/condition, columns per experiment
+# lba_wide <- bind_rows(
+#   thresh_cond_table,
+#   thresh_table,
+#   drift_table,
+#   drift_diff_table
+# ) |>
+#   mutate(
+#     qi     = paste0("[", round(lower, 3), ", ", round(upper, 3), "]"),
+#     median = round(median, 3),
+#     Parameter = factor(parameter, levels = c(
+#       "Threshold", "Threshold contrast",
+#       "Drift rate", "Drift rate contrast"
+#     )),
+#     Condition = factor(condition, levels = c(
+#       "novel", "learned", "famous",
+#       "novel - learned", "novel - famous"
+#     ))
+#   ) |>
+#   arrange(experiment, Parameter, Condition) |>
+#   select(Parameter, Condition, experiment, median, qi) |>
+#   pivot_wider(
+#     names_from  = experiment,
+#     values_from = c(median, qi),
+#     names_glue  = "{.value}_{experiment}"
+#   ) |>
+#   select(
+#     Parameter, Condition,
+#     `Median` = median_1, `95% QI` = qi_1,
+#     `Median ` = median_2, `95% QI ` = qi_2,
+#     `Median  ` = median_4, `95% QI  ` = qi_4
+#   )
+# 
+# lba_wide |>
+#   tt(
+#     notes = "QI = quantile interval."
+#   ) |>
+#   format_tt(replace = list("NA" = "—")) |>
+#   format_tt(j = c("Median", "Median ", "Median  "), digits = 2, num_fmt = "decimal") |>
+#   group_tt(
+#     j = list(
+#       "Experiment 1" = 3:4,
+#       "Experiment 2" = 5:6,
+#       "Experiment 4" = 7:8
+#     )
+#   ) |>
+#   style_tt(fontsize = 0.85)
 ```
 
 ### Experiment 2
@@ -1219,7 +1169,7 @@ We set out to understand not merely *that* familiarity affects face recognition,
 
 ## The impact of visual familiarity  
 
-The most theoretically important finding is the combination of drift rate and threshold effects. Across Experiments 1 and 2, the novelty advantage in drift rate was substantially larger than the novelty advantage in threshold. This dissociation matters because the two parameters reflect qualitatively different aspects of the decision process. Drift rate indexes the quality of evidence accumulation — how cleanly and rapidly perceptual and cogntive systems extract decision-relevant information from a face. Threshold indexes how much accumulated evidence is required before a decision is triggered. The dominance of the drift rate effect localises familiarity's influence to the quality of signal from the image more so than as a function of response bias between novel and familiar key presses.
+The most theoretically important finding is the combination of drift rate and threshold effects. Across Experiments 1 and 2, the novelty advantage in drift rate was substantially larger than the novelty advantage in threshold. This dissociation matters because the two parameters reflect qualitatively different aspects of the decision process. Drift rate indexes the quality of evidence accumulation — how cleanly and rapidly perceptual and cognitive systems extract decision-relevant information from a face. Threshold indexes how much accumulated evidence is required before a decision is triggered. The dominance of the drift rate effect localises familiarity's influence to the quality of signal from the image more so than as a function of response bias between novel and familiar key presses.
 
 Set within the Bruce and Young framework of face perception [@bruceUnderstandingFaceRecognition1986], visual familiarity modulates the quality of structural encoding and feature matching within the core face processing system [@bruceUnderstandingFaceRecognition1986; @gobbiniNeuralResponseVisual2006], thus generating a stronger perceptual signal that feeds into the decision process. Novel faces, by this account, provide a cleaner and less ambiguous perceptual signal than visually familiar faces — consistent with "pop-out" and attentional capture accounts [@johnstonAttentionCaptureNovel1990; @lev-ariEcologicalViewSelective2022; @lubowVisualSearchFunction1997]. In contrast, visually familiar faces may generate noisier representations due to interference from accumulated but imperfectly consolidated memory traces [@rapcsakFaceRecognition2019].
 
@@ -1244,19 +1194,38 @@ We can think of several relevant future directions in addition to the ones alrea
 
 {{< pagebreak >}}
 
+# Disclosures
+
+## Data and code availability
+
+All materials are available on GitHub (link) and the OSF (link).
+
+## Author contributions
+
+[CRediT](https://www.elsevier.com/researcher/author/policies-and-guidelines/credit-author-statement) author statement:
+
+Conceptualization: RF, PD, RR\
+Methodology: RF, RR\
+Software: RF, RR\
+Validation: RF, RR\
+Formal analysis: RF, RR\
+Investigation: RF\
+Data Curation: RF, RR\
+Writing - Original Draft: RF\
+Writing - Review & Editing: RF, PD, RR\
+Visualisation: RF, RR\
+Supervision: RR\
+Project Administration: RF, RR
+
+## Competing interests
+
+The authors declare no competing interests. 
+
+{{< pagebreak >}}
+
 # References
 
 :::{#refs}
 :::
 
-::: {.content-visible when-format="html"}
 
-# Appendix A: Supplementary Materials {.appendix}
-
-## Parameter recovery study
-
-## Priors 
-
-## Exploratory models
-
-:::

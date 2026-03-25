@@ -9,7 +9,7 @@
 <meta name="author" content="Raphaël Fournier">
 <meta name="author" content="Paul Downing">
 <meta name="author" content="Richard Ramsey">
-<meta name="dcterms.date" content="2026-03-21">
+<meta name="dcterms.date" content="2026-03-25">
 <meta name="keywords" content="face perception, memory, familiarity, person knowledge, decision models, evidence accumulation modelling">
 
 <title>How does familiarity impact the computational processes that support face recognition?</title>
@@ -158,8 +158,13 @@ window.Quarto = {
   <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations"><span class="header-section-number">4.3</span> Limitations</a></li>
   <li><a href="#future-directions" id="toc-future-directions" class="nav-link" data-scroll-target="#future-directions"><span class="header-section-number">4.4</span> Future directions</a></li>
   </ul></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">5</span> References</a></li>
-  
+  <li><a href="#disclosures" id="toc-disclosures" class="nav-link" data-scroll-target="#disclosures"><span class="header-section-number">5</span> Disclosures</a>
+  <ul class="collapse">
+  <li><a href="#data-and-code-availability" id="toc-data-and-code-availability" class="nav-link" data-scroll-target="#data-and-code-availability"><span class="header-section-number">5.1</span> Data and code availability</a></li>
+  <li><a href="#author-contributions" id="toc-author-contributions" class="nav-link" data-scroll-target="#author-contributions"><span class="header-section-number">5.2</span> Author contributions</a></li>
+  <li><a href="#competing-interests" id="toc-competing-interests" class="nav-link" data-scroll-target="#competing-interests"><span class="header-section-number">5.3</span> Competing interests</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">6</span> References</a></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="manuscript.pdf"><i class="bi bi-file-pdf"></i>Typst (preprint)</a></li><li><a href="manuscript.docx"><i class="bi bi-file-word"></i>MS Word (preprint)</a></li></ul></div><div class="quarto-other-links"><h2>Other Links</h2><ul><li><a href="https://osf.io/preprints/psyarxiv/"><i class="bi bi-file-pdf"></i>Preprint (PsyArXiv)</a></li><li><a href="https://rich-ramsey.github.io/preprint-example"><i class="bi bi-globe2"></i>Online supplement</a></li><li><a href="supplementary.pdf"><i class="bi bi-file-pdf"></i>Supplementary Materials (PDF)</a></li><li><a href="https://github.com/rich-ramsey/"><i class="bi bi-github"></i>GitHub Repository</a></li><li><a href="https://osf.io/65bt2"><i class="bi bi-archive"></i>OSF Repository</a></li></ul></div></nav>
 </div>
@@ -176,11 +181,11 @@ window.Quarto = {
   <div class="quarto-title-meta-heading">Affiliations</div>
   
     <div class="quarto-title-meta-contents">
-    <p class="author">Raphaël Fournier <a href="mailto:rfournier@ethz.ch" class="quarto-title-author-email"><i class="bi bi-envelope"></i></a> <a href="https://orcid.org/0000-0002-5135-4066" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+    <p class="author">Raphaël Fournier <a href="https://orcid.org/0000-0002-5135-4066" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
   </div>
   <div class="quarto-title-meta-contents">
         <p class="affiliation">
-            Neural Control of Movement Laboratory
+            Neural Control of Movement Laboratory, Department of Health Sciences and Technology, ETH Zürich
           </p>
       </div>
     <div class="quarto-title-meta-contents">
@@ -188,7 +193,7 @@ window.Quarto = {
   </div>
   <div class="quarto-title-meta-contents">
         <p class="affiliation">
-            
+            School of Psychology and Sports Science, Bangor University
           </p>
       </div>
     <div class="quarto-title-meta-contents">
@@ -196,10 +201,13 @@ window.Quarto = {
   </div>
   <div class="quarto-title-meta-contents">
         <p class="affiliation">
-            Neural Control of Movement Laboratory
+            Neural Control of Movement Laboratory, Department of Health Sciences and Technology, ETH Zürich
           </p>
         <p class="affiliation">
-            Social Brain Sciences Laboratory
+            Social Brain Sciences Laboratory, Department of Humanities, Social and Political Sciences, ETH Zürich
+          </p>
+        <p class="affiliation">
+            Learning and Instruction Laboratory, Department of Humanities, Social and Political Sciences, ETH Zürich
           </p>
       </div>
   </div>
@@ -210,7 +218,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 21, 2026</p>
+      <p class="date">March 25, 2026</p>
     </div>
   </div>
   
@@ -269,19 +277,19 @@ Table&nbsp;1: Parameters in the linear ballistic accumulator model
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_sad7mryvc94eou6atog9 = TinyTable.createTableFunctions("tinytable_sad7mryvc94eou6atog9");
+      const tableFns_4hiw1nlwdroz0st28774 = TinyTable.createTableFunctions("tinytable_4hiw1nlwdroz0st28774");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 } ], css_id: 'tinytable_css_b1vla65msfcfr5clxbez',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_fwef4rgzco1hiepiasec',}, 
+          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 } ], css_id: 'tinytable_css_70y84ett5ket537cv4q5',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_7n6sv8ehk6vy24e3zv8v',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_sad7mryvc94eou6atog9.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_4hiw1nlwdroz0st28774.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -290,11 +298,11 @@ Table&nbsp;1: Parameters in the linear ballistic accumulator model
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_sad7mryvc94eou6atog9 td.tinytable_css_b1vla65msfcfr5clxbez, #tinytable_sad7mryvc94eou6atog9 th.tinytable_css_b1vla65msfcfr5clxbez {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_sad7mryvc94eou6atog9 td.tinytable_css_fwef4rgzco1hiepiasec, #tinytable_sad7mryvc94eou6atog9 th.tinytable_css_fwef4rgzco1hiepiasec {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_4hiw1nlwdroz0st28774 td.tinytable_css_70y84ett5ket537cv4q5, #tinytable_4hiw1nlwdroz0st28774 th.tinytable_css_70y84ett5ket537cv4q5 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_4hiw1nlwdroz0st28774 td.tinytable_css_7n6sv8ehk6vy24e3zv8v, #tinytable_4hiw1nlwdroz0st28774 th.tinytable_css_7n6sv8ehk6vy24e3zv8v {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_sad7mryvc94eou6atog9" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_4hiw1nlwdroz0st28774" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
         <thead>
               <tr>
@@ -350,19 +358,19 @@ Table&nbsp;2: An overview of the experimental work
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_ilvzyi9eqphvqkl1k9jc = TinyTable.createTableFunctions("tinytable_ilvzyi9eqphvqkl1k9jc");
+      const tableFns_uj0tpkkjfilfzpi2pcq7 = TinyTable.createTableFunctions("tinytable_uj0tpkkjfilfzpi2pcq7");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 }, { i: '4', j: 5 } ], css_id: 'tinytable_css_zsnaem5zsmowchocya7e',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_aly04ojk185donum0gob',}, 
+          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 }, { i: '4', j: 5 } ], css_id: 'tinytable_css_87li7d4fk3owk8vqkgtc',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_tlv33zlmoajhddns2x4t',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_ilvzyi9eqphvqkl1k9jc.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_uj0tpkkjfilfzpi2pcq7.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -371,11 +379,11 @@ Table&nbsp;2: An overview of the experimental work
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_ilvzyi9eqphvqkl1k9jc td.tinytable_css_zsnaem5zsmowchocya7e, #tinytable_ilvzyi9eqphvqkl1k9jc th.tinytable_css_zsnaem5zsmowchocya7e {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_ilvzyi9eqphvqkl1k9jc td.tinytable_css_aly04ojk185donum0gob, #tinytable_ilvzyi9eqphvqkl1k9jc th.tinytable_css_aly04ojk185donum0gob {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_uj0tpkkjfilfzpi2pcq7 td.tinytable_css_87li7d4fk3owk8vqkgtc, #tinytable_uj0tpkkjfilfzpi2pcq7 th.tinytable_css_87li7d4fk3owk8vqkgtc {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_uj0tpkkjfilfzpi2pcq7 td.tinytable_css_tlv33zlmoajhddns2x4t, #tinytable_uj0tpkkjfilfzpi2pcq7 th.tinytable_css_tlv33zlmoajhddns2x4t {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_ilvzyi9eqphvqkl1k9jc" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_uj0tpkkjfilfzpi2pcq7" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
         <thead>
               <tr>
@@ -452,20 +460,20 @@ Table&nbsp;3: Participant summary across experiments. RT = response time; — = 
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_mo53ty8qu676bdg287q9 = TinyTable.createTableFunctions("tinytable_mo53ty8qu676bdg287q9");
+      const tableFns_yivfe567ec9epne1ufho = TinyTable.createTableFunctions("tinytable_yivfe567ec9epne1ufho");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 }, { i: '4', j: 5 }, { i: '4', j: 6 }, { i: '4', j: 7 }, { i: '4', j: 8 }, { i: '4', j: 9 }, { i: '4', j: 10 }, { i: '4', j: 11 }, { i: '4', j: 12 } ], css_id: 'tinytable_css_tx8qgfkxka5qjgs13kaz',}, 
-          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '1', j: 5 }, { i: '2', j: 5 }, { i: '3', j: 5 }, { i: '1', j: 6 }, { i: '2', j: 6 }, { i: '3', j: 6 }, { i: '1', j: 7 }, { i: '2', j: 7 }, { i: '3', j: 7 }, { i: '1', j: 8 }, { i: '2', j: 8 }, { i: '3', j: 8 }, { i: '1', j: 9 }, { i: '2', j: 9 }, { i: '3', j: 9 }, { i: '1', j: 10 }, { i: '2', j: 10 }, { i: '3', j: 10 }, { i: '1', j: 11 }, { i: '2', j: 11 }, { i: '3', j: 11 }, { i: '1', j: 12 }, { i: '2', j: 12 }, { i: '3', j: 12 } ], css_id: 'tinytable_css_30tvpbbd7x82skk5v3ei',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 }, { i: '0', j: 7 }, { i: '0', j: 8 }, { i: '0', j: 9 }, { i: '0', j: 10 }, { i: '0', j: 11 }, { i: '0', j: 12 } ], css_id: 'tinytable_css_l07d65yfieprj9anommm',}, 
+          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 }, { i: '4', j: 5 }, { i: '4', j: 6 }, { i: '4', j: 7 }, { i: '4', j: 8 }, { i: '4', j: 9 }, { i: '4', j: 10 }, { i: '4', j: 11 }, { i: '4', j: 12 } ], css_id: 'tinytable_css_ngw85sklivlzstthg55q',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '1', j: 5 }, { i: '2', j: 5 }, { i: '3', j: 5 }, { i: '1', j: 6 }, { i: '2', j: 6 }, { i: '3', j: 6 }, { i: '1', j: 7 }, { i: '2', j: 7 }, { i: '3', j: 7 }, { i: '1', j: 8 }, { i: '2', j: 8 }, { i: '3', j: 8 }, { i: '1', j: 9 }, { i: '2', j: 9 }, { i: '3', j: 9 }, { i: '1', j: 10 }, { i: '2', j: 10 }, { i: '3', j: 10 }, { i: '1', j: 11 }, { i: '2', j: 11 }, { i: '3', j: 11 }, { i: '1', j: 12 }, { i: '2', j: 12 }, { i: '3', j: 12 } ], css_id: 'tinytable_css_fcahj6032vioahnvjdhs',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 }, { i: '0', j: 7 }, { i: '0', j: 8 }, { i: '0', j: 9 }, { i: '0', j: 10 }, { i: '0', j: 11 }, { i: '0', j: 12 } ], css_id: 'tinytable_css_vbb405gxbid8qgqbf0be',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_mo53ty8qu676bdg287q9.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_yivfe567ec9epne1ufho.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -474,12 +482,12 @@ Table&nbsp;3: Participant summary across experiments. RT = response time; — = 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_mo53ty8qu676bdg287q9 td.tinytable_css_tx8qgfkxka5qjgs13kaz, #tinytable_mo53ty8qu676bdg287q9 th.tinytable_css_tx8qgfkxka5qjgs13kaz {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
-    #tinytable_mo53ty8qu676bdg287q9 td.tinytable_css_30tvpbbd7x82skk5v3ei, #tinytable_mo53ty8qu676bdg287q9 th.tinytable_css_30tvpbbd7x82skk5v3ei { font-size: 0.85em }
-    #tinytable_mo53ty8qu676bdg287q9 td.tinytable_css_l07d65yfieprj9anommm, #tinytable_mo53ty8qu676bdg287q9 th.tinytable_css_l07d65yfieprj9anommm {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
+    #tinytable_yivfe567ec9epne1ufho td.tinytable_css_ngw85sklivlzstthg55q, #tinytable_yivfe567ec9epne1ufho th.tinytable_css_ngw85sklivlzstthg55q {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
+    #tinytable_yivfe567ec9epne1ufho td.tinytable_css_fcahj6032vioahnvjdhs, #tinytable_yivfe567ec9epne1ufho th.tinytable_css_fcahj6032vioahnvjdhs { font-size: 0.85em }
+    #tinytable_yivfe567ec9epne1ufho td.tinytable_css_vbb405gxbid8qgqbf0be, #tinytable_yivfe567ec9epne1ufho th.tinytable_css_vbb405gxbid8qgqbf0be {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_mo53ty8qu676bdg287q9" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_yivfe567ec9epne1ufho" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
         <thead>
               <tr>
@@ -504,7 +512,7 @@ Table&nbsp;3: Participant summary across experiments. RT = response time; — = 
                   <td data-row="1" data-col="2">Lab</td>
                   <td data-row="1" data-col="3">31</td>
                   <td data-row="1" data-col="4">0</td>
-                  <td data-row="1" data-col="5">30</td>
+                  <td data-row="1" data-col="5">31</td>
                   <td data-row="1" data-col="6">1</td>
                   <td data-row="1" data-col="7">0</td>
                   <td data-row="1" data-col="8">—</td>
@@ -517,7 +525,7 @@ Table&nbsp;3: Participant summary across experiments. RT = response time; — = 
                   <td data-row="2" data-col="1">Experiment 2</td>
                   <td data-row="2" data-col="2">Online</td>
                   <td data-row="2" data-col="3">38</td>
-                  <td data-row="2" data-col="4">3</td>
+                  <td data-row="2" data-col="4">0</td>
                   <td data-row="2" data-col="5">35</td>
                   <td data-row="2" data-col="6">4</td>
                   <td data-row="2" data-col="7">1</td>
@@ -553,7 +561,7 @@ Table&nbsp;3: Participant summary across experiments. RT = response time; — = 
                   <td data-row="4" data-col="9">30</td>
                   <td data-row="4" data-col="10">13</td>
                   <td data-row="4" data-col="11">17</td>
-                  <td data-row="4" data-col="12">40.1 (9.6)</td>
+                  <td data-row="4" data-col="12">39.5 (10)</td>
                 </tr>
         </tbody>
       </table>
@@ -596,7 +604,7 @@ Figure&nbsp;2: Experimental procedure of Experiment 1
 <h2 data-number="2.3" class="anchored" data-anchor-id="experiment-2"><span class="header-section-number">2.3</span> Experiment 2</h2>
 <section id="participants-1" class="level3" data-number="2.3.1">
 <h3 data-number="2.3.1" class="anchored" data-anchor-id="participants-1"><span class="header-section-number">2.3.1</span> Participants</h3>
-<p>All participant were recruited on the Prolific platform (<a href="https://www.prolific.com" class="uri">https://www.prolific.com</a>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. Furthermore, Prolific offers the option to chose the approval rate of the participants willing to take part in the study. The approval rate is the percentage for which participants has been approved in previous experiment. A approval rate between 95% and 100% was established in our study to ensure data quality. 38 participants started the experiment. After reading the inform consent, 3 participants decided to not continue the experimental procedure and withdraw from the experiment. In the end, 35 participants completed the experiment and gave their informed consent. Following our preregistration exclusion criterion, 4 participants were excluded because their percentage of missed trials was higher lower than 25% and 1 was removed because the overall accuracy was lower than 55%. In the end, the data of 30 participants (20 men and 10 women) was retained for the analysis and the LBA modeling. Ages ranged from 25 to 61 (<span class="math inline">\(M_{age} =\)</span> 41.7, <span class="math inline">\(SD_{age} =\)</span> 12). Following Prolific payment principles, each participant received 9£ for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.</p>
+<p>All participant were recruited on the Prolific platform (<a href="https://www.prolific.com" class="uri">https://www.prolific.com</a>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. Furthermore, Prolific offers the option to chose the approval rate of the participants willing to take part in the study. The approval rate is the percentage for which participants has been approved in previous experiment. A approval rate between 95% and 100% was established in our study to ensure data quality. 38 participants started the experiment. After reading the inform consent, 0 participants decided to not continue the experimental procedure and withdraw from the experiment. In the end, 35 participants completed the experiment and gave their informed consent. Following our preregistration exclusion criterion, 4 participants were excluded because their percentage of missed trials was higher lower than 25% and 1 was removed because the overall accuracy was lower than 55%. In the end, the data of 30 participants (20 men and 10 women) was retained for the analysis and the LBA modeling. Ages ranged from 25 to 61 (<span class="math inline">\(M_{age} =\)</span> 41.7, <span class="math inline">\(SD_{age} =\)</span> 12). Following Prolific payment principles, each participant received 9£ for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.</p>
 </section>
 <section id="stimuli-1" class="level3" data-number="2.3.2">
 <h3 data-number="2.3.2" class="anchored" data-anchor-id="stimuli-1"><span class="header-section-number">2.3.2</span> Stimuli</h3>
@@ -661,7 +669,7 @@ Figure&nbsp;4: Experimental procedure of Experiment 3
 <h2 data-number="2.5" class="anchored" data-anchor-id="experiment-4"><span class="header-section-number">2.5</span> Experiment 4</h2>
 <section id="participants-3" class="level3" data-number="2.5.1">
 <h3 data-number="2.5.1" class="anchored" data-anchor-id="participants-3"><span class="header-section-number">2.5.1</span> Participants</h3>
-<p>All participant were recruited on the Prolific platform (<a href="https://www.prolific.com" class="uri">https://www.prolific.com</a>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. An approval rate between 95% and 100% was established in our study to ensure data quality. 58 participants started the experiment. After reading the inform consent, 12 participants decided to not continue the experimental procedure and withdraw from the experiment. 46 participants completed the experiment. Following our preregistration exclusion criterion, 1 participant was excluded because the percentage of missed trials was higher than 25% and 3 were removed because the overall accuracy was lower than 55%. Furthermore, 12 did not show a level of familiarity high enough with the presented faces in the first part of the experiment. In the end, the data of 30 participants (17 men and 13 women) was retained for further analysis and the LBA modeling. Ages ranged from 26 to 61 (<span class="math inline">\(M_{age} =\)</span> 40.1, <span class="math inline">\(SD_{age} =\)</span> 9.6). Following Prolific payment principles, each participant received 9£ for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.</p>
+<p>All participant were recruited on the Prolific platform (<a href="https://www.prolific.com" class="uri">https://www.prolific.com</a>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. An approval rate between 95% and 100% was established in our study to ensure data quality. 58 participants started the experiment. After reading the inform consent, 12 participants decided to not continue the experimental procedure and withdraw from the experiment. 46 participants completed the experiment. Following our preregistration exclusion criterion, 1 participant was excluded because the percentage of missed trials was higher than 25% and 3 were removed because the overall accuracy was lower than 55%. Furthermore, 12 did not show a level of familiarity high enough with the presented faces in the first part of the experiment. In the end, the data of 30 participants (17 men and 13 women) was retained for further analysis and the LBA modeling. Ages ranged from 25 to 61 (<span class="math inline">\(M_{age} =\)</span> 39.5, <span class="math inline">\(SD_{age} =\)</span> 10). Following Prolific payment principles, each participant received 9£ for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.</p>
 </section>
 <section id="stimuli-3" class="level3" data-number="2.5.2">
 <h3 data-number="2.5.2" class="anchored" data-anchor-id="stimuli-3"><span class="header-section-number">2.5.2</span> Stimuli</h3>
@@ -681,8 +689,126 @@ Figure&nbsp;4: Experimental procedure of Experiment 3
 <h2 data-number="2.6" class="anchored" data-anchor-id="evidence-accumulation-modeling"><span class="header-section-number">2.6</span> Evidence accumulation modeling</h2>
 <section id="model-specification" class="level3" data-number="2.6.1">
 <h3 data-number="2.6.1" class="anchored" data-anchor-id="model-specification"><span class="header-section-number">2.6.1</span> Model specification</h3>
-<p>A LBA model was fit to each participant’s data for both face conditions: for “Learned” vs.&nbsp;“Novel” in Experiment 1 and 2, and for “Famous” vs.&nbsp;“Novel” for Experiment 3 and 4. LBA models have one accumulator for each response option, with potentially different parameter values. In our design, that meant that for Experiment 1 and 3, there was one accumulator for the “Learned” response and another for the “Novel” response. For Experiment 3 and 4, there was one accumulator for the “Famous” response and another for the “Novel” response. Separate models were fit for each experiment and model specifications were outline in our preregistrations. More specifically, for experiment 1 and 2, threshold were allowed to vary by participants’ response (Learned/Novel) whereas mean drift rate was allowed to vary by the stimulus condition (Learned/Novel) and the match between the accumulator and the stimulus. If the stimulus was “Learned”, then the accumulator for the “Learned” response would be TRUE, whereas the accumulator for the “Novel” response would be FALSE. The difference between the TRUE and FALSE accumulator represented both, the quantity and quality of the information processing about a decision <span class="citation" data-cites="lewandowskyComputationalModelingCognition2018">(<a href="#ref-lewandowskyComputationalModelingCognition2018" role="doc-biblioref">Lewandowsky and Oberauer 2018</a>)</span>. A greater difference between these accumulators means a greater quality of evidence accumulating towards that decision.</p>
+<p>A hierarchical LBA model was fit to the data for each experiment separately with model specifications outlines in our preregistrations (<a href="#tbl-model-formula" class="quarto-xref">Table&nbsp;4</a>). LBA models have one accumulator for each response option, with potentially different parameter values. In our design, that meant that for Experiment 1 and 2, there was one accumulator for the “Learned” response and another for the “Novel” response. For Experiment 3 and 4, there was one accumulator for the “Famous” response and another for the “Novel” response. More specifically, for Experiment 1 and 2, threshold was allowed to vary by participants’ response (Learned/Novel) whereas mean drift rate was allowed to vary by the stimulus condition (Learned/Novel) and the match between the accumulator and the stimulus (TRUE/FALSE). If the stimulus was “Learned”, then the accumulator for the “Learned” response would be TRUE, whereas the accumulator for the “Novel” response would be FALSE. The difference between the TRUE and FALSE accumulator represents the quality of the information processing about a decision <span class="citation" data-cites="lewandowskyComputationalModelingCognition2018">(<a href="#ref-lewandowskyComputationalModelingCognition2018" role="doc-biblioref">Lewandowsky and Oberauer 2018</a>)</span>. A greater difference between these accumulators means a greater quality of evidence accumulating towards that decision.</p>
 <p>For every model, threshold was allowed to vary by response (Novel/Learned for Experiment 1 and 2, Novel/Famous for Experiment 3 and 4). The standard deviation for the true accumulator was allowed to vary by the match factor whereas the the standard deviation for the false accumulator was kept uniform to make the model identifiable <span class="citation" data-cites="donkinGettingMoreAccuracy2009">(<a href="#ref-donkinGettingMoreAccuracy2009" role="doc-biblioref">Donkin et al. 2009</a>)</span>. A single value for the start point (A) and non-decision time (t0) was estimated for our preregistered models but model estimations where these parameters were allowed to vary are described in supplementary materials.</p>
+<div class="cell">
+<div id="tbl-model-formula" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-model-formula-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;4: Formula specification for the pre-registered linear ballistic accumulator model.
+</figcaption>
+<div aria-describedby="tbl-model-formula-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<!-- preamble start -->
+
+    <script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"></script>
+
+    <script>
+      // Create table-specific functions using external factory
+      const tableFns_hle9vl7svyi7b158wi6i = TinyTable.createTableFunctions("tinytable_hle9vl7svyi7b158wi6i");
+      // tinytable span after
+      window.addEventListener('load', function () {
+          var cellsToStyle = [
+            // tinytable style arrays after
+          { positions: [ { i: '7', j: 1 }, { i: '7', j: 2 }, { i: '7', j: 3 }, { i: '7', j: 4 }, { i: '7', j: 5 }, { i: '7', j: 6 } ], css_id: 'tinytable_css_7or08h27pnvgunkj4pwf',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 } ], css_id: 'tinytable_css_6bahfczsuy2uoo93utb2',}, 
+          ];
+
+          // Loop over the arrays to style the cells
+          cellsToStyle.forEach(function (group) {
+              group.positions.forEach(function (cell) {
+                  tableFns_hle9vl7svyi7b158wi6i.styleCell(cell.i, cell.j, group.css_id);
+              });
+          });
+      });
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
+    <style>
+    /* tinytable css entries after */
+    #tinytable_hle9vl7svyi7b158wi6i td.tinytable_css_7or08h27pnvgunkj4pwf, #tinytable_hle9vl7svyi7b158wi6i th.tinytable_css_7or08h27pnvgunkj4pwf {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_hle9vl7svyi7b158wi6i td.tinytable_css_6bahfczsuy2uoo93utb2, #tinytable_hle9vl7svyi7b158wi6i th.tinytable_css_6bahfczsuy2uoo93utb2 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    </style>
+    <div class="container">
+      <table class="tinytable" id="tinytable_hle9vl7svyi7b158wi6i" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+        
+        <thead>
+              <tr>
+                <th scope="col" data-row="0" data-col="1">Parameter</th>
+                <th scope="col" data-row="0" data-col="2">Label</th>
+                <th scope="col" data-row="0" data-col="3">Condition</th>
+                <th scope="col" data-row="0" data-col="4">Response</th>
+                <th scope="col" data-row="0" data-col="5">Accuracy</th>
+                <th scope="col" data-row="0" data-col="6">Fixed</th>
+              </tr>
+        </thead>
+        <tfoot><tr><td colspan="6">Condition = training condition (Learned vs. Novel or Famous vs. Novel); Response = key-press response (same vs. different); Accuracy = (true/correct vs false/incorrect); SD = standard deviation.</td></tr></tfoot>
+        <tbody>
+                <tr>
+                  <td data-row="1" data-col="1">Start point</td>
+                  <td data-row="1" data-col="2">A</td>
+                  <td data-row="1" data-col="3">-</td>
+                  <td data-row="1" data-col="4">-</td>
+                  <td data-row="1" data-col="5">-</td>
+                  <td data-row="1" data-col="6">1</td>
+                </tr>
+                <tr>
+                  <td data-row="2" data-col="1">Mean drift rate</td>
+                  <td data-row="2" data-col="2">v</td>
+                  <td data-row="2" data-col="3">yes</td>
+                  <td data-row="2" data-col="4">no</td>
+                  <td data-row="2" data-col="5">yes</td>
+                  <td data-row="2" data-col="6">-</td>
+                </tr>
+                <tr>
+                  <td data-row="3" data-col="1">SD drift rate</td>
+                  <td data-row="3" data-col="2">sd_v</td>
+                  <td data-row="3" data-col="3">no</td>
+                  <td data-row="3" data-col="4">no</td>
+                  <td data-row="3" data-col="5">yes</td>
+                  <td data-row="3" data-col="6">-</td>
+                </tr>
+                <tr>
+                  <td data-row="4" data-col="1">SD false drift rate</td>
+                  <td data-row="4" data-col="2">false.sd_v</td>
+                  <td data-row="4" data-col="3">-</td>
+                  <td data-row="4" data-col="4">-</td>
+                  <td data-row="4" data-col="5">-</td>
+                  <td data-row="4" data-col="6">1</td>
+                </tr>
+                <tr>
+                  <td data-row="5" data-col="1">Threshold</td>
+                  <td data-row="5" data-col="2">b</td>
+                  <td data-row="5" data-col="3">yes</td>
+                  <td data-row="5" data-col="4">yes</td>
+                  <td data-row="5" data-col="5">no</td>
+                  <td data-row="5" data-col="6">-</td>
+                </tr>
+                <tr>
+                  <td data-row="6" data-col="1">Non-decision time</td>
+                  <td data-row="6" data-col="2">t0</td>
+                  <td data-row="6" data-col="3">yes</td>
+                  <td data-row="6" data-col="4">no</td>
+                  <td data-row="6" data-col="5">no</td>
+                  <td data-row="6" data-col="6">-</td>
+                </tr>
+                <tr>
+                  <td data-row="7" data-col="1">SD Non-decision time</td>
+                  <td data-row="7" data-col="2">st_0</td>
+                  <td data-row="7" data-col="3">-</td>
+                  <td data-row="7" data-col="4">-</td>
+                  <td data-row="7" data-col="5">-</td>
+                  <td data-row="7" data-col="6">0</td>
+                </tr>
+        </tbody>
+      </table>
+    </div>
+<!-- hack to avoid NA insertion in last line -->
+</div>
+</div>
+</figure>
+</div>
+</div>
 </section>
 <section id="model-estimation" class="level3" data-number="2.6.2">
 <h3 data-number="2.6.2" class="anchored" data-anchor-id="model-estimation"><span class="header-section-number">2.6.2</span> Model estimation</h3>
@@ -753,7 +879,7 @@ Figure&nbsp;6: Density of response times [s] across conditions for the four expe
 </section>
 <section id="evidence-accumulation-modeling-results" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="evidence-accumulation-modeling-results"><span class="header-section-number">3.2</span> Evidence accumulation modeling results</h2>
-<p>For all experiments, posterior distributions for drift rate and threshold parameters are visulaised in <a href="#fig-threshold-all" class="quarto-xref">Figure&nbsp;7</a> and <a href="#fig-drift-all" class="quarto-xref">Figure&nbsp;8</a> and the medians and 95% quantile intervals are summarised in <a href="#tbl-lba-params" class="quarto-xref">Table&nbsp;4</a>.</p>
+<p>For all experiments, posterior distributions for drift rate and threshold parameters are visulaised in <a href="#fig-threshold-all" class="quarto-xref">Figure&nbsp;7</a> and <a href="#fig-drift-all" class="quarto-xref">Figure&nbsp;8</a> and the medians and 95% quantile intervals are summarised in <a href="#tbl-lba-params" class="quarto-xref">Table&nbsp;5</a>.</p>
 <section id="experiment-1-1" class="level3" data-number="3.2.1">
 <h3 data-number="3.2.1" class="anchored" data-anchor-id="experiment-1-1"><span class="header-section-number">3.2.1</span> Experiment 1</h3>
 <p><em>Threshold:</em> We estimated the threshold parameter for both response options (Novel and Learned). Inspection of the posterior distributions of the effect of face familiarity on the threshold parameter shows that while the threshold for Novel faces is greater that the one for Learned faces.</p>
@@ -832,7 +958,7 @@ Figure&nbsp;8: Drift rate estimates across experiments
 <div id="tbl-lba-params" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-lba-params-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;4: Posterior median and 95% credible intervals for threshold and drift rate parameters across experiments. Positive contrast values indicate a novel face advantage.
+Table&nbsp;5: Posterior median and 95% quantile intervals for threshold and drift rate parameters across experiments.
 </figcaption>
 <div aria-describedby="tbl-lba-params-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -842,19 +968,23 @@ Table&nbsp;4: Posterior median and 95% credible intervals for threshold and drif
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_q39p03cz3boayzzt5lu8 = TinyTable.createTableFunctions("tinytable_q39p03cz3boayzzt5lu8");
+      const tableFns_bkxa7l700ulewgbee9ue = TinyTable.createTableFunctions("tinytable_bkxa7l700ulewgbee9ue");
       // tinytable span after
+      window.addEventListener('load', function () { tableFns_bkxa7l700ulewgbee9ue.spanCell(15, 1, 1, 4) })
+      window.addEventListener('load', function () { tableFns_bkxa7l700ulewgbee9ue.spanCell(8, 1, 1, 4) })
+      window.addEventListener('load', function () { tableFns_bkxa7l700ulewgbee9ue.spanCell(1, 1, 1, 4) })
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '18', j: 1 }, { i: '18', j: 2 }, { i: '18', j: 3 }, { i: '18', j: 4 }, { i: '18', j: 5 } ], css_id: 'tinytable_css_6imcy9k7h1z8vb5xafy7',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_71avea0zwb48e9hikyjz',}, 
+          { positions: [ { i: '21', j: 1 }, { i: '21', j: 2 }, { i: '21', j: 3 }, { i: '21', j: 4 } ], css_id: 'tinytable_css_rbsa8lq1krc5qmhf1j6m',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '10', j: 1 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '13', j: 1 }, { i: '14', j: 1 }, { i: '15', j: 1 }, { i: '16', j: 1 }, { i: '17', j: 1 }, { i: '18', j: 1 }, { i: '19', j: 1 }, { i: '20', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '10', j: 2 }, { i: '11', j: 2 }, { i: '12', j: 2 }, { i: '13', j: 2 }, { i: '14', j: 2 }, { i: '15', j: 2 }, { i: '16', j: 2 }, { i: '17', j: 2 }, { i: '18', j: 2 }, { i: '19', j: 2 }, { i: '20', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '10', j: 3 }, { i: '11', j: 3 }, { i: '12', j: 3 }, { i: '13', j: 3 }, { i: '14', j: 3 }, { i: '15', j: 3 }, { i: '16', j: 3 }, { i: '17', j: 3 }, { i: '18', j: 3 }, { i: '19', j: 3 }, { i: '20', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '4', j: 4 }, { i: '5', j: 4 }, { i: '6', j: 4 }, { i: '7', j: 4 }, { i: '8', j: 4 }, { i: '9', j: 4 }, { i: '10', j: 4 }, { i: '11', j: 4 }, { i: '12', j: 4 }, { i: '13', j: 4 }, { i: '14', j: 4 }, { i: '15', j: 4 }, { i: '16', j: 4 }, { i: '17', j: 4 }, { i: '18', j: 4 }, { i: '19', j: 4 }, { i: '20', j: 4 } ], css_id: 'tinytable_css_su4s2yjiwbkcnq215gxt',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_xlm5l8bqm736bj5plj08',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_q39p03cz3boayzzt5lu8.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_bkxa7l700ulewgbee9ue.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -863,148 +993,148 @@ Table&nbsp;4: Posterior median and 95% credible intervals for threshold and drif
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_q39p03cz3boayzzt5lu8 td.tinytable_css_6imcy9k7h1z8vb5xafy7, #tinytable_q39p03cz3boayzzt5lu8 th.tinytable_css_6imcy9k7h1z8vb5xafy7 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_q39p03cz3boayzzt5lu8 td.tinytable_css_71avea0zwb48e9hikyjz, #tinytable_q39p03cz3boayzzt5lu8 th.tinytable_css_71avea0zwb48e9hikyjz {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_bkxa7l700ulewgbee9ue td.tinytable_css_rbsa8lq1krc5qmhf1j6m, #tinytable_bkxa7l700ulewgbee9ue th.tinytable_css_rbsa8lq1krc5qmhf1j6m {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
+    #tinytable_bkxa7l700ulewgbee9ue td.tinytable_css_su4s2yjiwbkcnq215gxt, #tinytable_bkxa7l700ulewgbee9ue th.tinytable_css_su4s2yjiwbkcnq215gxt { font-size: 0.85em }
+    #tinytable_bkxa7l700ulewgbee9ue td.tinytable_css_xlm5l8bqm736bj5plj08, #tinytable_bkxa7l700ulewgbee9ue th.tinytable_css_xlm5l8bqm736bj5plj08 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_q39p03cz3boayzzt5lu8" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_bkxa7l700ulewgbee9ue" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
         <thead>
               <tr>
-                <th scope="col" data-row="0" data-col="1">Experiment</th>
-                <th scope="col" data-row="0" data-col="2">Parameter</th>
-                <th scope="col" data-row="0" data-col="3">Condition</th>
-                <th scope="col" data-row="0" data-col="4">Median</th>
-                <th scope="col" data-row="0" data-col="5">95% QI</th>
+                <th scope="col" data-row="0" data-col="1">Parameter</th>
+                <th scope="col" data-row="0" data-col="2">Condition</th>
+                <th scope="col" data-row="0" data-col="3">Median</th>
+                <th scope="col" data-row="0" data-col="4">95% QI</th>
               </tr>
         </thead>
-        
+        <tfoot><tr><td colspan="4">QI = quantile interval.</td></tr></tfoot>
         <tbody>
                 <tr>
                   <td data-row="1" data-col="1">Experiment 1</td>
-                  <td data-row="1" data-col="2">Threshold</td>
-                  <td data-row="1" data-col="3">novel</td>
-                  <td data-row="1" data-col="4">0.129</td>
-                  <td data-row="1" data-col="5">[-0.009, 0.259]</td>
+                  <td data-row="1" data-col="2">Experiment 1</td>
+                  <td data-row="1" data-col="3">Experiment 1</td>
+                  <td data-row="1" data-col="4">Experiment 1</td>
                 </tr>
                 <tr>
-                  <td data-row="2" data-col="1">Experiment 1</td>
-                  <td data-row="2" data-col="2">Threshold</td>
-                  <td data-row="2" data-col="3">learned</td>
-                  <td data-row="2" data-col="4">0.046</td>
-                  <td data-row="2" data-col="5">[-0.095, 0.181]</td>
+                  <td data-row="2" data-col="1">Threshold</td>
+                  <td data-row="2" data-col="2">novel</td>
+                  <td data-row="2" data-col="3">0.2</td>
+                  <td data-row="2" data-col="4">[0.061, 0.333]</td>
                 </tr>
                 <tr>
-                  <td data-row="3" data-col="1">Experiment 1</td>
-                  <td data-row="3" data-col="2">Threshold contrast</td>
-                  <td data-row="3" data-col="3">novel - learned</td>
-                  <td data-row="3" data-col="4">0.082</td>
-                  <td data-row="3" data-col="5">[0.014, 0.15]</td>
+                  <td data-row="3" data-col="1">Threshold</td>
+                  <td data-row="3" data-col="2">learned</td>
+                  <td data-row="3" data-col="3">0.12</td>
+                  <td data-row="3" data-col="4">[-0.027, 0.256]</td>
                 </tr>
                 <tr>
-                  <td data-row="4" data-col="1">Experiment 1</td>
-                  <td data-row="4" data-col="2">Drift rate</td>
-                  <td data-row="4" data-col="3">novel</td>
-                  <td data-row="4" data-col="4">2.155</td>
-                  <td data-row="4" data-col="5">[1.965, 2.358]</td>
+                  <td data-row="4" data-col="1">Threshold contrast</td>
+                  <td data-row="4" data-col="2">novel - learned</td>
+                  <td data-row="4" data-col="3">0.08</td>
+                  <td data-row="4" data-col="4">[0.017, 0.148]</td>
                 </tr>
                 <tr>
-                  <td data-row="5" data-col="1">Experiment 1</td>
-                  <td data-row="5" data-col="2">Drift rate</td>
-                  <td data-row="5" data-col="3">learned</td>
-                  <td data-row="5" data-col="4">0.802</td>
-                  <td data-row="5" data-col="5">[0.654, 0.948]</td>
+                  <td data-row="5" data-col="1">Drift rate</td>
+                  <td data-row="5" data-col="2">novel</td>
+                  <td data-row="5" data-col="3">2.11</td>
+                  <td data-row="5" data-col="4">[1.922, 2.31]</td>
                 </tr>
                 <tr>
-                  <td data-row="6" data-col="1">Experiment 1</td>
-                  <td data-row="6" data-col="2">Drift rate contrast</td>
-                  <td data-row="6" data-col="3">novel - learned</td>
-                  <td data-row="6" data-col="4">1.355</td>
-                  <td data-row="6" data-col="5">[1.086, 1.631]</td>
+                  <td data-row="6" data-col="1">Drift rate</td>
+                  <td data-row="6" data-col="2">learned</td>
+                  <td data-row="6" data-col="3">0.77</td>
+                  <td data-row="6" data-col="4">[0.626, 0.914]</td>
                 </tr>
                 <tr>
-                  <td data-row="7" data-col="1">Experiment 2</td>
-                  <td data-row="7" data-col="2">Threshold</td>
-                  <td data-row="7" data-col="3">novel</td>
-                  <td data-row="7" data-col="4">0.438</td>
-                  <td data-row="7" data-col="5">[0.319, 0.551]</td>
+                  <td data-row="7" data-col="1">Drift rate contrast</td>
+                  <td data-row="7" data-col="2">novel - learned</td>
+                  <td data-row="7" data-col="3">1.35</td>
+                  <td data-row="7" data-col="4">[1.074, 1.618]</td>
                 </tr>
                 <tr>
                   <td data-row="8" data-col="1">Experiment 2</td>
-                  <td data-row="8" data-col="2">Threshold</td>
-                  <td data-row="8" data-col="3">learned</td>
-                  <td data-row="8" data-col="4">0.244</td>
-                  <td data-row="8" data-col="5">[0.123, 0.363]</td>
+                  <td data-row="8" data-col="2">Experiment 2</td>
+                  <td data-row="8" data-col="3">Experiment 2</td>
+                  <td data-row="8" data-col="4">Experiment 2</td>
                 </tr>
                 <tr>
-                  <td data-row="9" data-col="1">Experiment 2</td>
-                  <td data-row="9" data-col="2">Threshold contrast</td>
-                  <td data-row="9" data-col="3">novel - learned</td>
-                  <td data-row="9" data-col="4">0.194</td>
-                  <td data-row="9" data-col="5">[0.134, 0.254]</td>
+                  <td data-row="9" data-col="1">Threshold</td>
+                  <td data-row="9" data-col="2">novel</td>
+                  <td data-row="9" data-col="3">0.51</td>
+                  <td data-row="9" data-col="4">[0.402, 0.613]</td>
                 </tr>
                 <tr>
-                  <td data-row="10" data-col="1">Experiment 2</td>
-                  <td data-row="10" data-col="2">Drift rate</td>
-                  <td data-row="10" data-col="3">novel</td>
-                  <td data-row="10" data-col="4">1.320</td>
-                  <td data-row="10" data-col="5">[1.177, 1.468]</td>
+                  <td data-row="10" data-col="1">Threshold</td>
+                  <td data-row="10" data-col="2">learned</td>
+                  <td data-row="10" data-col="3">0.35</td>
+                  <td data-row="10" data-col="4">[0.242, 0.461]</td>
                 </tr>
                 <tr>
-                  <td data-row="11" data-col="1">Experiment 2</td>
-                  <td data-row="11" data-col="2">Drift rate</td>
-                  <td data-row="11" data-col="3">learned</td>
-                  <td data-row="11" data-col="4">0.222</td>
-                  <td data-row="11" data-col="5">[0.084, 0.362]</td>
+                  <td data-row="11" data-col="1">Threshold contrast</td>
+                  <td data-row="11" data-col="2">novel - learned</td>
+                  <td data-row="11" data-col="3">0.16</td>
+                  <td data-row="11" data-col="4">[0.097, 0.215]</td>
                 </tr>
                 <tr>
-                  <td data-row="12" data-col="1">Experiment 2</td>
-                  <td data-row="12" data-col="2">Drift rate contrast</td>
-                  <td data-row="12" data-col="3">novel - learned</td>
-                  <td data-row="12" data-col="4">1.099</td>
-                  <td data-row="12" data-col="5">[0.849, 1.349]</td>
+                  <td data-row="12" data-col="1">Drift rate</td>
+                  <td data-row="12" data-col="2">novel</td>
+                  <td data-row="12" data-col="3">1.3</td>
+                  <td data-row="12" data-col="4">[1.156, 1.449]</td>
                 </tr>
                 <tr>
-                  <td data-row="13" data-col="1">Experiment 4</td>
-                  <td data-row="13" data-col="2">Threshold</td>
-                  <td data-row="13" data-col="3">novel</td>
-                  <td data-row="13" data-col="4">0.793</td>
-                  <td data-row="13" data-col="5">[0.717, 0.865]</td>
+                  <td data-row="13" data-col="1">Drift rate</td>
+                  <td data-row="13" data-col="2">learned</td>
+                  <td data-row="13" data-col="3">0.24</td>
+                  <td data-row="13" data-col="4">[0.094, 0.381]</td>
                 </tr>
                 <tr>
-                  <td data-row="14" data-col="1">Experiment 4</td>
-                  <td data-row="14" data-col="2">Threshold</td>
-                  <td data-row="14" data-col="3">famous</td>
-                  <td data-row="14" data-col="4">0.482</td>
-                  <td data-row="14" data-col="5">[0.403, 0.556]</td>
+                  <td data-row="14" data-col="1">Drift rate contrast</td>
+                  <td data-row="14" data-col="2">novel - learned</td>
+                  <td data-row="14" data-col="3">1.06</td>
+                  <td data-row="14" data-col="4">[0.806, 1.323]</td>
                 </tr>
                 <tr>
                   <td data-row="15" data-col="1">Experiment 4</td>
-                  <td data-row="15" data-col="2">Threshold contrast</td>
-                  <td data-row="15" data-col="3">novel - famous</td>
-                  <td data-row="15" data-col="4">0.311</td>
-                  <td data-row="15" data-col="5">[0.261, 0.363]</td>
+                  <td data-row="15" data-col="2">Experiment 4</td>
+                  <td data-row="15" data-col="3">Experiment 4</td>
+                  <td data-row="15" data-col="4">Experiment 4</td>
                 </tr>
                 <tr>
-                  <td data-row="16" data-col="1">Experiment 4</td>
-                  <td data-row="16" data-col="2">Drift rate</td>
-                  <td data-row="16" data-col="3">novel</td>
-                  <td data-row="16" data-col="4">2.750</td>
-                  <td data-row="16" data-col="5">[2.532, 2.976]</td>
+                  <td data-row="16" data-col="1">Threshold</td>
+                  <td data-row="16" data-col="2">novel</td>
+                  <td data-row="16" data-col="3">0.8</td>
+                  <td data-row="16" data-col="4">[0.713, 0.872]</td>
                 </tr>
                 <tr>
-                  <td data-row="17" data-col="1">Experiment 4</td>
-                  <td data-row="17" data-col="2">Drift rate</td>
-                  <td data-row="17" data-col="3">famous</td>
-                  <td data-row="17" data-col="4">-0.187</td>
-                  <td data-row="17" data-col="5">[-0.39, 0.013]</td>
+                  <td data-row="17" data-col="1">Threshold</td>
+                  <td data-row="17" data-col="2">famous</td>
+                  <td data-row="17" data-col="3">0.5</td>
+                  <td data-row="17" data-col="4">[0.412, 0.573]</td>
                 </tr>
                 <tr>
-                  <td data-row="18" data-col="1">Experiment 4</td>
-                  <td data-row="18" data-col="2">Drift rate contrast</td>
-                  <td data-row="18" data-col="3">novel - famous</td>
-                  <td data-row="18" data-col="4">2.938</td>
-                  <td data-row="18" data-col="5">[2.547, 3.335]</td>
+                  <td data-row="18" data-col="1">Threshold contrast</td>
+                  <td data-row="18" data-col="2">novel - famous</td>
+                  <td data-row="18" data-col="3">0.3</td>
+                  <td data-row="18" data-col="4">[0.248, 0.349]</td>
+                </tr>
+                <tr>
+                  <td data-row="19" data-col="1">Drift rate</td>
+                  <td data-row="19" data-col="2">novel</td>
+                  <td data-row="19" data-col="3">2.76</td>
+                  <td data-row="19" data-col="4">[2.532, 2.977]</td>
+                </tr>
+                <tr>
+                  <td data-row="20" data-col="1">Drift rate</td>
+                  <td data-row="20" data-col="2">famous</td>
+                  <td data-row="20" data-col="3">-0.17</td>
+                  <td data-row="20" data-col="4">[-0.371, 0.033]</td>
+                </tr>
+                <tr>
+                  <td data-row="21" data-col="1">Drift rate contrast</td>
+                  <td data-row="21" data-col="2">novel - famous</td>
+                  <td data-row="21" data-col="3">2.92</td>
+                  <td data-row="21" data-col="4">[2.528, 3.328]</td>
                 </tr>
         </tbody>
       </table>
@@ -1037,7 +1167,7 @@ Table&nbsp;4: Posterior median and 95% credible intervals for threshold and drif
 <p>We set out to understand not merely <em>that</em> familiarity affects face recognition, but <em>how</em> — specifically, which latent computational processes are modulated when a face is familiar versus novel. By fitting linear ballistic accumulator models to recognition data across a series of experiments, we show that familiarity primarily affects the quality of evidence accumulation, with a secondary and smaller effect on response caution. This computational signature — a novelty advantage in drift rate, accompanied by a modest novelty advantage in threshold — replicates across visual familiarity (Experiments 1 and 2) and, tentatively, visual familiarity and person knowledge (Experiment 4). These findings move beyond manifest measures of accuracy and response time to characterise the decision-level mechanisms that underpin familiar face recognition <span class="citation" data-cites="phillipsStateModellingFace2025">(<a href="#ref-phillipsStateModellingFace2025" role="doc-biblioref">Phillips and White 2025</a>)</span>.</p>
 <section id="the-impact-of-visual-familiarity" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="the-impact-of-visual-familiarity"><span class="header-section-number">4.1</span> The impact of visual familiarity</h2>
-<p>The most theoretically important finding is the combination of drift rate and threshold effects. Across Experiments 1 and 2, the novelty advantage in drift rate was substantially larger than the novelty advantage in threshold. This dissociation matters because the two parameters reflect qualitatively different aspects of the decision process. Drift rate indexes the quality of evidence accumulation — how cleanly and rapidly perceptual and cogntive systems extract decision-relevant information from a face. Threshold indexes how much accumulated evidence is required before a decision is triggered. The dominance of the drift rate effect localises familiarity’s influence to the quality of signal from the image more so than as a function of response bias between novel and familiar key presses.</p>
+<p>The most theoretically important finding is the combination of drift rate and threshold effects. Across Experiments 1 and 2, the novelty advantage in drift rate was substantially larger than the novelty advantage in threshold. This dissociation matters because the two parameters reflect qualitatively different aspects of the decision process. Drift rate indexes the quality of evidence accumulation — how cleanly and rapidly perceptual and cognitive systems extract decision-relevant information from a face. Threshold indexes how much accumulated evidence is required before a decision is triggered. The dominance of the drift rate effect localises familiarity’s influence to the quality of signal from the image more so than as a function of response bias between novel and familiar key presses.</p>
 <p>Set within the Bruce and Young framework of face perception <span class="citation" data-cites="bruceUnderstandingFaceRecognition1986">(<a href="#ref-bruceUnderstandingFaceRecognition1986" role="doc-biblioref">Bruce and Young 1986</a>)</span>, visual familiarity modulates the quality of structural encoding and feature matching within the core face processing system <span class="citation" data-cites="bruceUnderstandingFaceRecognition1986 gobbiniNeuralResponseVisual2006">(<a href="#ref-bruceUnderstandingFaceRecognition1986" role="doc-biblioref">Bruce and Young 1986</a>; <a href="#ref-gobbiniNeuralResponseVisual2006" role="doc-biblioref">Gobbini and Haxby 2006</a>)</span>, thus generating a stronger perceptual signal that feeds into the decision process. Novel faces, by this account, provide a cleaner and less ambiguous perceptual signal than visually familiar faces — consistent with “pop-out” and attentional capture accounts <span class="citation" data-cites="johnstonAttentionCaptureNovel1990 lev-ariEcologicalViewSelective2022 lubowVisualSearchFunction1997">(<a href="#ref-johnstonAttentionCaptureNovel1990" role="doc-biblioref">W. A. Johnston et al. 1990</a>; <a href="#ref-lev-ariEcologicalViewSelective2022" role="doc-biblioref">Lev-Ari, Beeri, and Gutfreund 2022</a>; <a href="#ref-lubowVisualSearchFunction1997" role="doc-biblioref">Lubow and Kaplan 1997</a>)</span>. In contrast, visually familiar faces may generate noisier representations due to interference from accumulated but imperfectly consolidated memory traces <span class="citation" data-cites="rapcsakFaceRecognition2019">(<a href="#ref-rapcsakFaceRecognition2019" role="doc-biblioref">Rapcsak 2019</a>)</span>.</p>
 <p>The smaller but reliable threshold effect reflects a qualitatively different influence on performance. In a yes/no recognition task, participants must set separate response criteria for the “familiar” and “novel” responses, and the higher threshold for the novel response is consistent with a well-documented conservative rejection bias in recognition memory [ CITE glanzerMirrorEffectRecognition1985; stretchWixtedWhyPositive1998]: participants are more willing to endorse familiarity than to endorse novelty, requiring more evidence before committing to a rejection. Because the drift rate advantage is substantially larger, the net behavioural outcome remains a novel face advantage in speed and accuracy — the signal quality benefit outweighs the response caution cost.</p>
 </section>
@@ -1057,8 +1187,36 @@ Table&nbsp;4: Posterior median and 95% credible intervals for threshold and drif
 <div style="page-break-after: always;"></div>
 </section>
 </section>
-<section id="references" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> References</h1>
+<section id="disclosures" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Disclosures</h1>
+<section id="data-and-code-availability" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="data-and-code-availability"><span class="header-section-number">5.1</span> Data and code availability</h2>
+<p>All materials are available on GitHub (link) and the OSF (link).</p>
+</section>
+<section id="author-contributions" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="author-contributions"><span class="header-section-number">5.2</span> Author contributions</h2>
+<p><a href="https://www.elsevier.com/researcher/author/policies-and-guidelines/credit-author-statement">CRediT</a> author statement:</p>
+<p>Conceptualization: RF, PD, RR<br>
+Methodology: RF, RR<br>
+Software: RF, RR<br>
+Validation: RF, RR<br>
+Formal analysis: RF, RR<br>
+Investigation: RF<br>
+Data Curation: RF, RR<br>
+Writing - Original Draft: RF<br>
+Writing - Review &amp; Editing: RF, PD, RR<br>
+Visualisation: RF, RR<br>
+Supervision: RR<br>
+Project Administration: RF, RR</p>
+</section>
+<section id="competing-interests" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="competing-interests"><span class="header-section-number">5.3</span> Competing interests</h2>
+<p>The authors declare no competing interests.</p>
+<div style="page-break-after: always;"></div>
+</section>
+</section>
+<section id="references" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-akanHaventSeenYou2023" class="csl-entry" role="listitem">
 Akan, Melisa, and Aaron S. Benjamin. 2023. <span>“Haven’t i Seen You Before? Conceptual but Not Perceptual Prior Familiarity Enhances Face Recognition Memory.”</span> <em>Journal of Memory and Language</em> 131 (August): 104433. <a href="https://doi.org/10.1016/j.jml.2023.104433">https://doi.org/10.1016/j.jml.2023.104433</a>.
@@ -1249,19 +1407,7 @@ Young, Andrew W., and A. Mike Burton. 2018. <span>“Are We Face Experts?”</sp
 </div>
 </section>
 
-
-<div id="quarto-appendix" class="default"><section id="appendix-a-supplementary-materials" class="level1 appendix" data-number="6"><h2 class="anchored quarto-appendix-heading"><span class="header-section-number">6</span> Appendix A: Supplementary Materials</h2><div class="quarto-appendix-contents">
-
-<section id="parameter-recovery-study" class="level2" data-number="6.1">
-<h2 data-number="6.1" class="anchored" data-anchor-id="parameter-recovery-study"><span class="header-section-number">6.1</span> Parameter recovery study</h2>
-</section>
-<section id="priors" class="level2" data-number="6.2">
-<h2 data-number="6.2" class="anchored" data-anchor-id="priors"><span class="header-section-number">6.2</span> Priors</h2>
-</section>
-<section id="exploratory-models" class="level2" data-number="6.3">
-<h2 data-number="6.3" class="anchored" data-anchor-id="exploratory-models"><span class="header-section-number">6.3</span> Exploratory models</h2>
-</section>
-</div></section></div></main>
+</main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {

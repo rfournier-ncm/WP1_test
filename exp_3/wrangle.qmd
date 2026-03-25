@@ -16,7 +16,7 @@ in data collection (responses recorded in ~80ms bins).
 #| include: false
 
 pkgs <- c(
-  "tidyverse", "here"
+  "tidyverse", "here", "patchwork"
   )
 vapply(
   pkgs, library, logical(1), character.only = TRUE, logical.return = TRUE
@@ -122,12 +122,9 @@ exclude_ratings <- data_ratings |>
   filter(n_fam < 30) |>
   pull(pid)
 
-# Apply ratings exclusion first
-data <- data |>
-  filter(!pid %in% exclude_ratings)
-
 # RT exclusion — participants with >25% missed trials
 exclude_rt <- data |>
+  filter(!pid %in% exclude_ratings) |>
   group_by(pid) |>
   summarise(perc_excluded = mean(is.na(rt)) * 100) |>
   filter(perc_excluded > 25) |>
@@ -135,7 +132,7 @@ exclude_rt <- data |>
 
 # Accuracy exclusion — on remaining participants
 exclude_acc <- data |>
-  filter(!pid %in% exclude_rt) |>
+  filter(!pid %in% exclude_ratings, !pid %in% exclude_rt) |>
   drop_na(rt) |>
   group_by(pid) |>
   summarise(perc_acc = mean(acc) * 100) |>
@@ -145,41 +142,13 @@ exclude_acc <- data |>
 # Apply all exclusions and remove missed trials
 data <- data |>
   filter(
+    !pid %in% exclude_ratings,
     !pid %in% exclude_rt,
     !pid %in% exclude_acc,
-    !is.na(rt)
+    !is.na(rt),
+    rt <= 0.9,  # enforced live in PsychoPy
+    rt >= 0.2   # preregistered lower bound
   )
-```
-
-```{r}
-# old_data <- read_csv(here("exp_3", "data", "from_raph", "data_exp_3.csv"))
-# 
-# # compare row counts and participants
-# nrow(old_data)
-# nrow(data)
-# n_distinct(old_data$pid)
-# n_distinct(data$pid)
-# 
-# # check for any rt > 0.9 (the response deadline for exp 3)
-# old_data |> filter(rt > 0.9) |> nrow()
-# data |> filter(rt > 0.9) |> nrow()
-# 
-# # check for any rt < 0.2 
-# old_data |> filter(rt < 0.2) |> nrow()
-# data |> filter(rt < 0.2) |> nrow()
-# 
-# # pids in old data
-# old_pids <- old_data |> distinct(pid) |> arrange(pid) |> pull(pid)
-# 
-# # pids in new data
-# new_pids <- data |> distinct(pid) |> arrange(pid) |> pull(pid)
-# 
-# # are they identical?
-# identical(old_pids, new_pids)
-# 
-# # if not, what differs?
-# setdiff(old_pids, new_pids)  # in old but not new
-# setdiff(new_pids, old_pids)  # in new but not old
 ```
 
 ```{r}
@@ -254,10 +223,6 @@ acc_group <- acc_pid |>
 ```{r}
 #| label: plot-rt-bar
 
-if (!dir.exists(here("exp_3", "figures"))) {
-  dir.create(here("exp_3", "figures"), recursive = TRUE)
-}
-
 p_rt <- ggplot(rt_group, aes(x = cond, y = mean, fill = cond, colour = cond)) +
   geom_col() +
   geom_errorbar(
@@ -323,13 +288,51 @@ p_rt_density
 
 (p_rt | p_acc) / p_rt_density
 
+if (!dir.exists(here("exp_3", "figures"))) {
+  dir.create(here("exp_3", "figures"), recursive = TRUE)
+}
+
 ggsave(here("exp_3", "figures", "rt_acc.jpeg"), width = 8, height = 6)
 ```
 
-# 6. Save
+# 6. Demographics 
+
+```{r}
+#| label: demographics
+
+demo_exp3 <- read_csv(here("exp_3", "data", "demo_exp_3.csv")) |>
+  mutate(
+    pid    = row_number(),
+    age    = as.numeric(Age),
+    gender = if_else(Gender == "F", "Female", "Male")
+  ) |>
+  filter(pid %in% unique(data$pid)) |>
+  select(pid, age, gender)
+
+```
+
+# 7. Save
 
 ```{r}
 #| label: save
 
+# save data to model
 write_csv(data, here("exp_3", "data", "data_exp_3.csv"))
+
+# save exclusion counts as a small csv
+exclusions <- tibble(
+  started         = 40L,
+  withdrew        = 0L,
+  completed       = 40L,
+  exclude_rt      = length(exclude_rt),
+  exclude_acc     = length(exclude_acc),
+  over_95         = 1L,
+  under_55        = 0L,
+  exclude_ratings = length(exclude_ratings),
+  final_n         = n_distinct(data$pid)
+)
+write_csv(exclusions, here("exp_3", "data", "exclusions_exp_3.csv"))
+
+# save cleaned demographics as a small csv
+write_csv(demo_exp3, here("exp_3", "data", "demo_exp_3_clean.csv"))
 ```

@@ -14,7 +14,7 @@ This file wrangles data for Experiment 2 in the face familiarity study.
 #| include: false
 
 pkgs <- c(
-  "tidyverse","patchwork","here"
+  "tidyverse", "here", "patchwork"
   )
 vapply(
   pkgs, library, logical(1), character.only = TRUE, logical.return = TRUE
@@ -124,49 +124,10 @@ data <- data |>
     !pid %in% exclude_rt,
     !pid %in% exclude_acc,
     !is.na(rt),
-    rt <= 2.0,
-    #rt >= 0.2 ## this may need adding eventually.
+    rt <= 2.0, # preregistered deadline
+    rt >= 0.2  # preregistered lower bound
   )
 ```
-
-```{r}
-# check the old data
-#old_data <- read_csv(here("exp_2", "data", "from_raph", "data_exp_2.csv"))
-
-# old_data |>
-#   filter(rt > 2.0) |>
-#   nrow()
-# 
-# raw_check <- read_csv(here("exp_2", "data", "from_raph", "wrangle_data_exp_2.csv"))
-# raw_check |> filter(rt > 2.0) |> nrow()
-# 
-# # compare row counts
-# nrow(old_data)
-# nrow(data)
-# 
-# # compare n participants
-# n_distinct(old_data$pid)
-# n_distinct(data$pid)
-# 
-# data |>
-#   filter(rt < 0.2)
-# 
-# old_data |>
-#   filter(rt < 0.2)
-
-## check the model data
-# load(here("exp_2", "models", "LBA_exp2_v1.RData"))
-# 
-# # check structure of first participant
-# str(LBA_exp2_v1[[1]]$data[[1]], max.level = 1)
-# 
-# # check the expand attribute
-# attr(LBA_exp2_v1[[1]]$data[[1]], "expand") |> length()
-# 
-# # total unique trials via expand attribute
-# map_int(LBA_exp2_v1[[1]]$data, ~ length(attr(.x, "expand"))) |> sum()
-```
-
 
 ```{r}
 #| label: data-check
@@ -239,10 +200,6 @@ acc_group <- acc_pid |>
 ```{r}
 #| label: plot-rt-bar
 
-if (!dir.exists(here("exp_2", "figures"))) {
-  dir.create(here("exp_2", "figures"), recursive = TRUE)
-}
-
 p_rt <- ggplot(rt_group, aes(x = cond, y = mean, fill = cond, colour = cond)) +
   geom_col() +
   geom_errorbar(
@@ -262,7 +219,6 @@ p_rt <- ggplot(rt_group, aes(x = cond, y = mean, fill = cond, colour = cond)) +
   labs(x = "Condition", y = "Mean RT [s]")
 
 p_rt
-
 ```
 
 ```{r}
@@ -287,7 +243,6 @@ p_acc <- ggplot(acc_group, aes(x = cond, y = mean_perc, fill = cond, colour = co
   labs(x = "Condition", y = "Accuracy [%]")
 
 p_acc
-
 ```
 
 ```{r}
@@ -300,7 +255,6 @@ p_rt_density <- ggplot(data, aes(x = rt, fill = cond, colour = cond)) +
   labs(x = "RT [s]")
 
 p_rt_density
-
 ```
 
 ```{r}
@@ -308,13 +262,53 @@ p_rt_density
 
 (p_rt | p_acc) / p_rt_density
 
+if (!dir.exists(here("exp_2", "figures"))) {
+  dir.create(here("exp_2", "figures"), recursive = TRUE)
+}
+
 ggsave(here("exp_2", "figures", "rt_acc.jpeg"), width = 8, height = 6)
 ```
 
-# 6. Save
+# 6. Demographics 
+
+```{r}
+#| label: demographics
+
+demo_exp2 <- read_csv(here("exp_2", "data", "demo_exp_2.csv")) |>
+  filter(
+    Status != "RETURNED",
+    `Participant id` %in% unique(data$pid)
+  ) |>
+  mutate(
+    pid    = as.character(`Participant id`),
+    age    = as.numeric(Age),
+    gender = as.character(Sex)
+  ) |>
+  select(pid, age, gender)
+```
+
+# 7. Save
 
 ```{r}
 #| label: save
 
+# save data to model
 write_csv(data, here("exp_2", "data", "data_exp_2.csv"))
+
+# save exclusion counts as a small csv
+exclusions <- tibble(
+  started         = 38L,
+  withdrew        = 0L,
+  completed       = n_distinct(raw$participant),
+  exclude_rt      = length(exclude_rt),
+  exclude_acc     = length(exclude_acc),
+  over_95         = NA_integer_,
+  under_55        = NA_integer_,
+  exclude_ratings = NA_integer_,
+  final_n         = n_distinct(data$pid)
+)
+write_csv(exclusions, here("exp_2", "data", "exclusions_exp_2.csv"))
+
+# save cleaned demographics as a small csv
+write_csv(demo_exp2, here("exp_2", "data", "demo_exp_2_clean.csv"))
 ```
