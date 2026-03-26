@@ -54,7 +54,8 @@ raw <- list.files(
 ) |>
   set_names() |>
   map(read_csv,
-      col_names = c("subj", "block", "trial", "keypress", "rt", "ori", "stim")
+      col_names = c("subj", "block", "trial", "keypress", "rt", "ori", "stim"),
+      show_col_types = FALSE
   ) |>
   list_rbind(names_to = "file") |>
   mutate(
@@ -67,16 +68,19 @@ write_csv(raw, here("exp_1", "data", "raw_data_exp_1.csv"))
 # stimulus coding for familiar stimuli
 fstim <- list.files(
   path       = here("exp_1", "data", "raw"),
-  pattern    = "^S.*csv",
+  pattern    = "^S.*\\.csv$",
   full.names = TRUE,
   recursive  = TRUE
 ) |>
-  set_names() |>
-  map(read_csv, col_names = TRUE) |>
-  list_rbind() |>
-  mutate(pid = row_number()) |>
-  pivot_longer(cols = -pid, names_to = "ftrial", values_to = "fstim") |>
-  select(pid, fstim)
+  set_names(\(x) str_extract(basename(x), "(?<=^S)\\d+")) |>  # keep as character
+  map(read_csv,
+      col_names = FALSE,
+      show_col_types = FALSE
+  ) |>
+  map(unlist) |>
+  enframe(name = "pid", value = "fstim") |>
+  unnest(fstim) |>
+  mutate(pid = as.integer(pid))           # convert to integer here instead
 
 write_csv(fstim, here("exp_1", "data", "fam_stim_exp_1.csv"))
 ```
@@ -312,8 +316,7 @@ demo_exp1 <- read_csv(here("exp_1", "data", "demo_exp_1.csv")) |>
   mutate(
     Date_of_birth   = lubridate::my(Date_of_birth),
     Date_of_testing = lubridate::dmy(`Date of testing`),
-    age             = floor(eeptools::age_calc(Date_of_birth,
-                            enddate = Date_of_testing, units = "years")),
+    age = floor(interval(Date_of_birth, Date_of_testing) / years(1)),
     gender          = if_else(Gender == "F", "Female", "Male"),
     pid             = row_number()
   ) |>

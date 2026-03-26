@@ -52,7 +52,10 @@ raw <- list.files(
   recursive  = TRUE
 ) |>
   set_names() |>
-  map(read_csv, col_types = cols(.default = "c")) |>
+  map(read_csv, 
+      col_types = cols(.default = "c"),
+      show_col_types = FALSE
+      ) |>
   list_rbind(names_to = "file")
 
 write_csv(raw, here("exp_4", "data", "raw_exp_4.csv"))

@@ -80,8 +80,8 @@ editor_options:
 #| include: false
 
 pkgs <- c(
-  "tidyverse", "RColorBrewer", "patchwork", "gtsummary", "paletteer", "eeptools", 
-  "here", "gridExtra", "EMC2", "tidybayes", "tinytable", "osfr"
+  "tidyverse", "RColorBrewer", "patchwork", "paletteer", "here", "EMC2", 
+  "tidybayes", "tinytable", "osfr"
 )
 vapply(
   pkgs, library, logical(1),

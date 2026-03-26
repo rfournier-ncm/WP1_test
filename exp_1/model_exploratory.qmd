@@ -205,7 +205,7 @@ save(pp_bias, file = here("exp_1", "models", "pp_LBA_exp1_v1_bias.RData"))
 
 load(here("exp_1", "models", "pp_LBA_exp1_v1_bias.RData"))
 
-pdf("exp_1/figures/exploratory/pp_density_bias.pdf", width = 10, height = 7)
+png("exp_1/figures/exploratory/pp_density_bias.png", width = 8, height = 6, units = "in", res = 150)
 plot_density(
   data_emc, 
   pp_bias, 
@@ -213,7 +213,7 @@ plot_density(
 )
 dev.off()
 
-pdf("exp_1/figures/exploratory/pp_cdf_bias.pdf", width = 10, height = 7)
+png("exp_1/figures/exploratory/pp_cdf_bias.png", width = 8, height = 6, units = "in", res = 150)
 plot_cdf(
   data_emc,
   pp_bias,  
@@ -325,7 +325,7 @@ save(pp_t0, file = here("exp_1", "models", "pp_LBA_exp1_v1_t0.RData"))
 
 load(here("exp_1", "models", "pp_LBA_exp1_v1_t0.RData"))
 
-pdf("exp_1/figures/exploratory/pp_density_t0.pdf", width = 10, height = 7)
+png("exp_1/figures/exploratory/pp_density_t0.png", width = 8, height = 6, units = "in", res = 150)
 plot_density(
   data_emc, 
   pp_t0, 
@@ -333,7 +333,7 @@ plot_density(
 )
 dev.off()
 
-pdf("exp_1/figures/exploratory/pp_cdf_t0.pdf", width = 10, height = 7)
+png("exp_1/figures/exploratory/pp_cdf_t0.png", width = 8, height = 6, units = "in", res = 150)
 plot_cdf(
   data_emc,
   pp_t0,  
@@ -445,7 +445,7 @@ save(pp_full, file = here("exp_1", "models", "pp_LBA_exp1_v1_full.RData"))
 
 load(here("exp_1", "models", "pp_LBA_exp1_v1_full.RData"))
 
-pdf("exp_1/figures/exploratory/pp_density_full.pdf", width = 10, height = 7)
+png("exp_1/figures/exploratory/pp_density_full.png", width = 8, height = 6, units = "in", res = 150)
 plot_density(
   data_emc, 
   pp_full, 
@@ -453,7 +453,7 @@ plot_density(
 )
 dev.off()
 
-pdf("exp_1/figures/exploratory/pp_cdf_full.pdf", width = 10, height = 7)
+png("exp_1/figures/exploratory/pp_cdf_full.png", width = 8, height = 6, units = "in", res = 150)
 plot_cdf(
   data_emc,
   pp_full,  

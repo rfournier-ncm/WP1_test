@@ -55,7 +55,8 @@ raw <- list.files(
 ) |>
   set_names() |>
   map(read_csv,
-      col_names = c("subj", "block", "trial", "keypress", "rt", "ori", "stim", "fam")
+      col_names = c("subj", "block", "trial", "keypress", "rt", "ori", "stim", "fam"),
+      show_col_types = FALSE
   ) |>
   list_rbind(names_to = "file") |>
   mutate(pid = as.integer(str_sub(subj, 2, -1))) |>

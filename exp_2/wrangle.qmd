@@ -46,13 +46,14 @@ saves a combined file. Skip to section 2 if the combined file already exists.
 #| eval: false
 
 raw <- list.files(
-  path       = here("exp_2", "data", "raw"),
-  pattern    = "*csv",
+  path = here("exp_2", "data", "raw"),
+  pattern = "*csv",
   full.names = TRUE,
-  recursive  = TRUE
+  recursive = TRUE
 ) |>
   set_names() |>
-  map(read_csv) |>
+  map(read_csv, 
+      show_col_types = FALSE) |>
   list_rbind(names_to = "file")
 
 write_csv(raw, here("exp_2", "data", "raw_data_exp_2.csv"))

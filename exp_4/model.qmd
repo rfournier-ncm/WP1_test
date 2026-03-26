@@ -14,7 +14,7 @@ This file fits the pre-registered LBA model for Exp 4 in the face familiarity st
 #| include: false
 
 pkgs <- c(
-  "EMC2", "tidyverse", "here"
+  "EMC2", "tidyverse", "here", "parallel", "future"
   )
 vapply(
   pkgs, library, logical(1), character.only = TRUE, logical.return = TRUE
@@ -30,8 +30,6 @@ supportsMulticore()
 detectCores()
 
 plan(multicore)
-
-plan(multisession, workers = 24)
 ```
 
 # 1. Read in data and wrangle
@@ -118,9 +116,6 @@ mu_sd <- c(
   A                   = .3, t0 = .3
 )
 
-# prior_exp4_v1 <- prior(design_exp4_v1, type = "standard",
-#                        mu_mean = mu_mean, mu_sd = mu_sd)
-
 prior_exp4_v1 <- prior(
   design_exp4_v1,
   type  = "standard",
@@ -178,7 +173,7 @@ summary(LBA_exp4_v1)
 ```{r}
 #| label: plot-pars
 
-plot_pars(LBA_exp4_v1, selection = "mu", layout = c(2, 5))
+plot_pars(LBA_exp4_v1, selection = "mu", layout = c(3, 3))
 ```
 
 ## 2.4 Posterior predictions
@@ -196,7 +191,7 @@ save(pp_LBA_exp4_v1, file = here("exp_4", "models", "pp_LBA_exp4_v1.RData"))
 
 load(here("exp_4", "models", "pp_LBA_exp4_v1.RData"))
 
-pdf("exp_4/figures/pp_density.pdf", width = 10, height = 7)
+png("exp_4/figures/pp_density.png", width = 8, height = 6, units = "in", res = 150)
 plot_density(
   data_emc, 
   pp_LBA_exp4_v1, 
@@ -204,7 +199,7 @@ plot_density(
 )
 dev.off()
 
-pdf("exp_4/figures/pp_cdf.pdf", width = 10, height = 7)
+png("exp_4/figures/pp_cdf.png", width = 8, height = 6, units = "in", res = 150)
 plot_cdf(
   data_emc,
   pp_LBA_exp4_v1,  

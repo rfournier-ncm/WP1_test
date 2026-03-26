@@ -175,12 +175,50 @@ check(LBA_exp1_v1)
 summary(LBA_exp1_v1)
 #plot(LBA_exp1_v1)
 #get_pars(LBA_exp1_v1, map = TRUE)
+
+## save out as necessary
+## exp 1 folder
+png("exp_1/figures/chains.png", width = 8, height = 6, units = "in", res = 150)
+plot(
+  LBA_exp1_v1,
+  selection = "mu",
+  layout = c(3, 3)
+)
+dev.off()
+
+## manuscript folder
+png("manuscript/figures/chains.png", width = 8, height = 6, units = "in", res = 150)
+plot(
+  LBA_exp1_v1,
+  selection = "mu",
+  layout = c(3, 3)
+)
+dev.off()
 ```
 
 ```{r}
 #| label: plot-pars
 
-plot_pars(LBA_exp1_v1, selection = "mu", layout = c(2, 5))
+plot_pars(LBA_exp1_v1, selection = "mu", layout = c(3, 3))
+
+## save out as necessary
+## exp 1 folder
+png("exp_1/figures/pars.png", width = 8, height = 6, units = "in", res = 300)
+plot_pars(
+  LBA_exp1_v1,
+  selection = "mu",
+  layout = c(3, 3)
+)
+dev.off()
+
+## manuscript folder
+png("manuscript/figures/pars.png", width = 8, height = 6, units = "in", res = 300)
+plot_pars(
+  LBA_exp1_v1,
+  selection = "mu",
+  layout = c(3, 3)
+)
+dev.off()
 ```
 
 ## 2.4 Posterior predictions
@@ -198,7 +236,8 @@ save(pp_LBA_exp1_v1, file = here("exp_1", "models", "pp_LBA_exp1_v1.RData"))
 
 load(here("exp_1", "models", "pp_LBA_exp1_v1.RData"))
 
-pdf("exp_1/figures/pp_density.pdf", width = 10, height = 7)
+## exp 1 folder
+png("exp_1/figures/pp_density.png", width = 8, height = 6, units = "in", res = 150)
 plot_density(
   data_emc, 
   pp_LBA_exp1_v1, 
@@ -206,7 +245,24 @@ plot_density(
 )
 dev.off()
 
-pdf("exp_1/figures/pp_cdf.pdf", width = 10, height = 7)
+png("exp_1/figures/pp_cdf.png", width = 8, height = 6, units = "in", res = 150)
+plot_cdf(
+  data_emc,
+  pp_LBA_exp1_v1,  
+  factors = "S"
+)
+dev.off()
+
+## manuscript folder
+png("manuscript/figures/pp_density.png", width = 8, height = 6, units = "in", res = 150)
+plot_density(
+  data_emc, 
+  pp_LBA_exp1_v1, 
+  factors = "S"
+)
+dev.off()
+
+png("manuscript/figures/pp_cdf.png", width = 8, height = 6, units = "in", res = 150)
 plot_cdf(
   data_emc,
   pp_LBA_exp1_v1,  
