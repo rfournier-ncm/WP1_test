@@ -237,9 +237,6 @@ mu_sd_t0 <- c(v_sd,
   t0_SNovel = .3, t0_SFamous = .3
 )
 
-# prior_t0 <- prior(design_t0, type = "standard",
-#                   mu_mean = mu_mean_t0, mu_sd = mu_sd_t0)
-
 prior_t0 <- prior(
   design_t0,
   type  = "standard",
@@ -355,9 +352,6 @@ mu_sd_full <- c(v_sd,
   A_lRNovel = .3, A_lRFamous = .3,
   t0_SNovel = .3, t0_SFamous = .3
 )
-
-# prior_full <- prior(design_full, type = "standard",
-#                     mu_mean = mu_mean_full, mu_sd = mu_sd_full)
 
 prior_full <- prior(
   design_full,

@@ -78,7 +78,12 @@ design_exp4_v1 <- design(
   data      = data_emc,
   model     = LBA,
   matchfun  = matchfun,
-  formula   = list(v ~ 0 + S:lM, sv ~ 0 + lM, B ~ 0 + lR, A ~ 1, t0 ~ 1),
+  formula   = list(
+    v  ~ 0 + S:lM, 
+    sv ~ 0 + lM, 
+    B  ~ 0 + lR, 
+    A  ~ 1, 
+    t0 ~ 1),
   constants = c(sv_lMFALSE = log(1))
 )
 ```

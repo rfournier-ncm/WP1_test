@@ -76,10 +76,16 @@ matchfun <- function(d) d$S == d$lR
 #| label: design
 
 design_exp2_v1 <- design(
-  data      = data_emc,
-  model     = LBA,
-  matchfun  = matchfun,
-  formula   = list(v ~ 0 + S:lM, sv ~ 0 + lM, B ~ 0 + lR, A ~ 1, t0 ~ 1),
+  data = data_emc,
+  model = LBA,
+  matchfun = matchfun,
+  formula = list(
+    v  ~ 0 + S:lM,
+    sv ~ 0 + lM,
+    B  ~ 0 + lR,
+    A  ~ 1,
+    t0 ~ 1
+  ),
   constants = c(sv_lMFALSE = log(1))
 )
 ```
@@ -116,9 +122,6 @@ mu_sd <- c(
   B_lRNovel            = .5, B_lRLearned = .5,
   A                    = .3, t0 = .3
 )
-
-# prior_exp2_v1 <- prior(design_exp2_v1, type = "standard",
-#                        mu_mean = mu_mean, mu_sd = mu_sd)
 
 prior_exp2_v1 <- prior(
   design_exp2_v1,
