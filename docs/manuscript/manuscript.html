@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.31">
+<meta name="generator" content="quarto-1.8.25">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -51,14 +51,15 @@ div.csl-indent {
 <script src="manuscript_files/libs/clipboard/clipboard.min.js"></script>
 <script src="manuscript_files/libs/quarto-html/quarto.js" type="module"></script>
 <script src="manuscript_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="manuscript_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="manuscript_files/libs/quarto-html/popper.min.js"></script>
 <script src="manuscript_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="manuscript_files/libs/quarto-html/anchor.min.js"></script>
 <link href="manuscript_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="manuscript_files/libs/quarto-html/quarto-syntax-highlighting-e1a5c8363afafaef2c763b6775fbf3ca.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="manuscript_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="manuscript_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="manuscript_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="manuscript_files/libs/bootstrap/bootstrap-490ac29d983896da3dfac26fbcf27479.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="manuscript_files/libs/bootstrap/bootstrap-f71ab33f14d55dc7002c31c3770475fe.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -74,7 +75,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -276,19 +277,19 @@ Table&nbsp;1: Parameters in the linear ballistic accumulator model
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_j8vkczp6dsz8dfflaewv = TinyTable.createTableFunctions("tinytable_j8vkczp6dsz8dfflaewv");
+      const tableFns_4yv6fnjhbwgkx2rbuf3w = TinyTable.createTableFunctions("tinytable_4yv6fnjhbwgkx2rbuf3w");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 } ], css_id: 'tinytable_css_h36vaxc462tmnftjzkr3',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_pp76ivuvmrnbx256tham',}, 
+          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 } ], css_id: 'tinytable_css_8u63locgvrexw0k4gpu1',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_98oalvjoodnb7ykgfmtg',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_j8vkczp6dsz8dfflaewv.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_4yv6fnjhbwgkx2rbuf3w.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -297,11 +298,11 @@ Table&nbsp;1: Parameters in the linear ballistic accumulator model
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_j8vkczp6dsz8dfflaewv td.tinytable_css_h36vaxc462tmnftjzkr3, #tinytable_j8vkczp6dsz8dfflaewv th.tinytable_css_h36vaxc462tmnftjzkr3 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_j8vkczp6dsz8dfflaewv td.tinytable_css_pp76ivuvmrnbx256tham, #tinytable_j8vkczp6dsz8dfflaewv th.tinytable_css_pp76ivuvmrnbx256tham {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_4yv6fnjhbwgkx2rbuf3w td.tinytable_css_8u63locgvrexw0k4gpu1, #tinytable_4yv6fnjhbwgkx2rbuf3w th.tinytable_css_8u63locgvrexw0k4gpu1 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_4yv6fnjhbwgkx2rbuf3w td.tinytable_css_98oalvjoodnb7ykgfmtg, #tinytable_4yv6fnjhbwgkx2rbuf3w th.tinytable_css_98oalvjoodnb7ykgfmtg {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_j8vkczp6dsz8dfflaewv" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_4yv6fnjhbwgkx2rbuf3w" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
         <thead>
               <tr>
@@ -357,19 +358,19 @@ Table&nbsp;2: An overview of the experimental work
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_qf704s89tjjyqza9j2aj = TinyTable.createTableFunctions("tinytable_qf704s89tjjyqza9j2aj");
+      const tableFns_k48qv3sqh9hen9daa7ei = TinyTable.createTableFunctions("tinytable_k48qv3sqh9hen9daa7ei");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 }, { i: '4', j: 5 } ], css_id: 'tinytable_css_wa8d9jstnsvbkl4amd03',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_ka515ge7mbgkdqoif0i0',}, 
+          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 }, { i: '4', j: 5 } ], css_id: 'tinytable_css_f9370554pux70xzrwiom',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_s4t4pffovg5b1apvp2tj',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_qf704s89tjjyqza9j2aj.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_k48qv3sqh9hen9daa7ei.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -378,11 +379,11 @@ Table&nbsp;2: An overview of the experimental work
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_qf704s89tjjyqza9j2aj td.tinytable_css_wa8d9jstnsvbkl4amd03, #tinytable_qf704s89tjjyqza9j2aj th.tinytable_css_wa8d9jstnsvbkl4amd03 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_qf704s89tjjyqza9j2aj td.tinytable_css_ka515ge7mbgkdqoif0i0, #tinytable_qf704s89tjjyqza9j2aj th.tinytable_css_ka515ge7mbgkdqoif0i0 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_k48qv3sqh9hen9daa7ei td.tinytable_css_f9370554pux70xzrwiom, #tinytable_k48qv3sqh9hen9daa7ei th.tinytable_css_f9370554pux70xzrwiom {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_k48qv3sqh9hen9daa7ei td.tinytable_css_s4t4pffovg5b1apvp2tj, #tinytable_k48qv3sqh9hen9daa7ei th.tinytable_css_s4t4pffovg5b1apvp2tj {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_qf704s89tjjyqza9j2aj" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_k48qv3sqh9hen9daa7ei" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
         <thead>
               <tr>
@@ -435,21 +436,21 @@ Table&nbsp;2: An overview of the experimental work
 </section>
 <section id="method-and-materials" class="level1" data-number="2">
 <h1 data-number="2"><span class="header-section-number">2</span> Method and Materials</h1>
-<p>We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures in the four experiments <span class="citation" data-cites="simonsConstraintsGeneralityCOG2017">(<a href="#ref-simonsConstraintsGeneralityCOG2017" role="doc-biblioref">Simons, Shoda, and Lindsay 2017</a>)</span>.</p>
 <section id="pre-registration-and-open-science" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="pre-registration-and-open-science"><span class="header-section-number">2.1</span> Pre-registration and open science</h2>
-<p>For each experiment, the research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered. The preregistration, raw data, stimuli, data wrangling and analysis code as well as the evidence-accumulation models outputs are available on the Open Science Framework: Experiment 1 (<a href="https://osf.io/azyvu/overview" class="uri">https://osf.io/azyvu/overview</a>), Experiment 2 (<a href="https://osf.io/tu2eh/overview" class="uri">https://osf.io/tu2eh/overview</a>), Experiment 3 (<a href="https://osf.io/ut78f/overview" class="uri">https://osf.io/ut78f/overview</a>) and Experiment 4 (<a href="https://osf.io/vj2aq/overview" class="uri">https://osf.io/vj2aq/overview</a>).</p>
+<p>We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures in the four experiments <span class="citation" data-cites="simonsConstraintsGeneralityCOG2017">(<a href="#ref-simonsConstraintsGeneralityCOG2017" role="doc-biblioref">Simons, Shoda, and Lindsay 2017</a>)</span>. For each experiment, the research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered (Experiment 1: <a href="https://osf.io/azyvu/overview" class="uri">https://osf.io/azyvu/overview</a>); Experiment 2: <a href="https://osf.io/tu2eh/overview" class="uri">https://osf.io/tu2eh/overview</a>; Experiment 3: <a href="https://osf.io/ut78f/overview" class="uri">https://osf.io/ut78f/overview</a>; Experiment 4 <a href="https://osf.io/vj2aq/overview" class="uri">https://osf.io/vj2aq/overview</a>. The raw data, experimental materials, and analysis code are available on GitHub (link) or the Open Science Framework (link).</p>
 </section>
 <section id="experiment-1" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="experiment-1"><span class="header-section-number">2.2</span> Experiment 1</h2>
 <section id="participants" class="level3" data-number="2.2.1">
 <h3 data-number="2.2.1" class="anchored" data-anchor-id="participants"><span class="header-section-number">2.2.1</span> Participants</h3>
-<p>All participants were recruited using either an online recruiting platform (<a href="https://marktplatz.uzhalumni.ch" class="uri">https://marktplatz.uzhalumni.ch</a>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. Sample size was determined in advance. Following previous suggestions from <span class="citation" data-cites="heathcoteDynamicModelsChoice2019">Heathcote et al. (<a href="#ref-heathcoteDynamicModelsChoice2019" role="doc-biblioref">2019</a>)</span>, a parameter recovery study was run to estimate if 30 usable participant datasets were sufficient to accurately recover the parameter estimates. The parameter recovery study included 30 participant datasets, each with 180 trials (90 trials “familiar” and 90 trials “unfamiliar”) and with our selected model parameterisation. The data-generated parameters were sufficiently well-recovered (See Supplementary Materials). 31 healthy participants took part in Experiment 1. All participants reported normal or corrected-to-normal vision and received payment (20 CHF) for participating in the experiment. Based on our preregistration, response times longer than 2.5 seconds were removed from the analysis. However, this cutoff value led to the the removal of 59% of the trials of one participant. Given the recommendation of having a certain number of trials per condition per participant when using evidence-accumulation models <span class="citation" data-cites="heathcoteDynamicModelsChoice2019 parker2024">(<a href="#ref-heathcoteDynamicModelsChoice2019" role="doc-biblioref">Heathcote et al. 2019</a>; <a href="#ref-parker2024" role="doc-biblioref">Parker and Ramsey 2024</a>)</span>, this participant was excluded from the data analysis. In the end, the data of 30 participants (11 men and 19 women) was retained for the analysis and the LBA modeling. Ages ranged from 20 to 42 years old (<span class="math inline">\(M_{age} =\)</span> 27.5, <span class="math inline">\(SD_{age} =\)</span> 5.4). This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.</p>
+<p>All participants were recruited using either an online recruiting platform (<a href="https://marktplatz.uzhalumni.ch" class="uri">https://marktplatz.uzhalumni.ch</a>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. Sample size was determined in advance. Following previous suggestions from <span class="citation" data-cites="heathcoteDynamicModelsChoice2019">Heathcote et al. (<a href="#ref-heathcoteDynamicModelsChoice2019" role="doc-biblioref">2019</a>)</span>, a parameter recovery study was run to estimate if 30 usable participant datasets were sufficient to accurately recover the parameter estimates. The parameter recovery study included 30 participant datasets, each with 180 trials (90 trials “familiar” and 90 trials “unfamiliar”) and with our selected model parameterisation. The arameters were sufficiently well-recovered to suggest the combination of data and design were a reasonable choice (See Supplementary Materials).</p>
+<p>31 healthy participants took part in Experiment 1 (<a href="#tbl-participants" class="quarto-xref">Table&nbsp;3</a>). All participants reported normal or corrected-to-normal vision and received payment (20 CHF) for participating in the experiment. Based on our preregistration, response times longer than 2.5 seconds were removed from the analysis. However, this cutoff value led to the the removal of 59% of the trials of one participant. Given the recommendation of having a certain number of trials per condition per participant when using evidence-accumulation models <span class="citation" data-cites="heathcoteDynamicModelsChoice2019 parker2024">(<a href="#ref-heathcoteDynamicModelsChoice2019" role="doc-biblioref">Heathcote et al. 2019</a>; <a href="#ref-parker2024" role="doc-biblioref">Parker and Ramsey 2024</a>)</span>, this participant was excluded from the data analysis. In the end, the data of 30 participants (11 men and 19 women) was retained for the analysis and the LBA modeling. Ages ranged from 20 to 42 years old (<span class="math inline">\(M_{age} =\)</span> 27.5, <span class="math inline">\(SD_{age} =\)</span> 5.4). All experiments in this paper were approved by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.</p>
 <div class="cell">
 <div id="tbl-participants" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-participants-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;3: Participant summary across experiments. RT = response time; — = criterion not applicable for this experiment.
+Table&nbsp;3: Participant summary across experiments.
 </figcaption>
 <div aria-describedby="tbl-participants-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
@@ -459,20 +460,20 @@ Table&nbsp;3: Participant summary across experiments. RT = response time; — = 
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_af7ll3hmy2q35hbklrl6 = TinyTable.createTableFunctions("tinytable_af7ll3hmy2q35hbklrl6");
+      const tableFns_p0ipnywnyikmqrx1dap3 = TinyTable.createTableFunctions("tinytable_p0ipnywnyikmqrx1dap3");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 }, { i: '4', j: 5 }, { i: '4', j: 6 }, { i: '4', j: 7 }, { i: '4', j: 8 }, { i: '4', j: 9 }, { i: '4', j: 10 }, { i: '4', j: 11 }, { i: '4', j: 12 } ], css_id: 'tinytable_css_yvol8dg8m07fk5jqg3fr',}, 
-          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '1', j: 5 }, { i: '2', j: 5 }, { i: '3', j: 5 }, { i: '1', j: 6 }, { i: '2', j: 6 }, { i: '3', j: 6 }, { i: '1', j: 7 }, { i: '2', j: 7 }, { i: '3', j: 7 }, { i: '1', j: 8 }, { i: '2', j: 8 }, { i: '3', j: 8 }, { i: '1', j: 9 }, { i: '2', j: 9 }, { i: '3', j: 9 }, { i: '1', j: 10 }, { i: '2', j: 10 }, { i: '3', j: 10 }, { i: '1', j: 11 }, { i: '2', j: 11 }, { i: '3', j: 11 }, { i: '1', j: 12 }, { i: '2', j: 12 }, { i: '3', j: 12 } ], css_id: 'tinytable_css_h0h15wwyx6mz0hrk54ja',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 }, { i: '0', j: 7 }, { i: '0', j: 8 }, { i: '0', j: 9 }, { i: '0', j: 10 }, { i: '0', j: 11 }, { i: '0', j: 12 } ], css_id: 'tinytable_css_2aqeayslzidy7i3rgg71',}, 
+          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 }, { i: '4', j: 5 }, { i: '4', j: 6 }, { i: '4', j: 7 }, { i: '4', j: 8 }, { i: '4', j: 9 }, { i: '4', j: 10 }, { i: '4', j: 11 }, { i: '4', j: 12 } ], css_id: 'tinytable_css_fj5ng0uv1bhmn8d6b9og',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '1', j: 5 }, { i: '2', j: 5 }, { i: '3', j: 5 }, { i: '1', j: 6 }, { i: '2', j: 6 }, { i: '3', j: 6 }, { i: '1', j: 7 }, { i: '2', j: 7 }, { i: '3', j: 7 }, { i: '1', j: 8 }, { i: '2', j: 8 }, { i: '3', j: 8 }, { i: '1', j: 9 }, { i: '2', j: 9 }, { i: '3', j: 9 }, { i: '1', j: 10 }, { i: '2', j: 10 }, { i: '3', j: 10 }, { i: '1', j: 11 }, { i: '2', j: 11 }, { i: '3', j: 11 }, { i: '1', j: 12 }, { i: '2', j: 12 }, { i: '3', j: 12 } ], css_id: 'tinytable_css_nu0osu25ijiwg7an7eqr',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 }, { i: '0', j: 7 }, { i: '0', j: 8 }, { i: '0', j: 9 }, { i: '0', j: 10 }, { i: '0', j: 11 }, { i: '0', j: 12 } ], css_id: 'tinytable_css_ysvvew9f1ch11jwqe7ol',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_af7ll3hmy2q35hbklrl6.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_p0ipnywnyikmqrx1dap3.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -481,12 +482,12 @@ Table&nbsp;3: Participant summary across experiments. RT = response time; — = 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_af7ll3hmy2q35hbklrl6 td.tinytable_css_yvol8dg8m07fk5jqg3fr, #tinytable_af7ll3hmy2q35hbklrl6 th.tinytable_css_yvol8dg8m07fk5jqg3fr {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
-    #tinytable_af7ll3hmy2q35hbklrl6 td.tinytable_css_h0h15wwyx6mz0hrk54ja, #tinytable_af7ll3hmy2q35hbklrl6 th.tinytable_css_h0h15wwyx6mz0hrk54ja { font-size: 0.85em }
-    #tinytable_af7ll3hmy2q35hbklrl6 td.tinytable_css_2aqeayslzidy7i3rgg71, #tinytable_af7ll3hmy2q35hbklrl6 th.tinytable_css_2aqeayslzidy7i3rgg71 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
+    #tinytable_p0ipnywnyikmqrx1dap3 td.tinytable_css_fj5ng0uv1bhmn8d6b9og, #tinytable_p0ipnywnyikmqrx1dap3 th.tinytable_css_fj5ng0uv1bhmn8d6b9og {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
+    #tinytable_p0ipnywnyikmqrx1dap3 td.tinytable_css_nu0osu25ijiwg7an7eqr, #tinytable_p0ipnywnyikmqrx1dap3 th.tinytable_css_nu0osu25ijiwg7an7eqr { font-size: 0.85em }
+    #tinytable_p0ipnywnyikmqrx1dap3 td.tinytable_css_ysvvew9f1ch11jwqe7ol, #tinytable_p0ipnywnyikmqrx1dap3 th.tinytable_css_ysvvew9f1ch11jwqe7ol {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_af7ll3hmy2q35hbklrl6" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_p0ipnywnyikmqrx1dap3" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
         <thead>
               <tr>
@@ -504,7 +505,7 @@ Table&nbsp;3: Participant summary across experiments. RT = response time; — = 
                 <th scope="col" data-row="0" data-col="12">Mean age (SD)</th>
               </tr>
         </thead>
-        
+        <tfoot><tr><td colspan="12">RT = response time; — = criterion not applicable for this experiment.</td></tr></tfoot>
         <tbody>
                 <tr>
                   <td data-row="1" data-col="1">Experiment 1</td>
@@ -574,7 +575,7 @@ Table&nbsp;3: Participant summary across experiments. RT = response time; — = 
 </section>
 <section id="stimuli" class="level3" data-number="2.2.2">
 <h3 data-number="2.2.2" class="anchored" data-anchor-id="stimuli"><span class="header-section-number">2.2.2</span> Stimuli</h3>
-<p>The stimuli consisted of images selected from two different data sets of face images: the Face Research Lab London Set (DeBruine, Lisa; Jones, Benedict (2017). Face Research Lab London Set. figshare. Data set. <a href="https://doi.org/10.6084/m9.figshare.5047666.v5" class="uri">https://doi.org/10.6084/m9.figshare.5047666.v5</a>) and the Color FERET Database (<a href="https://www.nist.gov/itl/products-and-services/color-feret-database" class="uri">https://www.nist.gov/itl/products-and-services/color-feret-database</a>). Each of these data sets is composed of images of different identities faces taken from different angle points. 102 identities were selected from the Face Research Lab London Set and 51 from the Color FERET Database. For each selected identity, three pictures of the face at three different view points (3/4 left view, frontal view and 3/4 right view) were cropped to only keep the internal features of the face. All of the images processing was realized using the free community-developed software GNU Image Manipulation Program (<span class="citation" data-cites="GIMP">The GIMP Development Team (<a href="#ref-GIMP" role="doc-biblioref">2025</a>)</span>). After 4 pilots experiments, we removed 27 identities (21 from the Face Research Lab London Set and 6 from the Color FERET Database) due to to the presence of identifiable features (i.e.&nbsp;skin marks, make-up…). In total, the data set of face images used in Experiment 1 contained 756 images: one set of three colorful face images and one set of three gray scaled face images for each of the 126 identities.</p>
+<p>The stimuli consisted of images selected from two different data sets of face images: the Face Research Lab London Set (REF : DeBruine, Lisa; Jones, Benedict (2017): <a href="https://doi.org/10.6084/m9.figshare.5047666.v5" class="uri">https://doi.org/10.6084/m9.figshare.5047666.v5</a>) and the Color FERET Database (<a href="https://www.nist.gov/itl/products-and-services/color-feret-database" class="uri">https://www.nist.gov/itl/products-and-services/color-feret-database</a>). Each of these data sets is composed of images of different identities taken from different angle points. 102 identities were selected from the Face Research Lab London Set and 51 from the Color FERET Database. For each selected identity, three pictures of the face at three different view points (3/4 left view, frontal view and 3/4 right view) were cropped to only keep the internal features of the face. All of the images processing was realized using the free community-developed software GNU Image Manipulation Program (<span class="citation" data-cites="GIMP">The GIMP Development Team (<a href="#ref-GIMP" role="doc-biblioref">2025</a>)</span>). After 4 pilots experiments, we removed 27 identities (21 from the Face Research Lab London Set and 6 from the Color FERET Database) due to to the presence of identifiable features (i.e.&nbsp;skin marks, make-up…). In total, the data set of face images used in Experiment 1 contained 756 images: one set of three colorful face images and one set of three gray scaled face images for each of the 126 identities.</p>
 </section>
 <section id="material" class="level3" data-number="2.2.3">
 <h3 data-number="2.2.3" class="anchored" data-anchor-id="material"><span class="header-section-number">2.2.3</span> Material</h3>
@@ -582,8 +583,8 @@ Table&nbsp;3: Participant summary across experiments. RT = response time; — = 
 </section>
 <section id="procedure" class="level3" data-number="2.2.4">
 <h3 data-number="2.2.4" class="anchored" data-anchor-id="procedure"><span class="header-section-number">2.2.4</span> Procedure</h3>
-<p>The experimental task was divided into two distinct parts: a familiarization part and a recognition part (<a href="#fig-proc-exp1" class="quarto-xref">Figure&nbsp;2</a>). In the familiarization part, the face of 30 unknown identities were presented on the screen and participants were told to memorize the identity of the faces. One familiarization trial consisted of the presentation of 6 face images, one after the other, depicting the same identity but varying in viewing points (3/4 left view, frontal view and 3/4 right view) and the colorimetry (colorful image, gray scale image). The duration of each image presentation was 0.75 second. Each participant underwent 30 familiarization trials. During the familiarization, we introduced catch trials to ensure participants attention. After some familiarization trials, a gray scale image of a person’s face was presented on the screen. Participants were asked to press the “q” key if the face belonged to the last seen identity or the “p” key if it was not. The faces seen during the familiarization were considered the “Learned faces” within-subject condition.</p>
-<p>In the recognition part, participants completed three blocks of 90 recognition trials. Each block was separated from another by a short break. Half of the trials were learned identities trials and the other half were new, previously unseen identities trials. In each trial, a gray scale image of a face was shown on the screen. Participants were asked to choose if they had previously seen this face in the familiarization part or not. If they did, the should press the “q” key and if they did not, the “p” key. Participants were asked to respond as quickly and accurately as possible. It is important to note that participants never saw two pictures of the same learned identity in the same block and never saw the same picture (3/4 left view, frontal view, or 3/4 right view) of a learned identity during the entire recognition part. Furthermore, each novel identity was only presented once in the entire recognition part. Response time [s] and accuracy were collected after each recognition trial.</p>
+<p>The experimental task was divided into two distinct parts: a familiarization part and a recognition part (<a href="#fig-proc-exp1" class="quarto-xref">Figure&nbsp;2</a>). In the familiarization part, the face of 30 unknown identities were presented on the screen and participants were told to memorize the identity of the faces. One familiarization trial consisted of the presentation of 6 face images, one after the other, depicting the same identity but varying in viewing points (3/4 left view, frontal view and 3/4 right view) and the colorimetry (colorful image, gray scale image). The duration of each image presentation was 0.75 second. Each participant underwent 30 familiarization trials. During the familiarization, we introduced catch trials to ensure participants attention. After some familiarization trials, a gray-scale image of a person’s face was presented on the screen. Participants were asked to press the “q” key if the face belonged to the last seen identity or the “p” key if it was not. The faces seen during the familiarization were considered the “Learned” faces within-subject condition.</p>
+<p>In the recognition part, participants completed three blocks of 90 recognition trials. Each block was separated from another by a short break. Half of the trials were learned identities trials and the other half were new, previously unseen identities trials. In each trial, a gray-scale image of a face was shown on the screen. Participants were asked to choose if they had previously seen this face in the familiarization part or not. If they recognised the face, they should press the “q” key and if they did not recognise the face, then they should press the “p” key. Participants were asked to respond as quickly and accurately as possible. It is important to note that participants never saw two pictures of the same learned identity in the same block and never saw the same picture (3/4 left view, frontal view, or 3/4 right view) of a learned identity during the entire recognition part. Furthermore, each novel identity was only presented once in the entire recognition part. Response time [s] and accuracy were collected after each recognition trial.</p>
 <div class="place" data-arguments="bottom, scope: &quot;parent&quot;, float: true">
 <div id="fig-proc-exp1" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -603,7 +604,7 @@ Figure&nbsp;2: Experimental procedure of Experiment 1
 <h2 data-number="2.3" class="anchored" data-anchor-id="experiment-2"><span class="header-section-number">2.3</span> Experiment 2</h2>
 <section id="participants-1" class="level3" data-number="2.3.1">
 <h3 data-number="2.3.1" class="anchored" data-anchor-id="participants-1"><span class="header-section-number">2.3.1</span> Participants</h3>
-<p>All participant were recruited on the Prolific platform (<a href="https://www.prolific.com" class="uri">https://www.prolific.com</a>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. Furthermore, Prolific offers the option to chose the approval rate of the participants willing to take part in the study. The approval rate is the percentage for which participants has been approved in previous experiment. A approval rate between 95% and 100% was established in our study to ensure data quality. 38 participants started the experiment. After reading the inform consent, 0 participants decided to not continue the experimental procedure and withdraw from the experiment. In the end, 35 participants completed the experiment and gave their informed consent. Following our preregistration exclusion criterion, 4 participants were excluded because their percentage of missed trials was higher lower than 25% and 1 was removed because the overall accuracy was lower than 55%. In the end, the data of 30 participants (20 men and 10 women) was retained for the analysis and the LBA modeling. Ages ranged from 25 to 61 (<span class="math inline">\(M_{age} =\)</span> 41.7, <span class="math inline">\(SD_{age} =\)</span> 12). Following Prolific payment principles, each participant received 9£ for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.</p>
+<p>All participant were recruited on the Prolific platform (<a href="https://www.prolific.com" class="uri">https://www.prolific.com</a>). Participants had to be located in the United Kingdom or in the United States, be aged between 18-65 years old, with normal or corrected-to-normal vision and speak fluent English. Furthermore, Prolific offers the option to chose the approval rate of the participants willing to take part in the study. The approval rate is the percentage for which participants has been approved in previous experiment. An approval rating between 95% and 100% was chosen in our study to try to ensure high data quality. 38 participants started the experiment and nobody withdrew. Following our preregistered exclusion criterion, 4 participants were excluded because their percentage of missed trials was higher than 25% and 1 was removed because the overall accuracy was lower than 55%. In the end, data from 30 participants (20 men and 10 women) were retained for the analysis and the LBA modeling. Ages ranged from 25 to 61 (<span class="math inline">\(M_{age} =\)</span> 41.7, <span class="math inline">\(SD_{age} =\)</span> 12). Following Prolific payment principles, each participant received 9£ for the completion of the study.</p>
 </section>
 <section id="stimuli-1" class="level3" data-number="2.3.2">
 <h3 data-number="2.3.2" class="anchored" data-anchor-id="stimuli-1"><span class="header-section-number">2.3.2</span> Stimuli</h3>
@@ -623,7 +624,8 @@ Figure&nbsp;2: Experimental procedure of Experiment 1
 <h2 data-number="2.4" class="anchored" data-anchor-id="experiment-3"><span class="header-section-number">2.4</span> Experiment 3</h2>
 <section id="participants-2" class="level3" data-number="2.4.1">
 <h3 data-number="2.4.1" class="anchored" data-anchor-id="participants-2"><span class="header-section-number">2.4.1</span> Participants</h3>
-<p>All participant were recruited using either an online recruiting platform (<a href="https://marktplatz.uzhalumni.ch" class="uri">https://marktplatz.uzhalumni.ch</a>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. 40 healthy participants took part in Experiment 3. Based on our preregistration criterion, 3 participants were excluded from the data analysis: 1 of them had an overall recognition accuracy larger than 95% and 0 of them had a overall accuracy lower than 55% (chance at 50%). We deviated from our preregistration in one way. Since this experiment was conducted to investigate how highly familiar faces affect the computational processes of face recognition, we had to remove 9 more participants who did not show a level of familiarity high enough with the presented faces in the first part of the experiment. This scenario did not occur during the pilot experiments we conducted and thus was not part of our preregistration. In the end, the data of 30 participants (13 men and 17 women) was retained for the analysis and the LBA modeling. Ages ranged from 20 to 42 years old (<span class="math inline">\(M_{age} =\)</span> 26.8, <span class="math inline">\(SD_{age} =\)</span> 5.8). All participants reported normal or corrected-to-normal vision and received payment (25 CHF) for participating in the experiment. This experiment was accepted by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.</p>
+<p>All participant were recruited using either an online recruiting platform (<a href="https://marktplatz.uzhalumni.ch" class="uri">https://marktplatz.uzhalumni.ch</a>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. 40 healthy participants took part in Experiment 3. We deviated from our preregistration in one way. Since this experiment was conducted to investigate how highly familiar faces affect the computational processes of face recognition, we had to remove 9 more participants who did not show a level of familiarity high enough with the presented faces in the first part of the experiment. This scenario did not occur during the pilot experiments we conducted and thus was not part of our preregistration.</p>
+<p>Based on our preregistered criteria, a further participant was excluded from further data analysisdue to an overall recognition accuracy larger than 95%. In the end, the data of 30 participants (13 men and 17 women) were retained for further analysis and LBA modeling. Ages ranged from 20 to 42 years old (<span class="math inline">\(M_{age} =\)</span> 26.8, <span class="math inline">\(SD_{age} =\)</span> 5.8). All participants reported normal or corrected-to-normal vision and received payment (25 CHF) for participating in the experiment.</p>
 </section>
 <section id="stimuli-2" class="level3" data-number="2.4.2">
 <h3 data-number="2.4.2" class="anchored" data-anchor-id="stimuli-2"><span class="header-section-number">2.4.2</span> Stimuli</h3>
@@ -668,15 +670,17 @@ Figure&nbsp;4: Experimental procedure of Experiment 3
 <h2 data-number="2.5" class="anchored" data-anchor-id="experiment-4"><span class="header-section-number">2.5</span> Experiment 4</h2>
 <section id="participants-3" class="level3" data-number="2.5.1">
 <h3 data-number="2.5.1" class="anchored" data-anchor-id="participants-3"><span class="header-section-number">2.5.1</span> Participants</h3>
-<p>All participant were recruited on the Prolific platform (<a href="https://www.prolific.com" class="uri">https://www.prolific.com</a>). Regarding the participants recruitment criteria established, participants had to be located in the United Kingdom or in the United States. Participants must be between 18-65 years old, with normal or corrected-to-normal vision. They must fluently speak English. An approval rate between 95% and 100% was established in our study to ensure data quality. 58 participants started the experiment. After reading the inform consent, 12 participants decided to not continue the experimental procedure and withdraw from the experiment. 46 participants completed the experiment. Following our preregistration exclusion criterion, 1 participant was excluded because the percentage of missed trials was higher than 25% and 3 were removed because the overall accuracy was lower than 55%. Furthermore, 12 did not show a level of familiarity high enough with the presented faces in the first part of the experiment. In the end, the data of 30 participants (17 men and 13 women) was retained for further analysis and the LBA modeling. Ages ranged from 25 to 61 (<span class="math inline">\(M_{age} =\)</span> 39.5, <span class="math inline">\(SD_{age} =\)</span> 10). Following Prolific payment principles, each participant received 9£ for the completion of the study. This experiment was accepted by the ethics committee of the Federal Institute of Technology (ETH) Zurich.</p>
+<p>All participant were recruited on the Prolific platform (<a href="https://www.prolific.com" class="uri">https://www.prolific.com</a>) using the same criteria as Experiment 2. 58 participants started the experiment and after reading the information and consent form 12 participants withdrew from the experiment. Thus 46 participants completed the experiment. Following our preregistered exclusion criterion, 12 did not show a sufficiently high level of familiarity with the famous faces. In addition, 1 participant was excluded because the percentage of missed trials was higher than 25% and 3 were removed because the overall accuracy was lower than 55% or higher than 95%. In the end, the data of 30 participants (17 men and 13 women) were retained for further analysis and LBA modeling. Ages ranged from 25 to 61 (<span class="math inline">\(M_{age} =\)</span> 39.5, <span class="math inline">\(SD_{age} =\)</span> 10). Following Prolific payment principles, each participant received 9£ for the completion of the study.</p>
 </section>
 <section id="stimuli-3" class="level3" data-number="2.5.2">
 <h3 data-number="2.5.2" class="anchored" data-anchor-id="stimuli-3"><span class="header-section-number">2.5.2</span> Stimuli</h3>
-<p>Initially, we planned to use the exact same stimuli as the one used in Experiment 3. However, during the pilot, it was noticed that the “Famous” faces and the “Novel” faces contained differences in low visual features such as brightness, luminosity angle and the resolution of the picture. These differences might have facilitate the categorization between “famous” and “novel” and affected the estimation of our parameters of interest. To avoid that decisions are based on visual features and not on familiarity, it was decided to completely change the face pictures data set for both conditions in Experiment 4. For the “Famous” condition, faces were all taken from <a href="https:://commons.wikimedia.org" class="uri">https:://commons.wikimedia.org</a>. For each of the famous identities (30 men, 30 women), four pictures were selected: one for the rating part of the experiment and three were used in the recognition part. The list of the attributions as well as the URL links to all the pictures can be found in the Supplementary Materials. For the “Novel” condition, face images were taken from the “10K US Adult Faces Database” <span class="citation" data-cites="bainbridgeIntrinsicMemorabilityFace2013">(<a href="#ref-bainbridgeIntrinsicMemorabilityFace2013" role="doc-biblioref">Bainbridge, Isola, and Oliva 2013</a>)</span>. These pictures depict faces in a natural environment, similar to the selected images of the celebrities. 103 faces were selected from this database and used in the recognition part of the experiment. To avoid recognition based on low visual features, we decided to not standardize the brightness and luminosity angle of the entire picture dataset. The rationale behind this decision was to avoid adding modifications to the original image that might facilitate the categorization between the stimuli conditions. The only low level visual feature that we standardized across all the images was the resolution. After cropping, every images was down sampled to a 250 pixels (px) height, a height similar to the original height of the images from “10K US Adult Faces Database”, and grayscaled.</p>
+<p>Initially, we planned to use the exact same stimuli as the one used in Experiment 3. However, during the pilot, it was noticed that the “Famous” faces and the “Novel” faces contained differences in low visual features such as brightness, luminosity angle and the resolution of the picture. These differences might have aided the categorization between “famous” and “novel” stimuli and affected the estimation of our parameters of interest. To avoid that decisions are based on visual features and not on familiarity, we changed the face pictures data set for both conditions in Experiment 4.</p>
+<p>For the “Famous” condition, faces were all taken from <a href="https:://commons.wikimedia.org" class="uri">https:://commons.wikimedia.org</a>. For each of the famous identities (30 men, 30 women), four pictures were selected: one for the rating part of the experiment and three were used in the recognition part. The list of the attributions as well as the URL links to all the pictures can be found in the Supplementary Materials. For the “Novel” condition, face images were taken from the “10K US Adult Faces Database” <span class="citation" data-cites="bainbridgeIntrinsicMemorabilityFace2013">(<a href="#ref-bainbridgeIntrinsicMemorabilityFace2013" role="doc-biblioref">Bainbridge, Isola, and Oliva 2013</a>)</span>. These pictures depict faces in a natural environment, similar to the selected images of the celebrities. 103 faces were selected from this database and used in the recognition part of the experiment.</p>
+<p>To avoid recognition based on low visual features, we decided to not standardize the brightness and luminosity angle of the entire picture dataset. The rationale behind this decision was to avoid adding modifications to the original image that might facilitate the categorization between the stimuli conditions. The only low level visual feature that we standardized across all the images was the resolution. After cropping, every images was down sampled to a 250 pixels (px) height, a height similar to the original height of the images from “10K US Adult Faces Database”, and grayscaled.</p>
 </section>
 <section id="material-3" class="level3" data-number="2.5.3">
 <h3 data-number="2.5.3" class="anchored" data-anchor-id="material-3"><span class="header-section-number">2.5.3</span> Material</h3>
-<p>Given the online nature of this experiment, participants were asked to complete the study using a desktop computer. The experimental procedure has been tested on three different operative systems (PC, Macintosh and Linux), as well as on three different web browsers (Google Chrome, Safari and Firefox). Participants were asked to specifically used these operative systems and these web browsers to ensure a good procedure. We received no complain from participants in regards to an inability to run the experiment on their own device because of technical issues.</p>
+<p>As Experiment 2, since this was an online data collection protocol, participants were asked to complete the study using a desktop computer.</p>
 </section>
 <section id="procedure-3" class="level3" data-number="2.5.4">
 <h3 data-number="2.5.4" class="anchored" data-anchor-id="procedure-3"><span class="header-section-number">2.5.4</span> Procedure</h3>
@@ -688,7 +692,7 @@ Figure&nbsp;4: Experimental procedure of Experiment 3
 <h2 data-number="2.6" class="anchored" data-anchor-id="evidence-accumulation-modeling"><span class="header-section-number">2.6</span> Evidence accumulation modeling</h2>
 <section id="model-specification" class="level3" data-number="2.6.1">
 <h3 data-number="2.6.1" class="anchored" data-anchor-id="model-specification"><span class="header-section-number">2.6.1</span> Model specification</h3>
-<p>A hierarchical LBA model was fit to the data for each experiment separately with model specifications outlines in our preregistrations (<a href="#tbl-model-formula" class="quarto-xref">Table&nbsp;4</a>). LBA models have one accumulator for each response option, with potentially different parameter values. In our design, that meant that for Experiment 1 and 2, there was one accumulator for the “Learned” response and another for the “Novel” response. For Experiment 3 and 4, there was one accumulator for the “Famous” response and another for the “Novel” response. More specifically, for Experiment 1 and 2, threshold was allowed to vary by participants’ response (Learned/Novel) whereas mean drift rate was allowed to vary by the stimulus condition (Learned/Novel) and the match between the accumulator and the stimulus (TRUE/FALSE). If the stimulus was “Learned”, then the accumulator for the “Learned” response would be TRUE, whereas the accumulator for the “Novel” response would be FALSE. The difference between the TRUE and FALSE accumulator represents the quality of the information processing about a decision <span class="citation" data-cites="lewandowskyComputationalModelingCognition2018">(<a href="#ref-lewandowskyComputationalModelingCognition2018" role="doc-biblioref">Lewandowsky and Oberauer 2018</a>)</span>. A greater difference between these accumulators means a greater quality of evidence accumulating towards that decision.</p>
+<p>A hierarchical LBA model was fit to the data with model specifications outlined in our preregistrations (<a href="#tbl-model-formula" class="quarto-xref">Table&nbsp;4</a>). LBA models have one accumulator for each response option, with potentially different parameter values. In our design, that meant that for Experiment 1 and 2, there was one accumulator for the “Learned” response and another for the “Novel” response. For Experiment 3 and 4, there was one accumulator for the “Famous” response and another for the “Novel” response. More specifically, for Experiment 1 and 2, threshold was allowed to vary by participants’ response (Learned/Novel) whereas mean drift rate was allowed to vary by the stimulus condition (Learned/Novel) and the match between the accumulator and the stimulus (TRUE/FALSE). If the stimulus was “Learned”, then the accumulator for the “Learned” response would be TRUE, whereas the accumulator for the “Novel” response would be FALSE. The difference between the TRUE and FALSE accumulator represents the quality of the information processing about a decision <span class="citation" data-cites="lewandowskyComputationalModelingCognition2018">(<a href="#ref-lewandowskyComputationalModelingCognition2018" role="doc-biblioref">Lewandowsky and Oberauer 2018</a>)</span>. A greater difference between these accumulators means a greater quality of evidence accumulating towards that decision.</p>
 <p>For every model, threshold was allowed to vary by response (Novel/Learned for Experiment 1 and 2, Novel/Famous for Experiment 3 and 4). The standard deviation for the true accumulator was allowed to vary by the match factor whereas the the standard deviation for the false accumulator was kept uniform to make the model identifiable <span class="citation" data-cites="donkinGettingMoreAccuracy2009">(<a href="#ref-donkinGettingMoreAccuracy2009" role="doc-biblioref">Donkin et al. 2009</a>)</span>. A single value for the start point (A) and non-decision time (t0) was estimated for our preregistered models but model estimations where these parameters were allowed to vary are described in supplementary materials.</p>
 <div class="cell">
 <div id="tbl-model-formula" class="cell quarto-float quarto-figure quarto-figure-center anchored">
@@ -704,19 +708,19 @@ Table&nbsp;4: Formula specification for the pre-registered linear ballistic accu
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_ydmvzsytfhaase4u7778 = TinyTable.createTableFunctions("tinytable_ydmvzsytfhaase4u7778");
+      const tableFns_heqmkxfa7q0xb8a1t0ph = TinyTable.createTableFunctions("tinytable_heqmkxfa7q0xb8a1t0ph");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '7', j: 1 }, { i: '7', j: 2 }, { i: '7', j: 3 }, { i: '7', j: 4 }, { i: '7', j: 5 }, { i: '7', j: 6 } ], css_id: 'tinytable_css_vxvn3fqy21woa4kepey5',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 } ], css_id: 'tinytable_css_cd3se0ssxdc4p0mj1e8n',}, 
+          { positions: [ { i: '7', j: 1 }, { i: '7', j: 2 }, { i: '7', j: 3 }, { i: '7', j: 4 }, { i: '7', j: 5 }, { i: '7', j: 6 } ], css_id: 'tinytable_css_c7vscm40ih4484axd86e',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 } ], css_id: 'tinytable_css_glkq2cg085z12muqm5al',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_ydmvzsytfhaase4u7778.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_heqmkxfa7q0xb8a1t0ph.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -725,11 +729,11 @@ Table&nbsp;4: Formula specification for the pre-registered linear ballistic accu
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_ydmvzsytfhaase4u7778 td.tinytable_css_vxvn3fqy21woa4kepey5, #tinytable_ydmvzsytfhaase4u7778 th.tinytable_css_vxvn3fqy21woa4kepey5 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_ydmvzsytfhaase4u7778 td.tinytable_css_cd3se0ssxdc4p0mj1e8n, #tinytable_ydmvzsytfhaase4u7778 th.tinytable_css_cd3se0ssxdc4p0mj1e8n {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_heqmkxfa7q0xb8a1t0ph td.tinytable_css_c7vscm40ih4484axd86e, #tinytable_heqmkxfa7q0xb8a1t0ph th.tinytable_css_c7vscm40ih4484axd86e {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_heqmkxfa7q0xb8a1t0ph td.tinytable_css_glkq2cg085z12muqm5al, #tinytable_heqmkxfa7q0xb8a1t0ph th.tinytable_css_glkq2cg085z12muqm5al {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_ydmvzsytfhaase4u7778" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_heqmkxfa7q0xb8a1t0ph" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
         <thead>
               <tr>
@@ -812,10 +816,12 @@ Table&nbsp;4: Formula specification for the pre-registered linear ballistic accu
 <section id="model-estimation" class="level3" data-number="2.6.2">
 <h3 data-number="2.6.2" class="anchored" data-anchor-id="model-estimation"><span class="header-section-number">2.6.2</span> Model estimation</h3>
 <p>We carried out a Bayesian model estimation using the EMC2 R package. Details about the priors of each model are provided in supplementary materials and the code required to run the analyses is available on OSF. Priors were chosen to be weakly-informative meaning that they have little influence on the estimation. The parameter were estimated through two sampling steps. First, a separate estimation of the fixed effects for each participants was conducted. These estimations were used as the starting point for the full hierarchical model.</p>
+<p>Priors here. Model checking here. Refer to plots in Supps.</p>
 </section>
 <section id="data-analysis" class="level3" data-number="2.6.3">
 <h3 data-number="2.6.3" class="anchored" data-anchor-id="data-analysis"><span class="header-section-number">2.6.3</span> Data analysis</h3>
 <p>For every experiment, the separate analysis of response times and accuracy was conducted using Bayesian Multilevel Models with R Package brms <span class="citation" data-cites="brms">(<a href="#ref-brms" role="doc-biblioref">Bürkner 2017</a>)</span>. The evidence-accumulation modelling analyses of the distributions of response times for the correct and wrong answers were realized using the EMC2 R package <span class="citation" data-cites="EMC2">(<a href="#ref-EMC2" role="doc-biblioref">Stevenson, Donzallaz, and Heathcote 2025</a>)</span>. In order to make inference about the magnitude of familiarity effects, differences in parameter estimates across conditions were compared. To summarize the distribution of parameters of interest, we report the median of the posterior distribution together with 95% quantile interval of the posterior distribution in square brackets in the following section.</p>
+<p>We can elaborate here on inferential criteria… RR can do this.</p>
 </section>
 </section>
 </section>
@@ -967,23 +973,23 @@ Table&nbsp;5: Posterior median and 95% quantile intervals for threshold and drif
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_depgkzbcfcf4uq04t3h5 = TinyTable.createTableFunctions("tinytable_depgkzbcfcf4uq04t3h5");
+      const tableFns_2g2q11w8irko7fu5cfrn = TinyTable.createTableFunctions("tinytable_2g2q11w8irko7fu5cfrn");
       // tinytable span after
-      window.addEventListener('load', function () { tableFns_depgkzbcfcf4uq04t3h5.spanCell(15, 1, 1, 4) })
-      window.addEventListener('load', function () { tableFns_depgkzbcfcf4uq04t3h5.spanCell(8, 1, 1, 4) })
-      window.addEventListener('load', function () { tableFns_depgkzbcfcf4uq04t3h5.spanCell(1, 1, 1, 4) })
+      window.addEventListener('load', function () { tableFns_2g2q11w8irko7fu5cfrn.spanCell(15, 1, 1, 4) })
+      window.addEventListener('load', function () { tableFns_2g2q11w8irko7fu5cfrn.spanCell(8, 1, 1, 4) })
+      window.addEventListener('load', function () { tableFns_2g2q11w8irko7fu5cfrn.spanCell(1, 1, 1, 4) })
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '21', j: 1 }, { i: '21', j: 2 }, { i: '21', j: 3 }, { i: '21', j: 4 } ], css_id: 'tinytable_css_g18mwohjuoyln48pq810',}, 
-          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '10', j: 1 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '13', j: 1 }, { i: '14', j: 1 }, { i: '15', j: 1 }, { i: '16', j: 1 }, { i: '17', j: 1 }, { i: '18', j: 1 }, { i: '19', j: 1 }, { i: '20', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '10', j: 2 }, { i: '11', j: 2 }, { i: '12', j: 2 }, { i: '13', j: 2 }, { i: '14', j: 2 }, { i: '15', j: 2 }, { i: '16', j: 2 }, { i: '17', j: 2 }, { i: '18', j: 2 }, { i: '19', j: 2 }, { i: '20', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '10', j: 3 }, { i: '11', j: 3 }, { i: '12', j: 3 }, { i: '13', j: 3 }, { i: '14', j: 3 }, { i: '15', j: 3 }, { i: '16', j: 3 }, { i: '17', j: 3 }, { i: '18', j: 3 }, { i: '19', j: 3 }, { i: '20', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '4', j: 4 }, { i: '5', j: 4 }, { i: '6', j: 4 }, { i: '7', j: 4 }, { i: '8', j: 4 }, { i: '9', j: 4 }, { i: '10', j: 4 }, { i: '11', j: 4 }, { i: '12', j: 4 }, { i: '13', j: 4 }, { i: '14', j: 4 }, { i: '15', j: 4 }, { i: '16', j: 4 }, { i: '17', j: 4 }, { i: '18', j: 4 }, { i: '19', j: 4 }, { i: '20', j: 4 } ], css_id: 'tinytable_css_19y6d6it376d75l0m0xl',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_aunw3jv7pmu3yw5thzpc',}, 
+          { positions: [ { i: '21', j: 1 }, { i: '21', j: 2 }, { i: '21', j: 3 }, { i: '21', j: 4 } ], css_id: 'tinytable_css_evcu272n3id04tnnovqy',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '10', j: 1 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '13', j: 1 }, { i: '14', j: 1 }, { i: '15', j: 1 }, { i: '16', j: 1 }, { i: '17', j: 1 }, { i: '18', j: 1 }, { i: '19', j: 1 }, { i: '20', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '10', j: 2 }, { i: '11', j: 2 }, { i: '12', j: 2 }, { i: '13', j: 2 }, { i: '14', j: 2 }, { i: '15', j: 2 }, { i: '16', j: 2 }, { i: '17', j: 2 }, { i: '18', j: 2 }, { i: '19', j: 2 }, { i: '20', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '10', j: 3 }, { i: '11', j: 3 }, { i: '12', j: 3 }, { i: '13', j: 3 }, { i: '14', j: 3 }, { i: '15', j: 3 }, { i: '16', j: 3 }, { i: '17', j: 3 }, { i: '18', j: 3 }, { i: '19', j: 3 }, { i: '20', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '4', j: 4 }, { i: '5', j: 4 }, { i: '6', j: 4 }, { i: '7', j: 4 }, { i: '8', j: 4 }, { i: '9', j: 4 }, { i: '10', j: 4 }, { i: '11', j: 4 }, { i: '12', j: 4 }, { i: '13', j: 4 }, { i: '14', j: 4 }, { i: '15', j: 4 }, { i: '16', j: 4 }, { i: '17', j: 4 }, { i: '18', j: 4 }, { i: '19', j: 4 }, { i: '20', j: 4 } ], css_id: 'tinytable_css_8xvnns3dlm5w2rx344lj',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_mepsolvbtfyzbbc9u6b1',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_depgkzbcfcf4uq04t3h5.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_2g2q11w8irko7fu5cfrn.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -992,12 +998,12 @@ Table&nbsp;5: Posterior median and 95% quantile intervals for threshold and drif
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_depgkzbcfcf4uq04t3h5 td.tinytable_css_g18mwohjuoyln48pq810, #tinytable_depgkzbcfcf4uq04t3h5 th.tinytable_css_g18mwohjuoyln48pq810 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
-    #tinytable_depgkzbcfcf4uq04t3h5 td.tinytable_css_19y6d6it376d75l0m0xl, #tinytable_depgkzbcfcf4uq04t3h5 th.tinytable_css_19y6d6it376d75l0m0xl { font-size: 0.85em }
-    #tinytable_depgkzbcfcf4uq04t3h5 td.tinytable_css_aunw3jv7pmu3yw5thzpc, #tinytable_depgkzbcfcf4uq04t3h5 th.tinytable_css_aunw3jv7pmu3yw5thzpc {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
+    #tinytable_2g2q11w8irko7fu5cfrn td.tinytable_css_evcu272n3id04tnnovqy, #tinytable_2g2q11w8irko7fu5cfrn th.tinytable_css_evcu272n3id04tnnovqy {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
+    #tinytable_2g2q11w8irko7fu5cfrn td.tinytable_css_8xvnns3dlm5w2rx344lj, #tinytable_2g2q11w8irko7fu5cfrn th.tinytable_css_8xvnns3dlm5w2rx344lj { font-size: 0.85em }
+    #tinytable_2g2q11w8irko7fu5cfrn td.tinytable_css_mepsolvbtfyzbbc9u6b1, #tinytable_2g2q11w8irko7fu5cfrn th.tinytable_css_mepsolvbtfyzbbc9u6b1 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_depgkzbcfcf4uq04t3h5" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_2g2q11w8irko7fu5cfrn" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
         <thead>
               <tr>
@@ -1459,13 +1465,14 @@ Young, Andrew W., and A. Mike Burton. 2018. <span>“Are We Face Experts?”</sp
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy
