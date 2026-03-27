@@ -1,6 +1,6 @@
 # Face Familiarity — Evidence Accumulation Modelling
 
-**Authors:** [Author 1], [Author 2], & Richard Ramsey
+**Authors:** Raphaël Fournier, Paul Downing & Richard Ramsey
 
 **Preprint:** [link]
 
