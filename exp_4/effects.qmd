@@ -51,13 +51,13 @@ exp4_models <- osfr::osf_retrieve_node("65bt2") |>
 local_dir <- here("exp_4", "models")
 if (!dir.exists(local_dir)) dir.create(local_dir, recursive = TRUE)
 
-if (!file.exists(here(local_dir, "LBA_exp4_v1.RData"))) {
+if (!file.exists(here(local_dir, "LBA_exp4.rds"))) {
   exp4_models |>
-    dplyr::filter(name == "LBA_exp4_v1.RData") |>
+    dplyr::filter(name == "LBA_exp4.rds") |>
     osfr::osf_download(path = local_dir, conflicts = "overwrite")
 }
 
-load(here("exp_4", "models", "LBA_exp4_v1.RData"))
+LBA_exp4 <- readRDS("exp_4/models/LBA_exp4.rds")
 ```
 
 # 2. Wrangle posteriors
@@ -71,7 +71,7 @@ param_cols <- c(
   "sv_lMTRUE", "B_lRNovel", "B_lRFamous", "A", "t0"
 )
 
-params  <- EMC2::parameters(LBA_exp4_v1, selection = "alpha", N = NULL)
+params  <- EMC2::parameters(LBA_exp4, selection = "alpha", N = NULL)
 n_pids  <- length(unique(params$subjects))
 n_draws <- nrow(params) / n_pids
 

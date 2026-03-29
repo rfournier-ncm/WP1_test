@@ -74,7 +74,7 @@ matchfun <- function(d) d$S == d$lR
 ```{r}
 #| label: design
 
-design_exp4_v1 <- design(
+design_exp4 <- design(
   data      = data_emc,
   model     = LBA,
   matchfun  = matchfun,
@@ -99,7 +99,7 @@ p_vector <- c(
   A                   = log(.5), t0 = log(.3)
 )
 
-mapped_pars(p_vector, x = design_exp4_v1)
+mapped_pars(p_vector, x = design_exp4)
 ```
 
 ```{r}
@@ -121,14 +121,14 @@ mu_sd <- c(
   A                   = .3, t0 = .3
 )
 
-prior_exp4_v1 <- prior(
-  design_exp4_v1,
+prior_exp4 <- prior(
+  design_exp4,
   type  = "standard",
   pmean = mu_mean,
   psd   = mu_sd
 )
 
-plot(x = prior_exp4_v1)
+plot(x = prior_exp4)
 ```
 
 ## 2.2 Fit model
@@ -137,31 +137,30 @@ plot(x = prior_exp4_v1)
 #| label: fit
 #| eval: false
 
-LBA_exp4_v1 <- make_emc(
+LBA_exp4 <- make_emc(
   data_emc, 
-  design_exp4_v1,
+  design_exp4,
   type = "standard", 
-  prior = prior_exp4_v1,
+  prior = prior_exp4,
   compress = TRUE)
 
-LBA_exp4_v1 <- fit(
-  LBA_exp4_v1,
+LBA_exp4 <- fit(
+  LBA_exp4,
   cores_for_chains = 1,
   cores_per_chain = 24,
   iter            = 5000,
   step_size       = 500,
   verbose         = TRUE,
-  fileName        = here("exp_4", "models", "tmp.RData")
+  fileName        = here("exp_4", "models", "tmp.rds")
 )
 
-save(LBA_exp4_v1, file = here("exp_4", "models", "LBA_exp4_v1.RData"))
-
+saveRDS(LBA_exp4, "exp_4/models/LBA_exp4.rds")
 ```
 
 ```{r}
 #| label: load
 
-load(here("exp_4", "models", "LBA_exp4_v1.RData"))
+LBA_exp4 <- readRDS("exp_4/models/LBA_exp4.rds")
 ```
 
 ## 2.3 Check model
@@ -169,16 +168,16 @@ load(here("exp_4", "models", "LBA_exp4_v1.RData"))
 ```{r}
 #| label: check
 
-check(LBA_exp4_v1)
-summary(LBA_exp4_v1)
-#plot(LBA_exp4_v1)
-#get_pars(LBA_exp4_v1, map = TRUE)
+check(LBA_exp4)
+summary(LBA_exp4)
+#plot(LBA_exp4)
+#get_pars(LBA_exp4, map = TRUE)
 ```
 
 ```{r}
 #| label: plot-pars
 
-plot_pars(LBA_exp4_v1, selection = "mu", layout = c(3, 3))
+plot_pars(LBA_exp4, selection = "mu", layout = c(3, 3))
 ```
 
 ## 2.4 Posterior predictions
@@ -187,19 +186,19 @@ plot_pars(LBA_exp4_v1, selection = "mu", layout = c(3, 3))
 #| label: posterior-predictions
 #| eval: false
 
-pp_LBA_exp4_v1 <- predict(LBA_exp4_v1, n_cores = 24)
-save(pp_LBA_exp4_v1, file = here("exp_4", "models", "pp_LBA_exp4_v1.RData"))
+pp_LBA_exp4 <- predict(LBA_exp4, n_cores = 24)
+saveRDS(pp_LBA_exp4, "exp_4/models/pp_LBA_exp4.rds")
 ```
 
 ```{r}
 #| label: plot-fit
 
-load(here("exp_4", "models", "pp_LBA_exp4_v1.RData"))
+pp_LBA_exp4 <- readRDS("exp_4/models/pp_LBA_exp4.rds")
 
 png("exp_4/figures/pp_density.png", width = 8, height = 6, units = "in", res = 150)
 plot_density(
   data_emc, 
-  pp_LBA_exp4_v1, 
+  pp_LBA_exp4, 
   factors = "S"
 )
 dev.off()
@@ -207,7 +206,7 @@ dev.off()
 png("exp_4/figures/pp_cdf.png", width = 8, height = 6, units = "in", res = 150)
 plot_cdf(
   data_emc,
-  pp_LBA_exp4_v1,  
+  pp_LBA_exp4,  
   factors = "S"
 )
 dev.off()

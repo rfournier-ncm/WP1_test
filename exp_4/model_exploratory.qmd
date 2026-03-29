@@ -67,9 +67,9 @@ Models (if previously computed and necessary)
 ```{r}
 #| label: read-models
 
-# load(here("exp_4", "models", "LBA_exp4_v1_bias.RData"))
-# load(here("exp_4", "models", "LBA_exp4_v1_t0.RData"))
-# load(here("exp_4", "models", "LBA_exp4_v1_full.RData"))
+# LBA_exp4_bias <- readRDS("exp_1/models/LBA_exp4_bias.rds")
+# LBA_exp4_t0 <- readRDS("exp_1/models/LBA_exp4_t0.rds")
+# LBA_exp4_full <- readRDS("exp_1/models/LBA_exp4_full.rds")
 ```
 
 # 2. Shared settings
@@ -134,7 +134,7 @@ prior_bias <- prior(
 #| label: fit-bias
 #| eval: false
 
-LBA_exp4_v1_bias <- make_emc(
+LBA_exp4_bias <- make_emc(
   data_emc, 
   design_bias,
   type = "standard", 
@@ -142,52 +142,52 @@ LBA_exp4_v1_bias <- make_emc(
   compress = TRUE
 )
 
-LBA_exp4_v1_bias <- fit(
-  LBA_exp4_v1_bias,
+LBA_exp4_bias <- fit(
+  LBA_exp4_bias,
   cores_for_chains = 1,
   cores_per_chain = 24,
   iter            = 5000,
   step_size       = 500,
   verbose         = TRUE,
-  fileName        = here("exp_4", "models", "tmp.RData")
+  fileName        = here("exp_4", "models", "tmp.rds")
 )
 
-save(LBA_exp4_v1_bias, file = here("exp_4", "models", "LBA_exp4_v1_bias.RData"))
+saveRDS(LBA_exp4_bias, "exp_4/models/LBA_exp4_bias.rds")
 ```
 
 ```{r}
 #| label: load-bias
 
-load(here("exp_4", "models", "LBA_exp4_v1_bias.RData"))
+LBA_exp4_bias <- readRDS("exp_4/models/LBA_exp4_bias.rds")
 ```
 
 ```{r}
 #| label: check-bias
 
-check(LBA_exp4_v1_bias)
-summary(LBA_exp4_v1_bias)
-#plot(LBA_exp4_v1_bias)
-#get_pars(LBA_exp4_v1_bias, map = TRUE)
+check(LBA_exp4_bias)
+summary(LBA_exp4_bias)
+#plot(LBA_exp4_bias)
+#get_pars(LBA_exp4_bias, map = TRUE)
 ```
 
 ```{r}
 #| label: plot-bias
 
-plot_pars(LBA_exp4_v1_bias, selection = "mu", layout = c(2, 5))
+plot_pars(LBA_exp4_bias, selection = "mu", layout = c(2, 5))
 ```
 
 ```{r}
 #| label: pp-bias
 #| eval: false
 
-pp_bias <- predict(LBA_exp4_v1_bias, n_cores = 24)
-save(pp_bias, file = here("exp_4", "models", "pp_LBA_exp4_v1_bias.RData"))
+pp_bias <- predict(LBA_exp4_bias, n_cores = 24)
+saveRDS(pp_bias, "exp_4/models/pp_LBA_exp4_bias.rds")
 ```
 
 ```{r}
 #| label: plot-fit-bias
 
-load(here("exp_4", "models", "pp_LBA_exp4_v1_bias.RData"))
+pp_bias <- readRDS("exp_4/models/pp_LBA_exp4_bias.rds")
 
 png("exp_4/figures/exploratory/pp_density_bias.png", width = 8, height = 6, units = "in", res = 150)
 plot_density(
@@ -250,7 +250,7 @@ prior_t0 <- prior(
 #| label: fit-t0
 #| eval: false
 
-LBA_exp4_v1_t0 <- make_emc(
+LBA_exp4_t0 <- make_emc(
   data_emc, 
   design_t0,
   type = "standard", 
@@ -258,52 +258,52 @@ LBA_exp4_v1_t0 <- make_emc(
   compress = TRUE
 )
 
-LBA_exp4_v1_t0 <- fit(
-  LBA_exp4_v1_t0,
+LBA_exp4_t0 <- fit(
+  LBA_exp4_t0,
   cores_for_chains = 1,
   cores_per_chain = 24,
   iter            = 5000,
   step_size       = 500,
   verbose         = TRUE,
-  fileName        = here("exp_4", "models", "tmp.RData")
+  fileName        = here("exp_4", "models", "tmp.rds")
 )
 
-save(LBA_exp4_v1_t0, file = here("exp_4", "models", "LBA_exp4_v1_t0.RData"))
+LBA_exp4_t0 <- readRDS("exp_4/models/LBA_exp4_t0.rds")
 ```
 
 ```{r}
 #| label: load-t0
 
-load(here("exp_4", "models", "LBA_exp4_v1_t0.RData"))
+LBA_exp4_t0 <- readRDS("exp_4/models/LBA_exp4_t0.rds")
 ```
 
 ```{r}
 #| label: check-t0
 
-check(LBA_exp4_v1_t0)
-summary(LBA_exp4_v1_t0)
-#plot(LBA_exp4_v1_t0)
-#get_pars(LBA_exp4_v1_t0, map = TRUE)
+check(LBA_exp4_t0)
+summary(LBA_exp4_t0)
+#plot(LBA_exp4_t0)
+#get_pars(LBA_exp4_t0, map = TRUE)
 ```
 
 ```{r}
 #| label: plot-t0
 
-plot_pars(LBA_exp4_v1_t0, selection = "mu", layout = c(2, 5))
+plot_pars(LBA_exp4_t0, selection = "mu", layout = c(2, 5))
 ```
 
 ```{r}
 #| label: pp-t0
 #| eval: false
 
-pp_t0 <- predict(LBA_exp4_v1_t0, n_cores = 24)
-save(pp_t0, file = here("exp_4", "models", "pp_LBA_exp4_v1_t0.RData"))
+pp_t0 <- predict(LBA_exp4_t0, n_cores = 24)
+saveRDS(pp_t0, "exp_4/models/pp_LBA_exp4_t0.rds")
 ```
 
 ```{r}
 #| label: plot-fit-t0
 
-load(here("exp_4", "models", "pp_LBA_exp4_v1_t0.RData"))
+pp_t0 <- readRDS("exp_4/models/pp_LBA_exp4_t0.rds")
 
 png("exp_4/figures/exploratory/pp_density_t0.png", width = 8, height = 6, units = "in", res = 150)
 plot_density(
@@ -365,7 +365,7 @@ prior_full <- prior(
 #| label: fit-full
 #| eval: false
 
-LBA_exp4_v1_full <- make_emc(
+LBA_exp4_full <- make_emc(
   data_emc, 
   design_full,
   type = "standard", 
@@ -373,52 +373,52 @@ LBA_exp4_v1_full <- make_emc(
   compress = TRUE
 )
 
-LBA_exp4_v1_full <- fit(
-  LBA_exp4_v1_full,
+LBA_exp4_full <- fit(
+  LBA_exp4_full,
   cores_for_chains = 1,
   cores_per_chain = 24,
   iter            = 5000,
   step_size       = 500,
   verbose         = TRUE,
-  fileName        = here("exp_4", "models", "tmp.RData")
+  fileName        = here("exp_4", "models", "tmp.rds")
 )
 
-save(LBA_exp4_v1_full, file = here("exp_4", "models", "LBA_exp4_v1_full.RData"))
+saveRDS(LBA_exp4_full, "exp_4/models/LBA_exp4_full.rds")
 ```
 
 ```{r}
 #| label: load-full
 
-load(here("exp_4", "models", "LBA_exp4_v1_full.RData"))
+LBA_exp4_full <- readRDS("exp_4/models/LBA_exp4_full.rds")
 ```
 
 ```{r}
 #| label: check-full
 
-check(LBA_exp4_v1_full)
-summary(LBA_exp4_v1_full)
-#plot(LBA_exp4_v1_full)
-#get_pars(LBA_exp4_v1_full, map = TRUE)
+check(LBA_exp4_full)
+summary(LBA_exp4_full)
+#plot(LBA_exp4_full)
+#get_pars(LBA_exp4_full, map = TRUE)
 ```
 
 ```{r}
 #| label: plot-full
 
-plot_pars(LBA_exp4_v1_full, selection = "mu", layout = c(2, 5))
+plot_pars(LBA_exp4_full, selection = "mu", layout = c(2, 5))
 ```
 
 ```{r}
 #| label: pp-full
 #| eval: false
 
-pp_full <- predict(LBA_exp4_v1_full, n_cores = 24)
-save(pp_full, file = here("exp_4", "models", "pp_LBA_exp4_v1_full.RData"))
+pp_full <- predict(LBA_exp4_full, n_cores = 24)
+saveRDS(pp_full, "exp_4/models/pp_LBA_exp4_full.rds")
 ```
 
 ```{r}
 #| label: plot-fit-full
 
-load(here("exp_4", "models", "pp_LBA_exp4_v1_full.RData"))
+pp_full <- readRDS("exp_4/models/pp_LBA_exp4_full.rds")
 
 png("exp_4/figures/exploratory/pp_density_full.png", width = 8, height = 6, units = "in", res = 150)
 plot_density(
@@ -442,13 +442,13 @@ dev.off()
 ```{r}
 #| label: model-comparison
 
-load(here("exp_4", "models", "LBA_exp4_v1.RData"))
-load(here("exp_4", "models", "LBA_exp4_bias.RData"))
-load(here("exp_4", "models", "LBA_exp4_t0.RData"))
-load(here("exp_4", "models", "LBA_exp4_full.RData"))
+LBA_exp4 <- readRDS("exp_1/models/LBA_exp4.rds")
+LBA_exp4_bias <- readRDS("exp_1/models/LBA_exp4_bias.rds")
+LBA_exp4_t0 <- readRDS("exp_1/models/LBA_exp4_t0.rds")
+LBA_exp4_full <- readRDS("exp_1/models/LBA_exp4_full.rds")
 
 model_list <- list(
-  preregistered = LBA_exp4_v1,
+  preregistered = LBA_exp4,
   bias          = LBA_exp4_bias,
   t0            = LBA_exp4_t0,
   full          = LBA_exp4_full

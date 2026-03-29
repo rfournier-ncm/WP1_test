@@ -51,9 +51,9 @@ exp1_models <- osfr::osf_retrieve_node("65bt2") |>
 
 # download a list of files if missing
 model_files <- c(
-  "LBA_exp1_v1_bias.RData",
-  "LBA_exp1_v1_t0.RData",
-  "LBA_exp1_v1_full.RData"
+  "LBA_exp1_bias.rds",
+  "LBA_exp1_t0.rds",
+  "LBA_exp1_full.rds"
 )
 
 local_dir <- here("exp_1", "models")
@@ -67,9 +67,9 @@ walk(model_files, ~ {
   }
 })
 
-load(here("exp_1", "models", "LBA_exp1_v1_bias.RData"))
-load(here("exp_1", "models", "LBA_exp1_v1_t0.RData"))
-load(here("exp_1", "models", "LBA_exp1_v1_full.RData"))
+LBA_xp1_bias <- readRDS("exp_1/models/LBA_exp1_bias.rds")
+LBA_exp1_t0 <- readRDS("exp_1/models/LBA_exp1_t0.rds")
+LBA_exp1_full <- readRDS("exp_1/models/LBA_exp1_full.rds")
 ```
 
 # 2. Wrangling function
@@ -388,7 +388,7 @@ plot_effects <- function(res, model_name, cond_label = "learned",
 #| label: effects-bias
 
 res_bias <- wrangle_model(
-  model      = LBA_exp1_v1_bias,
+  model      = LBA_exp1_bias,
   param_cols = c(
     "v_SNovel:lMTRUE", "v_SNovel:lMFALSE",
     "v_SLearned:lMTRUE", "v_SLearned:lMFALSE",
@@ -403,7 +403,7 @@ plot_effects(res_bias, model_name = "bias")
 #| label: effects-t0
 
 res_t0 <- wrangle_model(
-  model      = LBA_exp1_v1_t0,
+  model      = LBA_exp1_t0,
   param_cols = c(
     "v_SNovel:lMTRUE", "v_SNovel:lMFALSE",
     "v_SLearned:lMTRUE", "v_SLearned:lMFALSE",
@@ -418,7 +418,7 @@ plot_effects(res_t0, model_name = "t0")
 #| label: effects-full
 
 res_full <- wrangle_model(
-  model      = LBA_exp1_v1_full,
+  model      = LBA_exp1_full,
   param_cols = c(
     "v_SNovel:lMTRUE", "v_SNovel:lMFALSE",
     "v_SLearned:lMTRUE", "v_SLearned:lMFALSE",
