@@ -58,28 +58,41 @@ LBA_exp1 <- readRDS("exp_1/models/LBA_exp1.rds")
 ```{r}
 #| label: wrangle
 
+## col names for map = TRUE
 param_cols <- c(
-  "v_SNovel:lMTRUE", "v_SNovel:lMFALSE",
-  "v_SLearned:lMTRUE", "v_SLearned:lMFALSE",
+  "v_SNovel_lMTRUE", "v_SNovel_lMFALSE",
+  "v_SLearned_lMTRUE", "v_SLearned_lMFALSE",
   "sv_lMTRUE", "B_lRNovel", "B_lRLearned", "A", "t0"
 )
 
-params <- EMC2::parameters(LBA_exp1, selection = "alpha", N = NULL)
+# subject-level — alpha, natural scale, drop constant
+params <- EMC2::parameters(LBA_exp1, selection = "alpha",
+                                  N = NULL, map = TRUE) |>
+  select(-sv_lMFALSE)
 
+# group-level posteriors - mu, natural scale
+params_mu <- EMC2::parameters(LBA_exp1, selection = "mu",
+                               N = NULL, map = TRUE)
+
+# pid-level posteriors
 n_pids  <- length(unique(params$subjects))
 n_draws <- nrow(params) / n_pids
 
-# pid-level posteriors
 theta_pid <- params |>
   as_tibble() |>
   pivot_longer(cols = all_of(param_cols), names_to = "param", values_to = "value") |>
   rename(pid = subjects) |>
   mutate(.draw = rep(1:n_draws, each = length(param_cols), times = n_pids))
 
-# group-level posteriors (average across pids)
-theta_group <- theta_pid |>
-  group_by(.draw, param) |>
-  summarise(value = mean(value, na.rm = TRUE), .groups = "drop")
+# group-level posteriors — mu, natural scale
+n_draws_mu <- nrow(params_mu)
+
+theta_group <- params_mu |>
+  as_tibble() |>
+  mutate(.draw = 1:n_draws_mu) |>
+  pivot_longer(cols = all_of(param_cols), 
+               names_to = "param", 
+               values_to = "value")
 
 # quantiles
 theta_group_q <- theta_group |>
@@ -89,7 +102,6 @@ theta_group_q <- theta_group |>
 theta_pid_q <- theta_pid |>
   group_by(pid, param) |>
   median_qi(value)
-
 ```
 
 # 3. All parameters overview

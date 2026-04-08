@@ -67,7 +67,7 @@ walk(model_files, ~ {
   }
 })
 
-LBA_xp1_bias <- readRDS("exp_1/models/LBA_exp1_bias.rds")
+LBA_exp1_bias <- readRDS("exp_1/models/LBA_exp1_bias.rds")
 LBA_exp1_t0 <- readRDS("exp_1/models/LBA_exp1_t0.rds")
 LBA_exp1_full <- readRDS("exp_1/models/LBA_exp1_full.rds")
 ```
@@ -78,7 +78,11 @@ LBA_exp1_full <- readRDS("exp_1/models/LBA_exp1_full.rds")
 #| label: wrangle-fn
 
 wrangle_model <- function(model, param_cols, cond_label = "learned") {
-  params  <- EMC2::parameters(model, selection = "alpha", N = NULL)
+  # subject-level — alpha, natural scale, drop constant
+  params  <- EMC2::parameters(model, selection = "alpha", 
+                               N = NULL, map = TRUE) |>
+    select(-any_of("sv_lMFALSE"))  # use any_of() in case it's not present
+  
   n_pids  <- length(unique(params$subjects))
   n_draws <- nrow(params) / n_pids
 
@@ -93,10 +97,19 @@ wrangle_model <- function(model, param_cols, cond_label = "learned") {
     rename(pid = subjects) |>
     mutate(.draw = rep(1:n_draws, each = length(param_cols), times = n_pids))
 
-  # group-level posteriors
-  theta_group <- theta_pid |>
-    group_by(.draw, param) |>
-    summarise(value = mean(value, na.rm = TRUE), .groups = "drop")
+  # group-level posteriors — mu, natural scale
+  params_mu  <- EMC2::parameters(model, selection = "mu",
+                                  N = NULL, map = TRUE)
+  n_draws_mu <- nrow(params_mu)
+
+  theta_group <- params_mu |>
+    as_tibble() |>
+    mutate(.draw = 1:n_draws_mu) |>
+    pivot_longer(
+      cols      = all_of(param_cols),
+      names_to  = "param",
+      values_to = "value"
+    )
 
   # helper to recode response/condition labels from param names
   recode_response <- function(param) {
@@ -390,8 +403,8 @@ plot_effects <- function(res, model_name, cond_label = "learned",
 res_bias <- wrangle_model(
   model      = LBA_exp1_bias,
   param_cols = c(
-    "v_SNovel:lMTRUE", "v_SNovel:lMFALSE",
-    "v_SLearned:lMTRUE", "v_SLearned:lMFALSE",
+    "v_SNovel_lMTRUE", "v_SNovel_lMFALSE",
+    "v_SLearned_lMTRUE", "v_SLearned_lMFALSE",
     "sv_lMTRUE", "B_lRNovel", "B_lRLearned",
     "A_lRNovel", "A_lRLearned", "t0"
   )
@@ -405,8 +418,8 @@ plot_effects(res_bias, model_name = "bias")
 res_t0 <- wrangle_model(
   model      = LBA_exp1_t0,
   param_cols = c(
-    "v_SNovel:lMTRUE", "v_SNovel:lMFALSE",
-    "v_SLearned:lMTRUE", "v_SLearned:lMFALSE",
+    "v_SNovel_lMTRUE", "v_SNovel_lMFALSE",
+    "v_SLearned_lMTRUE", "v_SLearned_lMFALSE",
     "sv_lMTRUE", "B_lRNovel", "B_lRLearned",
     "A", "t0_SNovel", "t0_SLearned"
   )
@@ -420,8 +433,8 @@ plot_effects(res_t0, model_name = "t0")
 res_full <- wrangle_model(
   model      = LBA_exp1_full,
   param_cols = c(
-    "v_SNovel:lMTRUE", "v_SNovel:lMFALSE",
-    "v_SLearned:lMTRUE", "v_SLearned:lMFALSE",
+    "v_SNovel_lMTRUE", "v_SNovel_lMFALSE",
+    "v_SLearned_lMTRUE", "v_SLearned_lMFALSE",
     "sv_lMTRUE", "B_lRNovel", "B_lRLearned",
     "A_lRNovel", "A_lRLearned",
     "t0_SNovel", "t0_SLearned"

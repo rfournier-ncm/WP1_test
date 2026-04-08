@@ -150,12 +150,12 @@ LBA_exp2_bias <- make_emc(
 
 LBA_exp2_bias <- fit(
   LBA_exp2_bias,
-  cores_for_chains = 1,
-  cores_per_chain = 24,
+  cores_for_chains = 3,
+  cores_per_chain = 9,
   iter            = 5000,
   step_size       = 500,
   verbose         = TRUE,
-  fileName        = here("exp_2", "models", "tmp.rds")
+  fileName        = here("exp_2", "models", "tmp.RData")
 )
 
 saveRDS(LBA_exp2_bias, "exp_2/models/LBA_exp2_bias.rds")
@@ -267,12 +267,12 @@ LBA_exp2_t0 <- make_emc(
 
 LBA_exp2_t0 <- fit(
   LBA_exp2_t0,
-  cores_for_chains = 1,
-  cores_per_chain = 24,
+  cores_for_chains = 3,
+  cores_per_chain = 9,
   iter            = 5000,
   step_size       = 500,
   verbose         = TRUE,
-  fileName        = here("exp_2", "models", "tmp.rds")
+  fileName        = here("exp_2", "models", "tmp.RData")
 )
 
 LBA_exp2_t0 <- readRDS("exp_2/models/LBA_exp2_t0.rds")
@@ -384,12 +384,12 @@ LBA_exp2_full <- make_emc(
 
 LBA_exp2_full <- fit(
   LBA_exp2_full,
-  cores_for_chains = 1,
-  cores_per_chain = 24,
+  cores_for_chains = 3,
+  cores_per_chain = 9,
   iter            = 5000,
   step_size       = 500,
   verbose         = TRUE,
-  fileName        = here("exp_2", "models", "tmp.rds")
+  fileName        = here("exp_2", "models", "tmp.RData")
 )
 
 saveRDS(LBA_exp2_full, "exp_2/models/LBA_exp2_full.rds")

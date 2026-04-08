@@ -149,8 +149,8 @@ LBA_exp2 <- make_emc(
 
 LBA_exp2 <- fit(
   LBA_exp2,
-  cores_for_chains = 1,
-  cores_per_chain = 24,
+  cores_for_chains = 3,
+  cores_per_chain = 9,
   iter            = 5000,
   step_size       = 500,
   verbose         = TRUE,

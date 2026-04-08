@@ -146,12 +146,12 @@ LBA_exp4 <- make_emc(
 
 LBA_exp4 <- fit(
   LBA_exp4,
-  cores_for_chains = 1,
-  cores_per_chain = 24,
+  cores_for_chains = 3,
+  cores_per_chain = 9,
   iter            = 5000,
   step_size       = 500,
   verbose         = TRUE,
-  fileName        = here("exp_4", "models", "tmp.rds")
+  fileName        = here("exp_4", "models", "tmp.RData")
 )
 
 saveRDS(LBA_exp4, "exp_4/models/LBA_exp4.rds")

@@ -753,7 +753,7 @@ rt_density
 
 ## Evidence accumulation modeling results
 
-For all experiments, posterior distributions for drift rate and threshold parameters are visulaised in @fig-threshold-all and @fig-drift-all and the medians and 95% quantile intervals are summarised in @tbl-lba-params.
+For all experiments, posterior distributions for drift rate and threshold parameters are visualised in @fig-threshold-all and @fig-drift-all and the medians and 95% quantile intervals are summarised in @tbl-lba-params.
 
 ```{r}
 #| label: download-models
@@ -786,9 +786,9 @@ download_if_missing <- function(exp_folder, file_name, local_dir) {
   }
 }
 
-download_if_missing("exp_1", "LBA_exp1_v1.RData", "exp_1/models")
-download_if_missing("exp_2", "LBA_exp2_v1.RData", "exp_2/models")
-download_if_missing("exp_4", "LBA_exp4_v1.RData", "exp_4/models")
+download_if_missing("exp_1", "LBA_exp1.rds", "exp_1/models")
+download_if_missing("exp_2", "LBA_exp2.rds", "exp_2/models")
+download_if_missing("exp_4", "LBA_exp4.rds", "exp_4/models")
 ```
 
 ```{r}
@@ -796,25 +796,27 @@ download_if_missing("exp_4", "LBA_exp4_v1.RData", "exp_4/models")
 #| include: false
 
 wrangle_lba <- function(model, exp_num, cond_label) {
-  # cond_label: "Learned" for Exp 1&2, "Famous" for Exp 4
-  
-  # Extract posterior samples and pivot to long format
-  params <- EMC2::parameters(model, selection = "alpha", N = NULL)
   
   param_cols <- c(
-    paste0("v_SNovel:lMTRUE"),
-    paste0("v_SNovel:lMFALSE"),
-    paste0("v_S", cond_label, ":lMTRUE"),
-    paste0("v_S", cond_label, ":lMFALSE"),
+    "v_SNovel_lMTRUE",
+    "v_SNovel_lMFALSE",
+    paste0("v_S", cond_label, "_lMTRUE"),
+    paste0("v_S", cond_label, "_lMFALSE"),
     "sv_lMTRUE",
     "B_lRNovel",
     paste0("B_lR", cond_label),
     "A", "t0"
   )
   
-  n_pids      <- length(unique(params$subjects))
-  n_draws     <- nrow(params) / n_pids
+  # subject-level — alpha, natural scale, drop constant
+  params <- EMC2::parameters(model, selection = "alpha", 
+                              N = NULL, map = TRUE) |>
+    select(-any_of("sv_lMFALSE"))
   
+  n_pids  <- length(unique(params$subjects))
+  n_draws <- nrow(params) / n_pids
+  
+  # pid-level posteriors
   pid_long <- params |>
     as_tibble() |>
     pivot_longer(
@@ -824,25 +826,77 @@ wrangle_lba <- function(model, exp_num, cond_label) {
     ) |>
     rename(pid = subjects) |>
     mutate(
-      .draw  = rep(1:n_draws, each = length(param_cols), times = n_pids),
+      .draw      = rep(1:n_draws, each = length(param_cols), times = n_pids),
       experiment = exp_num
     )
   
-  # Average across participants to get group level
-  pid_long |>
-    group_by(experiment, .draw, param) |>
-    summarise(value = mean(value, na.rm = TRUE), .groups = "drop")
+  # group-level — mu, natural scale
+  params_mu  <- EMC2::parameters(model, selection = "mu",
+                                  N = NULL, map = TRUE)
+  n_draws_mu <- nrow(params_mu)
+  
+  params_mu |>
+    as_tibble() |>
+    mutate(
+      .draw      = 1:n_draws_mu,
+      experiment = exp_num
+    ) |>
+    pivot_longer(
+      cols      = all_of(param_cols),
+      names_to  = "param",
+      values_to = "value"
+    )
 }
 
+
+# wrangle_lba <- function(model, exp_num, cond_label) {
+#   # cond_label: "Learned" for Exp 1&2, "Famous" for Exp 4
+#   
+#   # Extract posterior samples and pivot to long format
+#   params <- EMC2::parameters(model, selection = "alpha", N = NULL)
+#   
+#   param_cols <- c(
+#     paste0("v_SNovel:lMTRUE"),
+#     paste0("v_SNovel:lMFALSE"),
+#     paste0("v_S", cond_label, ":lMTRUE"),
+#     paste0("v_S", cond_label, ":lMFALSE"),
+#     "sv_lMTRUE",
+#     "B_lRNovel",
+#     paste0("B_lR", cond_label),
+#     "A", "t0"
+#   )
+#   
+#   n_pids      <- length(unique(params$subjects))
+#   n_draws     <- nrow(params) / n_pids
+#   
+#   pid_long <- params |>
+#     as_tibble() |>
+#     pivot_longer(
+#       cols      = all_of(param_cols),
+#       names_to  = "param",
+#       values_to = "value"
+#     ) |>
+#     rename(pid = subjects) |>
+#     mutate(
+#       .draw  = rep(1:n_draws, each = length(param_cols), times = n_pids),
+#       experiment = exp_num
+#     )
+#   
+#   # Average across participants to get group level
+#   pid_long |>
+#     group_by(experiment, .draw, param) |>
+#     summarise(value = mean(value, na.rm = TRUE), .groups = "drop")
+# }
+# 
 # Load models and wrangle
-load(here("exp_1/models/LBA_exp1_v1.RData"))
-load(here("exp_2/models/LBA_exp2_v1.RData"))
-load(here("exp_4/models/LBA_exp4_v1.RData"))
+LBA_exp1 <- readRDS(here("exp_1", "models", "LBA_exp1.rds"))
+LBA_exp2 <- readRDS(here("exp_2", "models", "LBA_exp2.rds"))
+LBA_exp4 <- readRDS(here("exp_4", "models", "LBA_exp4.rds"))
 
 theta_all <- bind_rows(
-  wrangle_lba(LBA_exp1_v1, 1, "Learned"),
-  wrangle_lba(LBA_exp2_v1, 2, "Learned"),
-  wrangle_lba(LBA_exp4_v1, 4, "Famous")
+  wrangle_lba(LBA_exp1, 1, "Learned"),
+  wrangle_lba(LBA_exp2, 2, "Learned"),
+  wrangle_lba(LBA_exp4, 4, "Famous")
 )
 ```
 

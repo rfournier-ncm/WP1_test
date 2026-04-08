@@ -144,12 +144,12 @@ LBA_exp4_bias <- make_emc(
 
 LBA_exp4_bias <- fit(
   LBA_exp4_bias,
-  cores_for_chains = 1,
-  cores_per_chain = 24,
+  cores_for_chains = 3,
+  cores_per_chain = 9,
   iter            = 5000,
   step_size       = 500,
   verbose         = TRUE,
-  fileName        = here("exp_4", "models", "tmp.rds")
+  fileName        = here("exp_4", "models", "tmp.RData")
 )
 
 saveRDS(LBA_exp4_bias, "exp_4/models/LBA_exp4_bias.rds")
@@ -260,12 +260,12 @@ LBA_exp4_t0 <- make_emc(
 
 LBA_exp4_t0 <- fit(
   LBA_exp4_t0,
-  cores_for_chains = 1,
-  cores_per_chain = 24,
+  cores_for_chains = 3,
+  cores_per_chain = 9,
   iter            = 5000,
   step_size       = 500,
   verbose         = TRUE,
-  fileName        = here("exp_4", "models", "tmp.rds")
+  fileName        = here("exp_4", "models", "tmp.RData")
 )
 
 LBA_exp4_t0 <- readRDS("exp_4/models/LBA_exp4_t0.rds")
@@ -375,12 +375,12 @@ LBA_exp4_full <- make_emc(
 
 LBA_exp4_full <- fit(
   LBA_exp4_full,
-  cores_for_chains = 1,
-  cores_per_chain = 24,
+  cores_for_chains = 3,
+  cores_per_chain = 9,
   iter            = 5000,
   step_size       = 500,
   verbose         = TRUE,
-  fileName        = here("exp_4", "models", "tmp.rds")
+  fileName        = here("exp_4", "models", "tmp.RData")
 )
 
 saveRDS(LBA_exp4_full, "exp_4/models/LBA_exp4_full.rds")
