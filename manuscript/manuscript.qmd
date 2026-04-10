@@ -248,8 +248,6 @@ participant_summary <- bind_rows(
   tibble(
     Experiment               = "Experiment 1",
     Setting                  = "Lab",
-    Started                  = excl_exp1$started,
-    Withdrew                 = excl_exp1$withdrew,
     Completed                = excl_exp1$completed,
     `RT exclusions`          = excl_exp1$exclude_rt,
     `Accuracy exclusions`    = excl_exp1$exclude_acc,
@@ -263,8 +261,6 @@ participant_summary <- bind_rows(
   tibble(
     Experiment               = "Experiment 2",
     Setting                  = "Online",
-    Started                  = excl_exp2$started,
-    Withdrew                 = excl_exp2$withdrew,
     Completed                = excl_exp2$completed,
     `RT exclusions`          = excl_exp2$exclude_rt,
     `Accuracy exclusions`    = excl_exp2$exclude_acc,
@@ -278,8 +274,6 @@ participant_summary <- bind_rows(
   tibble(
     Experiment               = "Experiment 3",
     Setting                  = "Lab",
-    Started                  = excl_exp3$started,
-    Withdrew                 = excl_exp3$withdrew,
     Completed                = excl_exp3$completed,
     `RT exclusions`          = excl_exp3$exclude_rt,
     `Accuracy exclusions`    = excl_exp3$exclude_acc,
@@ -293,8 +287,6 @@ participant_summary <- bind_rows(
   tibble(
     Experiment               = "Experiment 4",
     Setting                  = "Online",
-    Started                  = excl_exp4$started,
-    Withdrew                 = excl_exp4$withdrew,
     Completed                = excl_exp4$completed,
     `RT exclusions`          = excl_exp4$exclude_rt,
     `Accuracy exclusions`    = excl_exp4$exclude_acc,
@@ -314,8 +306,6 @@ exp3_row <- participant_summary |> filter(Experiment == "Experiment 3")
 exp4_row <- participant_summary |> filter(Experiment == "Experiment 4")
 
 # Exp 1
-started_exp1        <- as.integer(exp1_row$Started)
-withdrew_exp1       <- as.integer(exp1_row$Withdrew)
 completed_exp1      <- as.integer(exp1_row$Completed)
 exclude_rt_exp1     <- as.integer(exp1_row$`RT exclusions`)
 exclude_acc_exp1    <- as.integer(exp1_row$`Accuracy exclusions`)
@@ -328,8 +318,6 @@ min_age_exp1        <- min(demo_exp1$age)
 max_age_exp1        <- max(demo_exp1$age)
 
 # Exp 2
-started_exp2        <- as.integer(exp2_row$Started)
-withdrew_exp2       <- as.integer(exp2_row$Withdrew)
 completed_exp2      <- as.integer(exp2_row$Completed)
 exclude_rt_exp2     <- as.integer(exp2_row$`RT exclusions`)
 exclude_acc_exp2    <- as.integer(exp2_row$`Accuracy exclusions`)
@@ -342,8 +330,6 @@ min_age_exp2        <- min(demo_exp2$age)
 max_age_exp2        <- max(demo_exp2$age)
 
 # Exp 3
-started_exp3         <- as.integer(exp3_row$Started)
-withdrew_exp3        <- as.integer(exp3_row$Withdrew)
 completed_exp3       <- as.integer(exp3_row$Completed)
 exclude_rt_exp3      <- as.integer(exp3_row$`RT exclusions`)
 exclude_acc_exp3     <- as.integer(exp3_row$`Accuracy exclusions`)
@@ -359,8 +345,6 @@ min_age_exp3         <- min(demo_exp3$age)
 max_age_exp3         <- max(demo_exp3$age)
 
 # Exp 4
-started_exp4         <- as.integer(exp4_row$Started)
-withdrew_exp4        <- as.integer(exp4_row$Withdrew)
 completed_exp4       <- as.integer(exp4_row$Completed)
 exclude_rt_exp4      <- as.integer(exp4_row$`RT exclusions`)
 exclude_acc_exp4     <- as.integer(exp4_row$`Accuracy exclusions`)
@@ -380,7 +364,7 @@ max_age_exp4         <- max(demo_exp4$age)
 
 All participants were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. Sample size was determined in advance. Following previous suggestions from @heathcoteDynamicModelsChoice2019, a parameter recovery study was run to estimate if 30 usable participant datasets were sufficient to accurately recover the parameter estimates. The parameter recovery study included 30 participant datasets, each with 180 trials (90 trials "familiar" and 90 trials "unfamiliar") and with our selected model parameterisation. The arameters were sufficiently well-recovered to suggest the combination of data and design were a reasonable choice (See Supplementary Materials). 
 
-`r started_exp1` healthy participants took part in Experiment 1 (@tbl-participants). All participants reported normal or corrected-to-normal vision and received payment (20 CHF) for participating in the experiment. Based on our preregistration, response times longer than 2.5 seconds were removed from the analysis. However, this cutoff value led to the the removal of 59% of the trials of one participant. Given the recommendation of having a certain number of trials per condition per participant when using evidence-accumulation models [@heathcoteDynamicModelsChoice2019; @parker2024], this participant was excluded from the data analysis. In the end, the data of `r final_n_exp1` participants (`r male_exp1` men and `r female_exp1` women) was retained for the analysis and the LBA modeling. Ages ranged from `r min_age_exp1` to `r max_age_exp1` years old ($M_{age} =$ `r mean_age_exp1`, $SD_{age} =$ `r sd_age_exp1`). All experiments in this paper were approved by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.
+`r completed_exp1` healthy participants completed Experiment 1 (@tbl-participants). All participants reported normal or corrected-to-normal vision and received payment (20 CHF) for participating in the experiment. Based on our preregistration, response times longer than 2.5 seconds were removed from the analysis. However, this cutoff value led to the the removal of 59% of the trials of one participant. Given the recommendation of having a certain number of trials per condition per participant when using evidence-accumulation models [@heathcoteDynamicModelsChoice2019; @parker2024], this participant was excluded from the data analysis. In the end, the data of `r final_n_exp1` participants (`r male_exp1` men and `r female_exp1` women) was retained for the analysis and the LBA modeling. Ages ranged from `r min_age_exp1` to `r max_age_exp1` years old ($M_{age} =$ `r mean_age_exp1`, $SD_{age} =$ `r sd_age_exp1`). All experiments in this paper were approved by the ethics committee of the Federal Institute of Technology Zurich (ETHZ), and all participant gave their informed consent to participate in the study.
 
 ```{r}
 #| label: tbl-participants
@@ -418,7 +402,7 @@ In the recognition part, participants completed three blocks of 90 recognition t
 
 ### Participants
 
-All participant were recruited on the Prolific platform (<https://www.prolific.com>). Participants had to be located in the United Kingdom or in the United States, be aged between 18-65 years old, with normal or corrected-to-normal vision and speak fluent English. Furthermore, Prolific offers the option to chose the approval rate of the participants willing to take part in the study. The approval rate is the percentage for which participants has been approved in previous experiment. An approval rating between 95% and 100% was chosen in our study to try to ensure high data quality. `r started_exp2` participants started the experiment and nobody withdrew. Following our preregistered exclusion criterion, `r exclude_rt_exp2` participants were excluded because their percentage of missed trials was higher than 25% and `r exclude_acc_exp2` was removed because the overall accuracy was lower than 55%. In the end, data from `r final_n_exp2` participants (`r male_exp2` men and `r female_exp2` women) were retained for the analysis and the LBA modeling. Ages ranged from `r min_age_exp2` to `r max_age_exp2` ($M_{age} =$ `r mean_age_exp2`, $SD_{age} =$ `r sd_age_exp2`). Following Prolific payment principles, each participant received 9£ for the completion of the study. 
+All participant were recruited on the Prolific platform (<https://www.prolific.com>). Participants had to be located in the United Kingdom or in the United States, be aged between 18-65 years old, with normal or corrected-to-normal vision and speak fluent English. Furthermore, Prolific offers the option to chose the approval rate of the participants willing to take part in the study. The approval rate is the percentage for which participants has been approved in previous experiment. An approval rating between 95% and 100% was chosen in our study to try to ensure high data quality. `r completed_exp2` participants completed Experiment 2. Following our preregistered exclusion criterion, `r exclude_rt_exp2` participants were excluded because their percentage of missed trials was higher than 25% and `r exclude_acc_exp2` was removed because the overall accuracy was lower than 55%. In the end, data from `r final_n_exp2` participants (`r male_exp2` men and `r female_exp2` women) were retained for the analysis and the LBA modeling. Ages ranged from `r min_age_exp2` to `r max_age_exp2` ($M_{age} =$ `r mean_age_exp2`, $SD_{age} =$ `r sd_age_exp2`). Following Prolific payment principles, each participant received 9£ for the completion of the study. 
 
 ### Stimuli
 
@@ -438,7 +422,7 @@ Regarding the experimental procedure, it was almost identical to the one used in
 
 ### Participants
 
-All participant were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. `r started_exp3` healthy participants took part in Experiment 3. We deviated from our preregistration in one way. Since this experiment was conducted to investigate how highly familiar faces affect the computational processes of face recognition, we had to remove `r exclude_ratings_exp3` more participants who did not show a level of familiarity high enough with the presented faces in the first part of the experiment. This scenario did not occur during the pilot experiments we conducted and thus was not part of our preregistration. 
+All participant were recruited using either an online recruiting platform (<https://marktplatz.uzhalumni.ch>) or via a mailing list dedicated to students from the Department of Psychology of the University of Zurich. `r completed_exp3` healthy participants completed Experiment 3. We deviated from our preregistration in one way. Since this experiment was conducted to investigate how highly familiar faces affect the computational processes of face recognition, we had to remove `r exclude_ratings_exp3` more participants who did not show a level of familiarity high enough with the presented faces in the first part of the experiment. This scenario did not occur during the pilot experiments we conducted and thus was not part of our preregistration. 
 
 Based on our preregistered criteria, a further participant was excluded from further data analysisdue to an overall recognition accuracy larger than 95%. In the end, the data of `r final_n_exp3` participants (`r male_exp3` men and `r female_exp3` women) were retained for further analysis and LBA modeling. Ages ranged from `r min_age_exp3` to `r max_age_exp3` years old ($M_{age} =$ `r mean_age_exp3`, $SD_{age} =$ `r sd_age_exp3`). All participants reported normal or corrected-to-normal vision and received payment (25 CHF) for participating in the experiment. 
 
@@ -474,7 +458,7 @@ The experimental task was divided into two distinct parts: a rating part and a r
 
 ### Participants
 
-All participant were recruited on the Prolific platform (<https://www.prolific.com>) using the same criteria as Experiment 2. `r started_exp4` participants started the experiment and after reading the information and consent form `r withdrew_exp4` participants withdrew from the experiment. Thus `r completed_exp4` participants completed the experiment. Following our preregistered exclusion criterion, `r exclude_ratings_exp4` did not show a sufficiently high level of familiarity with the famous faces. In addition, `r exclude_rt_exp4` participant was excluded because the percentage of missed trials was higher than 25% and `r exclude_acc_exp4` were removed because the overall accuracy was lower than 55% or higher than 95%. In the end, the data of `r final_n_exp4` participants (`r male_exp4` men and `r female_exp4` women) were retained for further analysis and LBA modeling. Ages ranged from `r min_age_exp4` to `r max_age_exp4` ($M_{age} =$ `r mean_age_exp4`, $SD_{age} =$ `r sd_age_exp4`). Following Prolific payment principles, each participant received 9£ for the completion of the study. 
+All participant were recruited on the Prolific platform (<https://www.prolific.com>) using the same criteria as Experiment 2. `r completed_exp4` participants completed Experiment 4. Following our preregistered exclusion criterion, `r exclude_ratings_exp4` did not show a sufficiently high level of familiarity with the famous faces. In addition, `r exclude_rt_exp4` participant was excluded because the percentage of missed trials was higher than 25% and `r exclude_acc_exp4` were removed because the overall accuracy was lower than 55% or higher than 95%. In the end, the data of `r final_n_exp4` participants (`r male_exp4` men and `r female_exp4` women) were retained for further analysis and LBA modeling. Ages ranged from `r min_age_exp4` to `r max_age_exp4` ($M_{age} =$ `r mean_age_exp4`, $SD_{age} =$ `r sd_age_exp4`). Following Prolific payment principles, each participant received 9£ for the completion of the study. 
 
 ### Stimuli
 
@@ -622,18 +606,23 @@ acc_plot_data <- acc_all |> semi_join(exp_conds, by = c("experiment", "cond"))
 
 ## paired plots for summarised RT and accuracy data
 paired_plot <- function(df, yvar, ylab, ylims) {
+  
+  # set consistent jitter for dots and lines
+  pos <- position_jitter(width = 0.06, height = 0, seed = 123)
+  
   ggplot(df, aes(x = cond, y = {{ yvar }}, 
                  fill = cond, colour = cond)) +
     # per-participant lines
     geom_line(
       aes(group = pid),
+      position = pos,
       colour    = "grey70",
       linewidth = 0.3,
       alpha     = 0.5
     ) +
     # per-participant dots
     geom_point(
-      position = position_jitter(width = 0.06, height = 0, seed = 123),
+      position = pos,
       alpha    = 0.5,
       size     = 1.5
     ) +
