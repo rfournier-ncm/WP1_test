@@ -188,3 +188,7 @@ ok, a bunch of things to check:
 - Exp 4 — original data pipeline to verify whether final n should be 30 or 31?
 - Exp 3/4 exclusion ordering — confirm ratings-first (Exp 3) vs RT-first (Exp 4) is scientifically justified, or standardise to a common workflow
 - Exp 2/4 models may need refitting once original data files are confirmed.
+
+# July 9th
+- Introduction changes: I removed brain areas and neuroscience mentions in the introduction since we don't come back to them in the discussion
+- Need to add a reason for the different viewing points + colorimetry during the familiarization

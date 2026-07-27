@@ -121,9 +121,9 @@ pd2 <- position_dodge(1)
 
 The ability to quickly and accurately recognise a familiar face is an important aspect of everyday life, as it guides social behaviour. The way that one might interact with a family member or friend is different to a stranger. Moreover, for familiar individuals, we not only know what they look like, but we also have access to person knowledge, such as their traits, attitudes, name and professional status. To date, most prior face recognition research has used manifest (observed) measures (i.e., response times and accuracy) to assess one's ability to recognise faces. As such, less is known about the latent computational processes that support face recognition [@phillipsStateModellingFace2025]. In the current project, we investigated how different types of familiarity, including visual feature familiarity and stored person knowledge, affected the latent processes that can be estimated by evidence accumulation models (EAMs; @ratcliffModelingResponseTimes1998). This computational approach has provided new insights on the dynamics of the decision process supporting face recognition.
 
-The structure of mental processes that support face recognition has been a topic of investigation over the last 50 years [@johnstonFamiliarUnfamiliarFace2009; @natuNeuralProcessingFamiliar2011]. One influential cognitive model of face recognition proposed a division between structural encoding of facial features, and more elaborate processes associated with identity recognition and person information [@bruceUnderstandingFaceRecognition1986]. Subsequent neuroscience research in humans and monkeys has enriched this model by relating different cognitive processes to different brain circuits [@landiFastLinkFace2021 @gobbiniNeuralResponseVisual2006; @gobbiniNeuralSystemsRecognition2007; @haxbyDistributedHumanNeural2000; @duchaineRevisedNeuralFramework2015]. The resulting model is a distributed neural network that incorporates two distinct systems: a core system and an extended system. The core system is dedicated to structural coding of facial features and spans fusiform gryi, as well as occipital and posterior temporal cortices. In contrast, the extended system is involved in more elaborate processes, such as those related to person knowledge, and is mediated by a broader network of brains areas spanning anterior temporal and frontal cortices [@duchaineRevisedNeuralFramework2015; @gobbiniNeuralSystemsRecognition2007; @haxbyDistributedHumanNeural2000; @ishaiLetsFaceIt2008; @kanwisher111FunctionalArchitecture2011]. By mediating the retrieval of identity-specific information from memory, the extended system is able to support the recognition of faces for which prior person knowledge information has been stored [@idagobbiniSocialEmotionalAttachment2004; @leibenluftMothersNeuralActivation2004].
+The structure of mental processes that support face recognition has been a topic of investigation over the last 50 years [@johnstonFamiliarUnfamiliarFace2009; @natuNeuralProcessingFamiliar2011]. One influential cognitive model of face recognition proposed a division between structural encoding of facial features, and more elaborate processes associated with identity recognition and person information [@bruceUnderstandingFaceRecognition1986]. Subsequent neuroscience research in humans and monkeys has enriched this model by relating different cognitive processes to different brain circuits [@landiFastLinkFace2021 @gobbiniNeuralResponseVisual2006; @gobbiniNeuralSystemsRecognition2007; @haxbyDistributedHumanNeural2000; @duchaineRevisedNeuralFramework2015]. The resulting model is a distributed neural network that incorporates two distinct systems: a core system and an extended system. The core system is dedicated to structural coding of facial features. In contrast, the extended system is involved in more elaborate processes, such as those related to person knowledge [@duchaineRevisedNeuralFramework2015; @gobbiniNeuralSystemsRecognition2007; @haxbyDistributedHumanNeural2000; @ishaiLetsFaceIt2008; @kanwisher111FunctionalArchitecture2011]. By mediating the retrieval of identity-specific information from memory, the extended system is able to support the recognition of faces for which prior person knowledge information has been stored [@idagobbiniSocialEmotionalAttachment2004; @leibenluftMothersNeuralActivation2004].
 
-Given the importance of knowing who it is you are interacting with, the study of familiarity has been a key aspect of the face perception research [@youngAreWeFace2018]. Largely using manifest measures, such as reaction time and accuracy, research consistently shows that familiar faces, especially those imbued with person knowledge, facilitate a range of face recognition processes compared to previously unseen individuals or visually familiar faces [@ramonFamiliarityMattersReview2018; @youngAreWeFace2018]. It has been argued that person knowledge involves a qualitatively different and deeper level of processing than visual familiarity [@schwartzIndependentContributionPerceptual2019], which facilitates the accurate discrimination of familiar from unfamiliar faces [@akanHaventSeenYou2023; @schwartzRolesPerceptualConceptual2016; @akanHaventSeenYou2023; @birdEffectsPreexperimentalKnowledge2011; @klatzkyRecognizingFamiliarUnfamiliar1984; @schwaningerRoleFeaturalConfigural2002].
+Given the importance of knowing who it is you are interacting with, the study of familiarity has been a key aspect of the face perception research [@youngAreWeFace2018]. Largely using manifest measures, such as response time and accuracy, research consistently shows that familiar faces, especially those imbued with person knowledge, facilitate a range of face recognition processes compared to previously unseen individuals or visually familiar faces [@ramonFamiliarityMattersReview2018; @youngAreWeFace2018]. It has been argued that person knowledge involves a qualitatively different and deeper level of processing than visual familiarity [@schwartzIndependentContributionPerceptual2019], which facilitates the accurate discrimination of familiar from unfamiliar faces [@akanHaventSeenYou2023; @schwartzRolesPerceptualConceptual2016; @akanHaventSeenYou2023; @birdEffectsPreexperimentalKnowledge2011; @klatzkyRecognizingFamiliarUnfamiliar1984; @schwaningerRoleFeaturalConfigural2002].
 
 Although manifest (observed) measures of performance have formed the bedrock of research findings on face perception, there have been many calls in recent years to embrace more computational approaches in social and cognitive neuroscience research [@charpentierApplicationComputationalModels2018; @forstmannIntroductionModelBasedCognitive2024a; @hackelComputationalNeuroscienceApproaches2018; @lockwoodComputationalModellingSocial2021; @parker2024; @phillipsStateModellingFace2025] (Cheong et al., 2017). One benefit of adopting computational approaches is that relationships between parts of a system can be more explicitly specified [@yarkoniGeneralizabilityCrisis2022] (Hintzman, 1991), which aids the development of theory [@muthukrishnaProblemTheory2019; @oberauerAddressingTheoryCrisis2019; @proulxStatisticalRitualTheory2021]. A second benefit is that latent (unobserved) parameters can be estimated, which can give rise to different interpretations of the cognitive processes involved in task performance [@ratcliffEffectsAgingReaction2001]. And at present, there is almost no understanding of the computational processes that support face recognition processes when familiarity is based on visual exposure compared to stored person knowledge [@phillipsStateModellingFace2025].
 
@@ -186,6 +186,7 @@ exp_details <- tribble(
   "2", "online", "visual", "visual exposure vs unknown", "core",
   "3", "laboratory", "visual & person knowledge", "famous vs unknown", "core & extended",
   "4", "online", "visual & person knowledge", "famous vs unknown", "core & extended",
+  "5", "online", "visual & person knowledge", "famous vs unknown", "core & extended",
 )
 ```
 
@@ -201,7 +202,7 @@ exp_details |>
 
 ## Pre-registration and open science
 
-We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures in the four experiments [@simonsConstraintsGeneralityCOG2017]. For each experiment, the research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered (Experiment 1: <https://osf.io/azyvu/overview>); Experiment 2: <https://osf.io/tu2eh/overview>; Experiment 3: <https://osf.io/ut78f/overview>; Experiment 4 <https://osf.io/vj2aq/overview>. The raw data, experimental materials, and analysis code are available on GitHub (link) or the Open Science Framework (link).
+We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures in the four experiments [@simonsConstraintsGeneralityCOG2017]. For each experiment, the research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered ((Experiment 1: <https://osf.io/azyvu/overview>); (Experiment 2: <https://osf.io/tu2eh/overview>); (Experiment 3: <https://osf.io/ut78f/overview>); (Experiment 4 <https://osf.io/vj2aq/overview>)  and (Experiment 5 <https://osf.io/6tqxw/overview>). The raw data, experimental materials, and analysis code are available on GitHub (link) or the Open Science Framework (link).
 
 ```{r}
 #| label: exclusions-all
@@ -211,16 +212,20 @@ data_exp1 <- read_csv(here("exp_1", "data", "data_exp_1.csv"))
 data_exp2 <- read_csv(here("exp_2", "data", "data_exp_2.csv"))
 data_exp3 <- read_csv(here("exp_3", "data", "data_exp_3.csv"))
 data_exp4 <- read_csv(here("exp_4", "data", "data_exp_4.csv"))
+data_exp5 <- read_csv(here("exp_5", "data", "data_exp_5.csv"))
 
 excl_exp1 <- read_csv(here("exp_1", "data", "exclusions_exp_1.csv"))
 excl_exp2 <- read_csv(here("exp_2", "data", "exclusions_exp_2.csv"))
 excl_exp3 <- read_csv(here("exp_3", "data", "exclusions_exp_3.csv"))
 excl_exp4 <- read_csv(here("exp_4", "data", "exclusions_exp_4.csv"))
+excl_exp5 <- read_csv(here("exp_5", "data", "exclusions_exp_5.csv"))
+
 
 list_participant_analysis_1 <- data_exp1 |> distinct(pid) |> pull(pid)
 list_participant_analysis_2 <- data_exp2 |> distinct(pid) |> pull(pid)
 list_participant_analysis_3 <- data_exp3 |> distinct(pid) |> pull(pid)
 list_participant_analysis_4 <- data_exp4 |> distinct(pid) |> pull(pid)
+list_participant_analysis_5 <- data_exp5 |> distinct(pid) |> pull(pid)
 ```
 
 ```{r}
@@ -231,6 +236,8 @@ demo_exp1 <- read_csv(here("exp_1", "data", "demo_exp_1_clean.csv"))
 demo_exp2 <- read_csv(here("exp_2", "data", "demo_exp_2_clean.csv"))
 demo_exp3 <- read_csv(here("exp_3", "data", "demo_exp_3_clean.csv"))
 demo_exp4 <- read_csv(here("exp_4", "data", "demo_exp_4_clean.csv"))
+demo_exp5 <- read_csv(here("exp_5", "data", "demo_exp_5_clean.csv"))
+
 
 # Exp 1 inline text scalar
 rt_exp_1  <- read_csv(here("exp_1", "data", "raw_data_exp_1.csv"))
@@ -296,6 +303,19 @@ participant_summary <- bind_rows(
     Male                     = sum(demo_exp4$gender == "Male"),
     `Mean age (SD)`          = paste0(round(mean(demo_exp4$age), 1), " (",
                                       round(sd(demo_exp4$age), 1), ")")
+  ),
+  tibble(
+    Experiment               = "Experiment 5",
+    Setting                  = "Online",
+    Completed                = excl_exp5$completed,
+    `RT exclusions`          = excl_exp5$exclude_rt,
+    `Accuracy exclusions`    = excl_exp5$exclude_acc,
+    `Familiarity exclusions` = as.character(excl_exp4$exclude_ratings),
+    `Final n`                = excl_exp5$final_n,
+    Female                   = sum(demo_exp5$gender == "Female"),
+    Male                     = sum(demo_exp5$gender == "Male"),
+    `Mean age (SD)`          = paste0(round(mean(demo_exp5$age), 1), " (",
+                                      round(sd(demo_exp5$age), 1), ")")
   )
 )
 
@@ -304,6 +324,8 @@ exp1_row <- participant_summary |> filter(Experiment == "Experiment 1")
 exp2_row <- participant_summary |> filter(Experiment == "Experiment 2")
 exp3_row <- participant_summary |> filter(Experiment == "Experiment 3")
 exp4_row <- participant_summary |> filter(Experiment == "Experiment 4")
+exp5_row <- participant_summary |> filter(Experiment == "Experiment 5")
+
 
 # Exp 1
 completed_exp1      <- as.integer(exp1_row$Completed)
@@ -356,6 +378,21 @@ mean_age_exp4        <- as.numeric(str_extract(exp4_row$`Mean age (SD)`, "^[0-9.
 sd_age_exp4          <- as.numeric(str_extract(exp4_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
 min_age_exp4         <- min(demo_exp4$age)
 max_age_exp4         <- max(demo_exp4$age)
+
+# Exp 5
+completed_exp5       <- as.integer(exp5_row$Completed)
+exclude_rt_exp5      <- as.integer(exp5_row$`RT exclusions`)
+exclude_acc_exp5     <- as.integer(exp5_row$`Accuracy exclusions`)
+exclude_ratings_exp5 <- as.integer(exp5_row$`Familiarity exclusions`)
+over_95_exp5         <- as.integer(excl_exp5$over_95)
+under_55_exp5        <- as.integer(excl_exp5$under_55)
+final_n_exp5         <- as.integer(exp5_row$`Final n`)
+male_exp5            <- as.integer(exp5_row$Male)
+female_exp5          <- as.integer(exp5_row$Female)
+mean_age_exp5        <- as.numeric(str_extract(exp5_row$`Mean age (SD)`, "^[0-9.]+"))
+sd_age_exp5          <- as.numeric(str_extract(exp5_row$`Mean age (SD)`, "(?<=\\().*(?=\\))"))
+min_age_exp5         <- min(demo_exp5$age)
+max_age_exp5         <- max(demo_exp5$age)
 ```
 
 ## Experiment 1
@@ -386,7 +423,7 @@ Stimuli were presented on the screen of a MacBook Pro (Apple M2 Pro, macOS 13 Ve
 
 ### Procedure
 
-The experimental task was divided into two distinct parts: a familiarization part and a recognition part (@fig-proc-exp1). In the familiarization part, the face of 30 unknown identities were presented on the screen and participants were told to memorize the identity of the faces. One familiarization trial consisted of the presentation of 6 face images, one after the other, depicting the same identity but varying in viewing points (3/4 left view, frontal view and 3/4 right view) and the colorimetry (colorful image, gray scale image). The duration of each image presentation was 0.75 second. Each participant underwent 30 familiarization trials. During the familiarization, we introduced catch trials to ensure participants attention. After some familiarization trials, a gray-scale image of a person's face was presented on the screen. Participants were asked to press the "q" key if the face belonged to the last seen identity or the "p" key if it was not. The faces seen during the familiarization were considered the "Learned" faces within-subject condition.
+The experimental task was divided into two distinct parts: a familiarization part and a recognition part (@fig-proc-exp1). In the familiarization part, the face of 30 unknown identities were presented on the screen and participants were told to memorize the identity of the faces. One familiarization trial consisted of the presentation of 6 face images, one after the other, depicting the same identity but varying in viewing points (3/4 left view, frontal view and 3/4 right view) and the colorimetry (colorful image, gray scale image). The variability of the face presentation (viewing points and colorimetry) was used to avoid that participants memorized the "picture" of the face instead of the "identity" of the face. The duration of each image presentation was 0.75 second. Each participant underwent 30 familiarization trials. During the familiarization, we introduced catch trials to ensure participants attention. After some familiarization trials, a gray-scale image of a person's face was presented on the screen. Participants were asked to press the "q" key if the face belonged to the last seen identity or the "p" key if it was not. The faces seen during the familiarization were considered the "Learned" faces within-subject condition.
 
 In the recognition part, participants completed three blocks of 90 recognition trials. Each block was separated from another by a short break. Half of the trials were learned identities trials and the other half were new, previously unseen identities trials. In each trial, a gray-scale image of a face was shown on the screen. Participants were asked to choose if they had previously seen this face in the familiarization part or not. If they recognised the face, they should press the "q" key and if they did not recognise the face, then they should press the "p" key. Participants were asked to respond as quickly and accurately as possible. It is important to note that participants never saw two pictures of the same learned identity in the same block and never saw the same picture (3/4 left view, frontal view, or 3/4 right view) of a learned identity during the entire recognition part. Furthermore, each novel identity was only presented once in the entire recognition part. Response time \[s\] and accuracy were collected after each recognition trial.
 
@@ -444,7 +481,7 @@ Stimuli were presented on the screen of a MacBook Pro (Apple M2 Pro, macOS 14 So
 
 ### Procedure
 
-The experimental task was divided into two distinct parts: a rating part and a recognition part (@fig-proc-exp3). During the rating part, participants were presented pictures of 60 celebrities. They were asked to rate these celebrities on two different features: how familiar the celebrity was to them (from 0: Highly unfamiliar to 10: Highly familiar) and how positive or negative were their feelings towards the celebrity (from 0:Highly negative to 10: Highly positive). After the two rating scales, participants were asked to choose the correct name of the same identity from four different naming options. From the 60 celebrities faces presented during the rating part, the 30 celebrities with the highest familiarity (with a minimum of 7 out of 10) and whose names were correctly assigned were for the "Famous" faces condition of the recognition part. In the recognition part, participants completed three blocks of 90 recognition trials. Each block was separated from another by a short break. Half of the trials were famous identities trials and the other half were new, previously unseen identities trials. At each trial, a gray scale image of a face was shown on the screen. Participants were asked to choose if they recognize the face (and not the picture) seen this face in the familiarization part or not. If they did, the should press the "q" key and if they did not, the "p" key. Based on pilot work, task difficulty was increased by adding a response time window of 0.9 second during each recognition trial. Response time \[s\] and accuracy were collected after each trial.
+The experimental task was divided into two distinct parts: a rating part and a recognition part (@fig-proc-exp3). During the rating part, participants were presented pictures of 60 celebrities. They were asked to rate these celebrities on two different features: how familiar the celebrity was to them (from 0: Highly unfamiliar to 10: Highly familiar) and how positive or negative were their feelings towards the celebrity (from 0:Highly negative to 10: Highly positive). After the two rating scales, participants were asked to choose the correct name of the same identity from four different naming options. From the 60 celebrities faces presented during the rating part, the 30 celebrities with the highest familiarity (with a minimum of 7 out of 10) and whose names were correctly assigned were for the "Famous" faces condition of the recognition part. Thus, the set of "Famous" faces used in the recognition part was individualized for each participant. In the recognition part, participants completed three blocks of 90 recognition trials. Each block was separated from another by a short break. Half of the trials were famous identities trials and the other half were new, previously unseen identities trials. At each trial, a gray scale image of a face was shown on the screen. Participants were asked to choose if they recognize the face (and not the picture) seen this face in the familiarization part or not. If they did, the should press the "q" key and if they did not, the "p" key. Based on pilot work, task difficulty was increased by adding a response time window of 0.9 second during each recognition trial. Response time \[s\] and accuracy were collected after each trial.
 
 :::: {.place arguments="bottom, scope: \"parent\", float: true"}
 :::{#fig-proc-exp3 fig-cap = "Experimental procedure of Experiment 3"}
@@ -454,19 +491,27 @@ The experimental task was divided into two distinct parts: a rating part and a r
 *The experimental procedure was divided into two parts: a rating part and a recognition part. a) In the rating part, participants were asked to rate famous faces on two distinct features using rating scales (0-10): their familiarity (low to high) and the emotional valence (negative to positive). After the two rating scales, they had to chose the correct name of the celebrities from four different naming options.(Disclaimer: the picture used here was not used in the actual rating part of the experiment. Its purpose here is to demonstrate what participants had to realize in the first part of the experiment. Image attribution: Philip Romano, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons, <https://commons.wikimedia.org/wiki/File:ChrisEvans2023.jpg>) b) In each trial of the recognition part, participants had to decided if they recognize the face shown on the screen. If they did, they had to press the "q" key and if the did not, the "p" key. They completed three blocks of 60 trials (half of them were famous faces, half were novel faces).* 
 ::::
 
-## Experiment 4
+### Issues with response times collection
+
+During data analysis, we observed that the distribution of the response times for Experiment 3 looked did not look positively skewed (right skewed). After investigation of the code used to run the experiment, we noticed that there was a coding error, which resulted in this abnormal response times distribution. We decided to not run further data analysis (LBA model) for this experiment because evidence-accumulation models expect the response times distribution to be right skewed. Instead, we decided to replicate Experiment 4, in which the same face familiarity levels (novel vs famous) were manipulated. 
+
+## Experiment 4 and Experiment 5
 
 ### Participants
 
-All participant were recruited on the Prolific platform (<https://www.prolific.com>) using the same criteria as Experiment 2. `r completed_exp4` participants completed Experiment 4. Following our preregistered exclusion criterion, `r exclude_ratings_exp4` did not show a sufficiently high level of familiarity with the famous faces. In addition, `r exclude_rt_exp4` participant was excluded because the percentage of missed trials was higher than 25% and `r exclude_acc_exp4` were removed because the overall accuracy was lower than 55% or higher than 95%. In the end, the data of `r final_n_exp4` participants (`r male_exp4` men and `r female_exp4` women) were retained for further analysis and LBA modeling. Ages ranged from `r min_age_exp4` to `r max_age_exp4` ($M_{age} =$ `r mean_age_exp4`, $SD_{age} =$ `r sd_age_exp4`). Following Prolific payment principles, each participant received 9£ for the completion of the study. 
+All participant were recruited on the Prolific platform (<https://www.prolific.com>) using the same criteria as Experiment 2. 
+
+For Experiment 4, `r completed_exp4` participants completed the experiment. Following our preregistered exclusion criterion, `r exclude_ratings_exp4` did not show a sufficiently high level of familiarity with the famous faces. In addition, `r exclude_rt_exp4` participant was excluded because the percentage of missed trials was higher than 25% and `r exclude_acc_exp4` were removed because the overall accuracy was lower than 55% or higher than 95%. In the end, the data of `r final_n_exp4` participants (`r male_exp4` men and `r female_exp4` women) were retained for further analysis and LBA modeling. Ages ranged from `r min_age_exp4` to `r max_age_exp4` ($M_{age} =$ `r mean_age_exp4`, $SD_{age} =$ `r sd_age_exp4`). Following Prolific payment principles, each participant received 9£ for the completion of the study. 
+
+`r completed_exp5` participants completed Experiment 5. `r exclude_ratings_exp5` did not show a sufficiently high level of familiarity with the famous faces and `r exclude_acc_exp5` were removed because the overall accuracy was lower than 55% or higher than 95%. In the end, the data of `r final_n_exp5` participants (`r male_exp5` men and `r female_exp5` women) were retained for further analysis and LBA modeling. Ages ranged from `r min_age_exp5` to `r max_age_exp5` ($M_{age} =$ `r mean_age_exp5`, $SD_{age} =$ `r sd_age_exp5`). Following Prolific payment principles, each participant received 9£ for the completion of the study. 
 
 ### Stimuli
 
-Initially, we planned to use the exact same stimuli as the one used in Experiment 3. However, during the pilot, it was noticed that the "Famous" faces and the "Novel" faces contained differences in low visual features such as brightness, luminosity angle and the resolution of the picture. These differences might have aided the categorization between "famous" and "novel" stimuli and affected the estimation of our parameters of interest. To avoid that decisions are based on visual features and not on familiarity, we changed the face pictures data set for both conditions in Experiment 4. 
+Initially, we planned to use the exact same stimuli as the one used in Experiment 3. However, during the pilot, it was noticed that the "Famous" faces and the "Novel" faces contained differences in low visual features such as brightness, luminosity angle and the resolution of the picture. These differences might have aided the categorization between "famous" and "novel" stimuli and affected the estimation of our parameters of interest. To avoid that decisions are based on visual features and not on familiarity, we changed the face pictures data set for both conditions in Experiment 4 and Experiment 5. 
 
-For the "Famous" condition, faces were all taken from <https:://commons.wikimedia.org>. For each of the famous identities (30 men, 30 women), four pictures were selected: one for the rating part of the experiment and three were used in the recognition part. The list of the attributions as well as the URL links to all the pictures can be found in the Supplementary Materials. For the "Novel" condition, face images were taken from the "10K US Adult Faces Database" [@bainbridgeIntrinsicMemorabilityFace2013]. These pictures depict faces in a natural environment, similar to the selected images of the celebrities. 103 faces were selected from this database and used in the recognition part of the experiment. 
+For the "Famous" condition, faces were all taken from <https:://commons.wikimedia.org>. For each of the famous identities (30 men, 30 women), four pictures were selected: one for the rating part of the experiment and three were used in the recognition part. The list of the attributions as well as the URL links to all the pictures can be found on OSF (Experiment 4: <https://osf.io/vj2aq/overview> and Experiment 5: <https://osf.io/6tqxw/overview>). For the "Novel" condition, face images were taken from the "10K US Adult Faces Database" [@bainbridgeIntrinsicMemorabilityFace2013]. These pictures depict faces in a natural environment, similar to the selected images of the celebrities. 103 faces were selected from this database and used in the recognition part of the experiment. 
 
-To avoid recognition based on low visual features, we decided to not standardize the brightness and luminosity angle of the entire picture dataset. The rationale behind this decision was to avoid adding modifications to the original image that might facilitate the categorization between the stimuli conditions. The only low level visual feature that we standardized across all the images was the resolution. After cropping, every images was down sampled to a 250 pixels (px) height, a height similar to the original height of the images from "10K US Adult Faces Database", and grayscaled.
+To avoid recognition based on low visual features, we decided to not standardize the brightness and luminosity angle of the entire picture dataset for both novel and famous faces. The original viewing point, luminosity angle, brightness and background of the picture were not manipulated. The rationale behind this decision was to avoid adding modifications to the original image that might facilitate the categorization between the stimuli conditions. The only low level visual feature that we standardized across all the images was the resolution. After cropping, every images was down sampled to a 250 pixels (px) height, a height similar to the original height of the images from "10K US Adult Faces Database", and grayscaled.
 
 ### Material
 
@@ -554,7 +599,8 @@ data_all <- bind_rows(
   read_exp("exp_1/data/data_exp_1.csv", 1),
   read_exp("exp_2/data/data_exp_2.csv", 2),
   read_exp("exp_3/data/data_exp_3.csv", 3),
-  read_exp("exp_4/data/data_exp_4.csv", 4, recode = c(familiar = "famous", novel = "novel"))
+  read_exp("exp_4/data/data_exp_4.csv", 4, recode = c(familiar = "famous", novel = "novel")),
+  read_exp("exp_5/data/data_exp_5.csv", 5)
 )
 
 head(data_all)
@@ -592,7 +638,8 @@ exp_conds <- tribble(
   1, "learned", 1, "novel",
   2, "learned", 2, "novel",
   3, "famous",  3, "novel",
-  4, "famous",  4, "novel"
+  4, "famous",  4, "novel",
+  5, "famous",  5, "novel",
 )
 
 # Filter rt_all and acc_all to only relevant conditions per experiment
@@ -778,6 +825,7 @@ download_if_missing <- function(exp_folder, file_name, local_dir) {
 download_if_missing("exp_1", "LBA_exp1.rds", "exp_1/models")
 download_if_missing("exp_2", "LBA_exp2.rds", "exp_2/models")
 download_if_missing("exp_4", "LBA_exp4.rds", "exp_4/models")
+download_if_missing("exp_5", "LBA_exp5.rds", "exp_5/models")
 ```
 
 ```{r}
@@ -881,11 +929,13 @@ wrangle_lba <- function(model, exp_num, cond_label) {
 LBA_exp1 <- readRDS(here("exp_1", "models", "LBA_exp1.rds"))
 LBA_exp2 <- readRDS(here("exp_2", "models", "LBA_exp2.rds"))
 LBA_exp4 <- readRDS(here("exp_4", "models", "LBA_exp4.rds"))
+LBA_exp5 <- readRDS(here("exp_5", "models", "LBA_exp5.rds"))
 
 theta_all <- bind_rows(
   wrangle_lba(LBA_exp1, 1, "Learned"),
   wrangle_lba(LBA_exp2, 2, "Learned"),
-  wrangle_lba(LBA_exp4, 4, "Famous")
+  wrangle_lba(LBA_exp4, 4, "Famous"),
+  wrangle_lba(LBA_exp5, 5, "Famous")
 )
 ```
 
@@ -1085,7 +1135,7 @@ thresh_table <- thresh_diff_all |>
   median_qi(diff) |>
   mutate(
     parameter = "Threshold contrast",
-    condition = if_else(experiment == 4, "novel - famous", "novel - learned")
+    condition = if_else(experiment == 4 | experiment == 5, "novel - famous", "novel - learned")
   ) |>
   select(experiment, parameter, condition, median = diff, lower = .lower, upper = .upper)
 
@@ -1100,7 +1150,7 @@ drift_diff_table <- drift_cond_diff_all |>
   median_qi(diff) |>
   mutate(
     parameter = "Drift rate contrast",
-    condition = if_else(experiment == 4, "novel - famous", "novel - learned")
+    condition = if_else(experiment == 4 | experiment == 5, "novel - famous", "novel - learned")
   ) |>
   select(experiment, parameter, condition, median = diff, lower = .lower, upper = .upper)
 
@@ -1137,6 +1187,7 @@ lba_table <- bind_rows(
 exp1_start <- which(lba_table$Experiment == "Experiment 1")[1]
 exp2_start <- which(lba_table$Experiment == "Experiment 2")[1]
 exp4_start <- which(lba_table$Experiment == "Experiment 4")[1]
+exp5_start <- which(lba_table$Experiment == "Experiment 5")[1]
 
 lba_table |>
   select(-Experiment) |>
@@ -1148,7 +1199,9 @@ lba_table |>
     i = list(
       "Experiment 1" = exp1_start,
       "Experiment 2" = exp2_start,
-      "Experiment 4" = exp4_start
+      "Experiment 4" = exp4_start,
+      "Experiment 5" = exp5_start
+
     )
   ) |>
   style_tt(fontsize = 0.85)
@@ -1216,29 +1269,35 @@ As explained in the Methods, due to a timing artefact in data collection (respon
 
 *Threshold:* Inspection of the posterior distribution shows that there is an effect of familiarity on the threshold parameter. Threshold was greater for Novel faces than for Famous faces.
 
-*Drift rate:* Inspection of the posterior distribution shows that there is a familiarity effect in drift rate difference, which mirrors the results from Experiment 1 and Experiment 2. The quality of the evidence accumulation was greater for Novel faces compared to Learned faces.
+*Drift rate:* Inspection of the posterior distribution shows that there is a familiarity effect in drift rate difference, which mirrors the results from Experiment 1 and Experiment 2. The quality of the evidence accumulation was greater for Novel faces compared to Famous faces.
+
+### Experiment 5
+
+*Threshold:* Inspection of the posterior distribution shows that there is an effect of familiarity on the threshold parameter which mirrors the results from Experiment 4.
+
+*Drift rate:* Inspection of the posterior distribution shows that there is a familiarity effect in drift rate difference, which mirrors the results from Experiment 1, Experiment 2 and Experiment 4. The quality of the evidence accumulation was greater for Novel faces compared to Famous faces.
 
 # General discussion
 
-We set out to understand not merely *that* familiarity affects face recognition, but *how* — specifically, which latent computational processes are modulated when a face is familiar versus novel. By fitting linear ballistic accumulator models to recognition data across a series of experiments, we show that familiarity primarily affects the quality of evidence accumulation, with a secondary and smaller effect on response caution. This computational signature — a novelty advantage in drift rate, accompanied by a modest novelty advantage in threshold — replicates across visual familiarity (Experiments 1 and 2) and, tentatively, visual familiarity and person knowledge (Experiment 4). These findings move beyond manifest measures of accuracy and response time to characterise the decision-level mechanisms that underpin familiar face recognition [@phillipsStateModellingFace2025].
+We set out to understand not merely *that* familiarity affects face recognition, but *how* — specifically, which latent computational processes are modulated when a face is familiar versus novel. By fitting linear ballistic accumulator models to recognition data across a series of experiments, we show that familiarity primarily affects the quality of evidence accumulation, with a secondary and smaller effect on response caution. This computational signature — a novelty advantage in drift rate, accompanied by a modest novelty advantage in threshold — replicates across visual familiarity (Experiments 1 and 2), and visual familiarity and person knowledge (Experiment 4 and 5). These findings move beyond manifest measures of accuracy and response time to characterise the decision-level mechanisms that underpin familiar face recognition [@phillipsStateModellingFace2025].
 
 ## The impact of visual familiarity  
 
 The most theoretically important finding is the combination of drift rate and threshold effects. Across Experiments 1 and 2, the novelty advantage in drift rate was substantially larger than the novelty advantage in threshold. This dissociation matters because the two parameters reflect qualitatively different aspects of the decision process. Drift rate indexes the quality of evidence accumulation — how cleanly and rapidly perceptual and cognitive systems extract decision-relevant information from a face. Threshold indexes how much accumulated evidence is required before a decision is triggered. The dominance of the drift rate effect localises familiarity's influence to the quality of signal from the image more so than as a function of response bias between novel and familiar key presses.
 
-Set within the Bruce and Young framework of face perception [@bruceUnderstandingFaceRecognition1986], visual familiarity modulates the quality of structural encoding and feature matching within the core face processing system [@bruceUnderstandingFaceRecognition1986; @gobbiniNeuralResponseVisual2006], thus generating a stronger perceptual signal that feeds into the decision process. Novel faces, by this account, provide a cleaner and less ambiguous perceptual signal than visually familiar faces — consistent with "pop-out" and attentional capture accounts [@johnstonAttentionCaptureNovel1990; @lev-ariEcologicalViewSelective2022; @lubowVisualSearchFunction1997]. In contrast, visually familiar faces may generate noisier representations due to interference from accumulated but imperfectly consolidated memory traces [@rapcsakFaceRecognition2019].
+Set within the Bruce and Young framework of face perception [@bruceUnderstandingFaceRecognition1986], visual familiarity modulates the quality of structural encoding and feature matching within the core face processing system [@bruceUnderstandingFaceRecognition1986; @gobbiniNeuralResponseVisual2006], thus generating a stronger perceptual signal that feeds into the decision process. One interpretation of the pattern of results obtained here could be that novel faces, by this account, provide a cleaner and less ambiguous perceptual signal than visually familiar faces — consistent with "pop-out" and attentional capture accounts [@johnstonAttentionCaptureNovel1990; @lev-ariEcologicalViewSelective2022; @lubowVisualSearchFunction1997]. In contrast, visually familiar faces may generate noisier representations due to interference from accumulated but imperfectly consolidated memory traces [@rapcsakFaceRecognition2019].
 
 The smaller but reliable threshold effect reflects a qualitatively different influence on performance. In a yes/no recognition task, participants must set separate response criteria for the "familiar" and "novel" responses, and the higher threshold for the novel response is consistent with a well-documented conservative rejection bias in recognition memory [ CITE glanzerMirrorEffectRecognition1985; stretchWixtedWhyPositive1998]: participants are more willing to endorse familiarity than to endorse novelty, requiring more evidence before committing to a rejection. Because the drift rate advantage is substantially larger, the net behavioural outcome remains a novel face advantage in speed and accuracy — the signal quality benefit outweighs the response caution cost.
 
 ## The impact of person knowledge 
 
-Extending these findings to person knowledge is theoretically important because famous faces engage not only the core face processing system but also the extended system, which mediates retrieval of identity-specific person knowledge [@gobbiniNeuralSystemsRecognition2007; @duchaineRevisedNeuralFramework2015]. However, our conclusions here must remain tentative since we only have evidence from a single experiment (Experiment 4) due to technical issues in data collection during Experiment 3. Experiment 4 showed a pattern broadly consistent with Experiments 1 and 2: novel faces produced higher drift rates and slightly higher response caution than famous faces. This raises the possibility that the computational signature of novelty generalises beyond visual familiarity to person knowledge contexts. Moreover, the effects were larger for drift rate and threshold compared to Experiments 1 and 2, which might suggest that the more stable memory traces for famous people based on the added person knowledge could exaggerate the novelty or "pop-out" effect. 
+Extending these findings to person knowledge is theoretically important because famous faces engage not only the core face processing system but also the extended system, which mediates retrieval of identity-specific person knowledge [@gobbiniNeuralSystemsRecognition2007; @duchaineRevisedNeuralFramework2015]. Experiment 4 and 5 showed a pattern broadly consistent with Experiments 1 and 2: novel faces produced higher drift rates and slightly higher response caution than famous faces. This raises the possibility that the computational signature of novelty generalises beyond visual familiarity to person knowledge contexts. Moreover, the effects were larger for drift rate and threshold compared to Experiments 1 and 2, which might suggest that the more stable memory traces for famous people based on the added person knowledge could exaggerate the novelty or "pop-out" effect.
 
 At this stage, however, we remain cautious in our conclusion here and suggest that person knowledge effects on drift rate and threshold remain a largely open empirical question, which requires careful further investigation using improved and/or different stimuli, such as personally familiar people (e.g., family, friends or partners). More generally, our findings underscore that although the study of true familiarity - where person knowledge is available - is more akin to our real-world experiences of interacting with familiar people, it is inherently more difficult to study with tight experimental control (REF Burton, 2024 Encyclopedia chapter).
 
 ## Limitations
 
-A novelty advantage in drift rate is in conceptual agreement with studies that reported a better recognition ability for novel faces than for visually familiar faces [@bindemannPerceivedAbilityActual2014; @readChangingPhotosFaces1990], whist being in apparent tension with prior work reporting better recognition performance for famous or personally familiar faces [@hancockRecognitionUnfamiliarFaces2000; @jenkins2011; @klatzkyRecognizingFamiliarUnfamiliar1984]. We suggest two factors may contribute to this discrepancy. First, prior studies used manifest measures that conflate signal quality with response bias, which makes interpretation more difficult [@wagenmakersEZdiffusionModelResponse2007]. Second, the yes/no recognition task used here creates an inherent asymmetry: a correct novel response requires only the absence of a recognition signal, whereas a correct famous response requires the presence of one. Novel faces may therefore benefit from a processing advantage that is specific to this task structure, and which would not generalise to tasks requiring positive identification of unfamiliar faces. Whether the novelty advantage in drift rate reflects a genuine signal quality effect, a task asymmetry, or both, remains an open question that future work should address by comparing LBA parameters across paradigms that vary the demands placed on novel versus familiar face processing.
+A novelty advantage in drift rate is in conceptual agreement with studies that reported a better perception ability for novel faces than for visually familiar faces [@bindemannPerceivedAbilityActual2014; @readChangingPhotosFaces1990], whist being in apparent tension with prior work reporting better recognition performance for famous or personally familiar faces [@hancockRecognitionUnfamiliarFaces2000; @jenkins2011; @klatzkyRecognizingFamiliarUnfamiliar1984]. We suggest two factors may contribute to this discrepancy. First, prior studies used manifest measures that conflate signal quality with response bias, which makes interpretation more difficult [@wagenmakersEZdiffusionModelResponse2007]. Second, the yes/no recognition task used here creates an inherent asymmetry: a correct novel response requires only the absence of a recognition signal, whereas a correct famous response requires the presence of one. Novel faces may therefore benefit from a processing advantage that is specific to this task structure, and which would not generalise to tasks requiring positive identification of unfamiliar faces. Whether the novelty advantage in drift rate reflects a genuine signal quality effect, a task asymmetry, or both, remains an open question that future work should address by comparing LBA parameters across paradigms that vary the demands placed on novel versus familiar face processing.
 
 Previous evidence accumulation model development studies have emphasised how the number of trials per cell of the design can influence model fitting and parameter estimation [@alexandrowiczComparingEightParameter2020; @lercheHowManyTrials2017; @wagenmakersEZdiffusionModelResponse2007]. Our design (90 trials per condition) and control of error rates followed the minimum recommendations to apply EAM [@lukenParameterIdentifiabilityEvidenceaccumulation2025], as well as a parameter recovery study that showed 90 trials per condition was sufficient to recover simulated parameters. Practical considerations were also incorporated, including the challenge of finding face stimuli with standardized low-level visual features that includes a large number of identities. Nonetheless, adding more trials per condition (e.g., 200 per condition; REF Boag et al 2025) would have increased the robustness of our parameter estimates. 
 

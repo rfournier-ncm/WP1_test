@@ -2,18 +2,21 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
+<meta name="generator" content="quarto-1.9.38">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Raphaël Fournier">
 <meta name="author" content="Paul Downing">
 <meta name="author" content="Richard Ramsey">
-<meta name="dcterms.date" content="2026-04-10">
+<meta name="dcterms.date" content="2026-07-13">
 <meta name="keywords" content="face perception, memory, familiarity, person knowledge, decision models, evidence accumulation modelling">
 
 <title>How does familiarity impact the computational processes that support face recognition?</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -29,7 +32,6 @@ ul.task-list li input[type="checkbox"] {
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -51,18 +53,17 @@ div.csl-indent {
 <script src="manuscript_files/libs/clipboard/clipboard.min.js"></script>
 <script src="manuscript_files/libs/quarto-html/quarto.js" type="module"></script>
 <script src="manuscript_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="manuscript_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="manuscript_files/libs/quarto-html/popper.min.js"></script>
 <script src="manuscript_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="manuscript_files/libs/quarto-html/anchor.min.js"></script>
 <link href="manuscript_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="manuscript_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="manuscript_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="manuscript_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="manuscript_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="manuscript_files/libs/bootstrap/bootstrap-f71ab33f14d55dc7002c31c3770475fe.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="manuscript_files/libs/bootstrap/bootstrap-fe6853329b567fd5d0b87211734a8b84.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -125,8 +126,9 @@ window.Quarto = {
   <li><a href="#stimuli-2" id="toc-stimuli-2" class="nav-link" data-scroll-target="#stimuli-2"><span class="header-section-number">2.4.2</span> Stimuli</a></li>
   <li><a href="#material-2" id="toc-material-2" class="nav-link" data-scroll-target="#material-2"><span class="header-section-number">2.4.3</span> Material</a></li>
   <li><a href="#procedure-2" id="toc-procedure-2" class="nav-link" data-scroll-target="#procedure-2"><span class="header-section-number">2.4.4</span> Procedure</a></li>
+  <li><a href="#issues-with-response-times-collection" id="toc-issues-with-response-times-collection" class="nav-link" data-scroll-target="#issues-with-response-times-collection"><span class="header-section-number">2.4.5</span> Issues with response times collection</a></li>
   </ul></li>
-  <li><a href="#experiment-4" id="toc-experiment-4" class="nav-link" data-scroll-target="#experiment-4"><span class="header-section-number">2.5</span> Experiment 4</a>
+  <li><a href="#experiment-4-and-experiment-5" id="toc-experiment-4-and-experiment-5" class="nav-link" data-scroll-target="#experiment-4-and-experiment-5"><span class="header-section-number">2.5</span> Experiment 4 and Experiment 5</a>
   <ul class="collapse">
   <li><a href="#participants-3" id="toc-participants-3" class="nav-link" data-scroll-target="#participants-3"><span class="header-section-number">2.5.1</span> Participants</a></li>
   <li><a href="#stimuli-3" id="toc-stimuli-3" class="nav-link" data-scroll-target="#stimuli-3"><span class="header-section-number">2.5.2</span> Stimuli</a></li>
@@ -148,7 +150,8 @@ window.Quarto = {
   <li><a href="#experiment-1-1" id="toc-experiment-1-1" class="nav-link" data-scroll-target="#experiment-1-1"><span class="header-section-number">3.2.1</span> Experiment 1</a></li>
   <li><a href="#experiment-2-1" id="toc-experiment-2-1" class="nav-link" data-scroll-target="#experiment-2-1"><span class="header-section-number">3.2.2</span> Experiment 2</a></li>
   <li><a href="#experiment-3-1" id="toc-experiment-3-1" class="nav-link" data-scroll-target="#experiment-3-1"><span class="header-section-number">3.2.3</span> Experiment 3</a></li>
-  <li><a href="#experiment-4-1" id="toc-experiment-4-1" class="nav-link" data-scroll-target="#experiment-4-1"><span class="header-section-number">3.2.4</span> Experiment 4</a></li>
+  <li><a href="#experiment-4" id="toc-experiment-4" class="nav-link" data-scroll-target="#experiment-4"><span class="header-section-number">3.2.4</span> Experiment 4</a></li>
+  <li><a href="#experiment-5" id="toc-experiment-5" class="nav-link" data-scroll-target="#experiment-5"><span class="header-section-number">3.2.5</span> Experiment 5</a></li>
   </ul></li>
   </ul></li>
   <li><a href="#general-discussion" id="toc-general-discussion" class="nav-link" data-scroll-target="#general-discussion"><span class="header-section-number">4</span> General discussion</a>
@@ -218,7 +221,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 10, 2026</p>
+      <p class="date">July 13, 2026</p>
     </div>
   </div>
   
@@ -246,10 +249,10 @@ window.Quarto = {
 <section id="introduction" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
 <p>The ability to quickly and accurately recognise a familiar face is an important aspect of everyday life, as it guides social behaviour. The way that one might interact with a family member or friend is different to a stranger. Moreover, for familiar individuals, we not only know what they look like, but we also have access to person knowledge, such as their traits, attitudes, name and professional status. To date, most prior face recognition research has used manifest (observed) measures (i.e., response times and accuracy) to assess one’s ability to recognise faces. As such, less is known about the latent computational processes that support face recognition <span class="citation" data-cites="phillipsStateModellingFace2025">(<a href="#ref-phillipsStateModellingFace2025" role="doc-biblioref">Phillips and White 2025</a>)</span>. In the current project, we investigated how different types of familiarity, including visual feature familiarity and stored person knowledge, affected the latent processes that can be estimated by evidence accumulation models (EAMs; <span class="citation" data-cites="ratcliffModelingResponseTimes1998">Ratcliff and Rouder (<a href="#ref-ratcliffModelingResponseTimes1998" role="doc-biblioref">1998</a>)</span>). This computational approach has provided new insights on the dynamics of the decision process supporting face recognition.</p>
-<p>The structure of mental processes that support face recognition has been a topic of investigation over the last 50 years <span class="citation" data-cites="johnstonFamiliarUnfamiliarFace2009 natuNeuralProcessingFamiliar2011">(<a href="#ref-johnstonFamiliarUnfamiliarFace2009" role="doc-biblioref">R. A. Johnston and Edmonds 2009</a>; <a href="#ref-natuNeuralProcessingFamiliar2011" role="doc-biblioref">Natu and O’Toole 2011</a>)</span>. One influential cognitive model of face recognition proposed a division between structural encoding of facial features, and more elaborate processes associated with identity recognition and person information <span class="citation" data-cites="bruceUnderstandingFaceRecognition1986">(<a href="#ref-bruceUnderstandingFaceRecognition1986" role="doc-biblioref">Bruce and Young 1986</a>)</span>. Subsequent neuroscience research in humans and monkeys has enriched this model by relating different cognitive processes to different brain circuits <span class="citation" data-cites="landiFastLinkFace2021 gobbiniNeuralSystemsRecognition2007 haxbyDistributedHumanNeural2000 duchaineRevisedNeuralFramework2015">Gobbini and Haxby (<a href="#ref-gobbiniNeuralResponseVisual2006" role="doc-biblioref">2006</a>)</span>. The resulting model is a distributed neural network that incorporates two distinct systems: a core system and an extended system. The core system is dedicated to structural coding of facial features and spans fusiform gryi, as well as occipital and posterior temporal cortices. In contrast, the extended system is involved in more elaborate processes, such as those related to person knowledge, and is mediated by a broader network of brains areas spanning anterior temporal and frontal cortices <span class="citation" data-cites="duchaineRevisedNeuralFramework2015 gobbiniNeuralSystemsRecognition2007 haxbyDistributedHumanNeural2000 ishaiLetsFaceIt2008 kanwisher111FunctionalArchitecture2011">(<a href="#ref-duchaineRevisedNeuralFramework2015" role="doc-biblioref">Duchaine and Yovel 2015</a>; <a href="#ref-gobbiniNeuralSystemsRecognition2007" role="doc-biblioref">Gobbini and Haxby 2007</a>; <a href="#ref-haxbyDistributedHumanNeural2000" role="doc-biblioref">Haxby, Hoffman, and Gobbini 2000</a>; <a href="#ref-ishaiLetsFaceIt2008" role="doc-biblioref">Ishai 2008</a>; <a href="#ref-kanwisher111FunctionalArchitecture2011" role="doc-biblioref">Kanwisher and Barton 2011</a>)</span>. By mediating the retrieval of identity-specific information from memory, the extended system is able to support the recognition of faces for which prior person knowledge information has been stored <span class="citation" data-cites="idagobbiniSocialEmotionalAttachment2004 leibenluftMothersNeuralActivation2004">(<a href="#ref-idagobbiniSocialEmotionalAttachment2004" role="doc-biblioref">Ida Gobbini et al. 2004</a>; <a href="#ref-leibenluftMothersNeuralActivation2004" role="doc-biblioref">Leibenluft et al. 2004</a>)</span>.</p>
-<p>Given the importance of knowing who it is you are interacting with, the study of familiarity has been a key aspect of the face perception research <span class="citation" data-cites="youngAreWeFace2018">(<a href="#ref-youngAreWeFace2018" role="doc-biblioref">Young and Burton 2018</a>)</span>. Largely using manifest measures, such as reaction time and accuracy, research consistently shows that familiar faces, especially those imbued with person knowledge, facilitate a range of face recognition processes compared to previously unseen individuals or visually familiar faces <span class="citation" data-cites="ramonFamiliarityMattersReview2018 youngAreWeFace2018">(<a href="#ref-ramonFamiliarityMattersReview2018" role="doc-biblioref">Ramon and Gobbini 2018</a>; <a href="#ref-youngAreWeFace2018" role="doc-biblioref">Young and Burton 2018</a>)</span>. It has been argued that person knowledge involves a qualitatively different and deeper level of processing than visual familiarity <span class="citation" data-cites="schwartzIndependentContributionPerceptual2019">(<a href="#ref-schwartzIndependentContributionPerceptual2019" role="doc-biblioref">Schwartz and Yovel 2019</a>)</span>, which facilitates the accurate discrimination of familiar from unfamiliar faces <span class="citation" data-cites="akanHaventSeenYou2023 schwartzRolesPerceptualConceptual2016 akanHaventSeenYou2023 birdEffectsPreexperimentalKnowledge2011 klatzkyRecognizingFamiliarUnfamiliar1984 schwaningerRoleFeaturalConfigural2002">(<a href="#ref-akanHaventSeenYou2023" role="doc-biblioref">Akan and Benjamin 2023</a>, <a href="#ref-akanHaventSeenYou2023" role="doc-biblioref">2023</a>; <a href="#ref-schwartzRolesPerceptualConceptual2016" role="doc-biblioref">Schwartz and Yovel 2016</a>; <a href="#ref-birdEffectsPreexperimentalKnowledge2011" role="doc-biblioref">Bird et al. 2011</a>; <a href="#ref-klatzkyRecognizingFamiliarUnfamiliar1984" role="doc-biblioref">Klatzky and Forrest 1984</a>; <a href="#ref-schwaningerRoleFeaturalConfigural2002" role="doc-biblioref">Schwaninger, Lobmaier, and Collishaw 2002</a>)</span>.</p>
-<p>Although manifest (observed) measures of performance have formed the bedrock of research findings on face perception, there have been many calls in recent years to embrace more computational approaches in social and cognitive neuroscience research <span class="citation" data-cites="charpentierApplicationComputationalModels2018 forstmannIntroductionModelBasedCognitive2024a hackelComputationalNeuroscienceApproaches2018 lockwoodComputationalModellingSocial2021 parker2024 phillipsStateModellingFace2025">(<a href="#ref-charpentierApplicationComputationalModels2018" role="doc-biblioref">Charpentier and O’Doherty 2018</a>; <a href="#ref-forstmannIntroductionModelBasedCognitive2024a" role="doc-biblioref">Forstmann and Turner 2024</a>; <a href="#ref-hackelComputationalNeuroscienceApproaches2018" role="doc-biblioref">Hackel and Amodio 2018</a>; <a href="#ref-lockwoodComputationalModellingSocial2021" role="doc-biblioref">Lockwood and Klein-Flügge 2021</a>; <a href="#ref-parker2024" role="doc-biblioref">Parker and Ramsey 2024</a>; <a href="#ref-phillipsStateModellingFace2025" role="doc-biblioref">Phillips and White 2025</a>)</span> (Cheong et al., 2017). One benefit of adopting computational approaches is that relationships between parts of a system can be more explicitly specified <span class="citation" data-cites="yarkoniGeneralizabilityCrisis2022">(<a href="#ref-yarkoniGeneralizabilityCrisis2022" role="doc-biblioref">Yarkoni 2022</a>)</span> (Hintzman, 1991), which aids the development of theory <span class="citation" data-cites="muthukrishnaProblemTheory2019 oberauerAddressingTheoryCrisis2019 proulxStatisticalRitualTheory2021">(<a href="#ref-muthukrishnaProblemTheory2019" role="doc-biblioref">Muthukrishna and Henrich 2019</a>; <a href="#ref-oberauerAddressingTheoryCrisis2019" role="doc-biblioref">Oberauer and Lewandowsky 2019</a>; <a href="#ref-proulxStatisticalRitualTheory2021" role="doc-biblioref">Proulx and Morey 2021</a>)</span>. A second benefit is that latent (unobserved) parameters can be estimated, which can give rise to different interpretations of the cognitive processes involved in task performance <span class="citation" data-cites="ratcliffEffectsAgingReaction2001">(<a href="#ref-ratcliffEffectsAgingReaction2001" role="doc-biblioref">Ratcliff, Thapar, and McKoon 2001</a>)</span>. And at present, there is almost no understanding of the computational processes that support face recognition processes when familiarity is based on visual exposure compared to stored person knowledge <span class="citation" data-cites="phillipsStateModellingFace2025">(<a href="#ref-phillipsStateModellingFace2025" role="doc-biblioref">Phillips and White 2025</a>)</span>.</p>
-<p>Evidence accumulation models (EAM) are one approach to investigate the computational processes that are involved in speeded decision tasks (for a review, see <span class="citation" data-cites="ratcliffDiffusionDecisionModel2016">Ratcliff et al. (<a href="#ref-ratcliffDiffusionDecisionModel2016" role="doc-biblioref">2016</a>)</span>). While a variety of different evidence accumulation models exists, they all share a similar set of assumptions: that evidence for each response option accumulates at different rates until one response option crosses a threshold and a response is triggered (see <a href="#fig-LBA" class="quarto-xref">Figure&nbsp;1</a> for an example of the linear ballistic accumulator (LBA) model; <span class="citation" data-cites="brownSimplestCompleteModel2008">Brown and Heathcote (<a href="#ref-brownSimplestCompleteModel2008" role="doc-biblioref">2008</a>)</span>). These models work by translating the distribution of response times for correct and incorrect responses into estimates of latent variables assumed to underlie the decision-making process <a href="#tbl-lba" class="quarto-xref">Table&nbsp;1</a>. These latent variables can then be mapped onto psychological constructs <span class="citation" data-cites="myersPracticalIntroductionUsing2022">(<a href="#ref-myersPracticalIntroductionUsing2022" role="doc-biblioref">Myers, Interian, and Moustafa 2022</a>)</span>. For example, drift rate is the rate at which evidence in favor of a decision accumulates over time, reflecting the signal-to-noise ratio provided by the stimulus. Threshold represents the amount of accumulated evidence needed to trigger the decision, reflecting the response caution towards a specific response. The starting point is the amount of evidence towards a response before the accumulation of evidence begins, reflecting the <em>a priori</em> bias towards a response. Finally, the non-decision time is an estimation of the time taken to complete processes that are not involved in the decision time, such as stimulus encoding and motor responses.</p>
+<p>The structure of mental processes that support face recognition has been a topic of investigation over the last 50 years <span class="citation" data-cites="johnstonFamiliarUnfamiliarFace2009 natuNeuralProcessingFamiliar2011">(<a href="#ref-johnstonFamiliarUnfamiliarFace2009" role="doc-biblioref">Johnston and Edmonds 2009</a>; <a href="#ref-natuNeuralProcessingFamiliar2011" role="doc-biblioref">Natu and O’Toole 2011</a>)</span>. One influential cognitive model of face recognition proposed a division between structural encoding of facial features, and more elaborate processes associated with identity recognition and person information <span class="citation" data-cites="bruceUnderstandingFaceRecognition1986">(<a href="#ref-bruceUnderstandingFaceRecognition1986" role="doc-biblioref">Bruce and Young 1986</a>)</span>. Subsequent neuroscience research in humans and monkeys has enriched this model by relating different cognitive processes to different brain circuits <span class="citation" data-cites="landiFastLinkFace2021 gobbiniNeuralSystemsRecognition2007 haxbyDistributedHumanNeural2000 duchaineRevisedNeuralFramework2015">Gobbini and Haxby (<a href="#ref-gobbiniNeuralResponseVisual2006" role="doc-biblioref">2006</a>)</span>. The resulting model is a distributed neural network that incorporates two distinct systems: a core system and an extended system. The core system is dedicated to structural coding of facial features. In contrast, the extended system is involved in more elaborate processes, such as those related to person knowledge <span class="citation" data-cites="duchaineRevisedNeuralFramework2015 gobbiniNeuralSystemsRecognition2007 haxbyDistributedHumanNeural2000 ishaiLetsFaceIt2008 kanwisher111FunctionalArchitecture2011">(<a href="#ref-duchaineRevisedNeuralFramework2015" role="doc-biblioref">Duchaine and Yovel 2015</a>; <a href="#ref-gobbiniNeuralSystemsRecognition2007" role="doc-biblioref">Gobbini and Haxby 2007</a>; <a href="#ref-haxbyDistributedHumanNeural2000" role="doc-biblioref">Haxby et al. 2000</a>; <a href="#ref-ishaiLetsFaceIt2008" role="doc-biblioref">Ishai 2008</a>; <a href="#ref-kanwisher111FunctionalArchitecture2011" role="doc-biblioref">Kanwisher and Barton 2011</a>)</span>. By mediating the retrieval of identity-specific information from memory, the extended system is able to support the recognition of faces for which prior person knowledge information has been stored <span class="citation" data-cites="idagobbiniSocialEmotionalAttachment2004 leibenluftMothersNeuralActivation2004">(<a href="#ref-idagobbiniSocialEmotionalAttachment2004" role="doc-biblioref">Ida Gobbini et al. 2004</a>; <a href="#ref-leibenluftMothersNeuralActivation2004" role="doc-biblioref">Leibenluft et al. 2004</a>)</span>.</p>
+<p>Given the importance of knowing who it is you are interacting with, the study of familiarity has been a key aspect of the face perception research <span class="citation" data-cites="youngAreWeFace2018">(<a href="#ref-youngAreWeFace2018" role="doc-biblioref">Young and Burton 2018</a>)</span>. Largely using manifest measures, such as reaction time and accuracy, research consistently shows that familiar faces, especially those imbued with person knowledge, facilitate a range of face recognition processes compared to previously unseen individuals or visually familiar faces <span class="citation" data-cites="ramonFamiliarityMattersReview2018 youngAreWeFace2018">(<a href="#ref-ramonFamiliarityMattersReview2018" role="doc-biblioref">Ramon and Gobbini 2018</a>; <a href="#ref-youngAreWeFace2018" role="doc-biblioref">Young and Burton 2018</a>)</span>. It has been argued that person knowledge involves a qualitatively different and deeper level of processing than visual familiarity <span class="citation" data-cites="schwartzIndependentContributionPerceptual2019">(<a href="#ref-schwartzIndependentContributionPerceptual2019" role="doc-biblioref">Schwartz and Yovel 2019</a>)</span>, which facilitates the accurate discrimination of familiar from unfamiliar faces <span class="citation" data-cites="akanHaventSeenYou2023 schwartzRolesPerceptualConceptual2016 akanHaventSeenYou2023 birdEffectsPreexperimentalKnowledge2011 klatzkyRecognizingFamiliarUnfamiliar1984 schwaningerRoleFeaturalConfigural2002">(<a href="#ref-akanHaventSeenYou2023" role="doc-biblioref">Akan and Benjamin 2023</a>, <a href="#ref-akanHaventSeenYou2023" role="doc-biblioref">2023</a>; <a href="#ref-schwartzRolesPerceptualConceptual2016" role="doc-biblioref">Schwartz and Yovel 2016</a>; <a href="#ref-birdEffectsPreexperimentalKnowledge2011" role="doc-biblioref">Bird et al. 2011</a>; <a href="#ref-klatzkyRecognizingFamiliarUnfamiliar1984" role="doc-biblioref">Klatzky and Forrest 1984</a>; <a href="#ref-schwaningerRoleFeaturalConfigural2002" role="doc-biblioref">Schwaninger et al. 2002</a>)</span>.</p>
+<p>Although manifest (observed) measures of performance have formed the bedrock of research findings on face perception, there have been many calls in recent years to embrace more computational approaches in social and cognitive neuroscience research <span class="citation" data-cites="charpentierApplicationComputationalModels2018 forstmannIntroductionModelBasedCognitive2024a hackelComputationalNeuroscienceApproaches2018 lockwoodComputationalModellingSocial2021 parker2024 phillipsStateModellingFace2025">(<a href="#ref-charpentierApplicationComputationalModels2018" role="doc-biblioref">Charpentier and O’Doherty 2018</a>; <a href="#ref-forstmannIntroductionModelBasedCognitive2024a" role="doc-biblioref">Forstmann and Turner 2024</a>; <a href="#ref-hackelComputationalNeuroscienceApproaches2018" role="doc-biblioref">Hackel and Amodio 2018</a>; <a href="#ref-lockwoodComputationalModellingSocial2021" role="doc-biblioref">Lockwood and Klein-Flügge 2021</a>; <a href="#ref-parker2024" role="doc-biblioref">Parker and Ramsey 2024</a>; <a href="#ref-phillipsStateModellingFace2025" role="doc-biblioref">Phillips and White 2025</a>)</span> (Cheong et al., 2017). One benefit of adopting computational approaches is that relationships between parts of a system can be more explicitly specified <span class="citation" data-cites="yarkoniGeneralizabilityCrisis2022">(<a href="#ref-yarkoniGeneralizabilityCrisis2022" role="doc-biblioref">Yarkoni 2022</a>)</span> (Hintzman, 1991), which aids the development of theory <span class="citation" data-cites="muthukrishnaProblemTheory2019 oberauerAddressingTheoryCrisis2019 proulxStatisticalRitualTheory2021">(<a href="#ref-muthukrishnaProblemTheory2019" role="doc-biblioref">Muthukrishna and Henrich 2019</a>; <a href="#ref-oberauerAddressingTheoryCrisis2019" role="doc-biblioref">Oberauer and Lewandowsky 2019</a>; <a href="#ref-proulxStatisticalRitualTheory2021" role="doc-biblioref">Proulx and Morey 2021</a>)</span>. A second benefit is that latent (unobserved) parameters can be estimated, which can give rise to different interpretations of the cognitive processes involved in task performance <span class="citation" data-cites="ratcliffEffectsAgingReaction2001">(<a href="#ref-ratcliffEffectsAgingReaction2001" role="doc-biblioref">Ratcliff et al. 2001</a>)</span>. And at present, there is almost no understanding of the computational processes that support face recognition processes when familiarity is based on visual exposure compared to stored person knowledge <span class="citation" data-cites="phillipsStateModellingFace2025">(<a href="#ref-phillipsStateModellingFace2025" role="doc-biblioref">Phillips and White 2025</a>)</span>.</p>
+<p>Evidence accumulation models (EAM) are one approach to investigate the computational processes that are involved in speeded decision tasks (for a review, see <span class="citation" data-cites="ratcliffDiffusionDecisionModel2016">Ratcliff et al. (<a href="#ref-ratcliffDiffusionDecisionModel2016" role="doc-biblioref">2016</a>)</span>). While a variety of different evidence accumulation models exists, they all share a similar set of assumptions: that evidence for each response option accumulates at different rates until one response option crosses a threshold and a response is triggered (see <a href="#fig-LBA" class="quarto-xref">Figure&nbsp;1</a> for an example of the linear ballistic accumulator (LBA) model; <span class="citation" data-cites="brownSimplestCompleteModel2008">Brown and Heathcote (<a href="#ref-brownSimplestCompleteModel2008" role="doc-biblioref">2008</a>)</span>). These models work by translating the distribution of response times for correct and incorrect responses into estimates of latent variables assumed to underlie the decision-making process <a href="#tbl-lba" class="quarto-xref">Table&nbsp;1</a>. These latent variables can then be mapped onto psychological constructs <span class="citation" data-cites="myersPracticalIntroductionUsing2022">(<a href="#ref-myersPracticalIntroductionUsing2022" role="doc-biblioref">Myers et al. 2022</a>)</span>. For example, drift rate is the rate at which evidence in favor of a decision accumulates over time, reflecting the signal-to-noise ratio provided by the stimulus. Threshold represents the amount of accumulated evidence needed to trigger the decision, reflecting the response caution towards a specific response. The starting point is the amount of evidence towards a response before the accumulation of evidence begins, reflecting the <em>a priori</em> bias towards a response. Finally, the non-decision time is an estimation of the time taken to complete processes that are not involved in the decision time, such as stimulus encoding and motor responses.</p>
 <div class="place" data-arguments="bottom, scope: &quot;parent&quot;, float: true">
 <div id="fig-LBA" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -277,19 +280,19 @@ Table&nbsp;1: Parameters in the linear ballistic accumulator model
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_beimudyzha4qqltszo0u = TinyTable.createTableFunctions("tinytable_beimudyzha4qqltszo0u");
+      const tableFns_oi1pmf6j1u84g0v1hn5h = TinyTable.createTableFunctions("tinytable_oi1pmf6j1u84g0v1hn5h");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 } ], css_id: 'tinytable_css_gn9kor9hxy9dnye41f7r',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_0s43k6fkq3ld6qbnbg1g',}, 
+          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 } ], css_id: 'tinytable_css_zvh7xxq290m0457mtcj4',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 } ], css_id: 'tinytable_css_bmpp9bdo3mr04jxz7znx',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_beimudyzha4qqltszo0u.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_oi1pmf6j1u84g0v1hn5h.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -298,11 +301,11 @@ Table&nbsp;1: Parameters in the linear ballistic accumulator model
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_beimudyzha4qqltszo0u td.tinytable_css_gn9kor9hxy9dnye41f7r, #tinytable_beimudyzha4qqltszo0u th.tinytable_css_gn9kor9hxy9dnye41f7r {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_beimudyzha4qqltszo0u td.tinytable_css_0s43k6fkq3ld6qbnbg1g, #tinytable_beimudyzha4qqltszo0u th.tinytable_css_0s43k6fkq3ld6qbnbg1g {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_oi1pmf6j1u84g0v1hn5h td.tinytable_css_zvh7xxq290m0457mtcj4, #tinytable_oi1pmf6j1u84g0v1hn5h th.tinytable_css_zvh7xxq290m0457mtcj4 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_oi1pmf6j1u84g0v1hn5h td.tinytable_css_bmpp9bdo3mr04jxz7znx, #tinytable_oi1pmf6j1u84g0v1hn5h th.tinytable_css_bmpp9bdo3mr04jxz7znx {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_beimudyzha4qqltszo0u" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_oi1pmf6j1u84g0v1hn5h" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
         <thead>
               <tr>
@@ -342,8 +345,8 @@ Table&nbsp;1: Parameters in the linear ballistic accumulator model
 </figure>
 </div>
 </div>
-<p>In the present study, we used evidence accumulation modelling to ask new questions regarding the computational processes that support the recognition of familiar versus unfamiliar individuals. More specifically, we address how different types of familiarity (visual feature familiarity versus visual feature familiarity plus person knowledge) impact the threshold (response caution) and drift rate (signal-to-noise ratio) parameters. Based on prior work in experimental psychology <span class="citation" data-cites="parker2024 ratcliffDiffusionDecisionModel2016">(<a href="#ref-parker2024" role="doc-biblioref">Parker and Ramsey 2024</a>; <a href="#ref-ratcliffDiffusionDecisionModel2016" role="doc-biblioref">Ratcliff et al. 2016</a>)</span>, we chose to primarily focus on threshold and drift rate as our primary parameters of interest because we could easily and intuitively see how performance advantages could emerge based on familiarity. For instance, based on conventional use of EAMs <span class="citation" data-cites="myersPracticalIntroductionUsing2022">(<a href="#ref-myersPracticalIntroductionUsing2022" role="doc-biblioref">Myers, Interian, and Moustafa 2022</a>)</span>, increases in signal-to-noise ratio and/or reductions in response caution could be interpreted as the task setting becoming easier.</p>
-<p>We, therefore, hypothesised that either drift rate and/or threshold would be affected by the face familiarity manipulation. However, given the general lack of prior evidence accumulation modelling in face recognition research, we were unsure <em>a priori</em> of the direction of the effects. For instance, we considered it plausible that novel compared to familiar stimuli could provide a benefit in some instances, by virtue of a pop-out or novelty detector <span class="citation" data-cites="glanzerMirrorEffectRecognition1985 kormi-nouriNoveltyEffectSupport2005 schomakerNoveltyEnhancesVisual2012 tulvingNoveltyAssessmentBrain1995">(<a href="#ref-glanzerMirrorEffectRecognition1985" role="doc-biblioref">Glanzer and Adams 1985</a>; <a href="#ref-kormi-nouriNoveltyEffectSupport2005" role="doc-biblioref">Kormi-Nouri, Nilsson, and Ohta 2005</a>; <a href="#ref-schomakerNoveltyEnhancesVisual2012" role="doc-biblioref">Schomaker and Meeter 2012</a>; <a href="#ref-tulvingNoveltyAssessmentBrain1995" role="doc-biblioref">Tulving and Kroll 1995</a>)</span>. Likewise, we also considered it plausible that familiar compared to novel stimuli could providing a benefit based on the many advantages reported for recognising personally familiar or famous individuals <span class="citation" data-cites="ramonFamiliarityMattersReview2018 youngAreWeFace2018">(<a href="#ref-ramonFamiliarityMattersReview2018" role="doc-biblioref">Ramon and Gobbini 2018</a>; <a href="#ref-youngAreWeFace2018" role="doc-biblioref">Young and Burton 2018</a>)</span>. Nonetheless, across a series of experiments, we used manipulations of familiarity that either only targeted the operation of core system only or the core and extended system of face perception (<a href="#tbl-exp" class="quarto-xref">Table&nbsp;2</a>), so that we could further understand the computational processes that underpin different types of familiar face recognition.</p>
+<p>In the present study, we used evidence accumulation modelling to ask new questions regarding the computational processes that support the recognition of familiar versus unfamiliar individuals. More specifically, we address how different types of familiarity (visual feature familiarity versus visual feature familiarity plus person knowledge) impact the threshold (response caution) and drift rate (signal-to-noise ratio) parameters. Based on prior work in experimental psychology <span class="citation" data-cites="parker2024 ratcliffDiffusionDecisionModel2016">(<a href="#ref-parker2024" role="doc-biblioref">Parker and Ramsey 2024</a>; <a href="#ref-ratcliffDiffusionDecisionModel2016" role="doc-biblioref">Ratcliff et al. 2016</a>)</span>, we chose to primarily focus on threshold and drift rate as our primary parameters of interest because we could easily and intuitively see how performance advantages could emerge based on familiarity. For instance, based on conventional use of EAMs <span class="citation" data-cites="myersPracticalIntroductionUsing2022">(<a href="#ref-myersPracticalIntroductionUsing2022" role="doc-biblioref">Myers et al. 2022</a>)</span>, increases in signal-to-noise ratio and/or reductions in response caution could be interpreted as the task setting becoming easier.</p>
+<p>We, therefore, hypothesised that either drift rate and/or threshold would be affected by the face familiarity manipulation. However, given the general lack of prior evidence accumulation modelling in face recognition research, we were unsure <em>a priori</em> of the direction of the effects. For instance, we considered it plausible that novel compared to familiar stimuli could provide a benefit in some instances, by virtue of a pop-out or novelty detector <span class="citation" data-cites="glanzerMirrorEffectRecognition1985 kormi-nouriNoveltyEffectSupport2005 schomakerNoveltyEnhancesVisual2012 tulvingNoveltyAssessmentBrain1995">(<a href="#ref-glanzerMirrorEffectRecognition1985" role="doc-biblioref">Glanzer and Adams 1985</a>; <a href="#ref-kormi-nouriNoveltyEffectSupport2005" role="doc-biblioref">Kormi-Nouri et al. 2005</a>; <a href="#ref-schomakerNoveltyEnhancesVisual2012" role="doc-biblioref">Schomaker and Meeter 2012</a>; <a href="#ref-tulvingNoveltyAssessmentBrain1995" role="doc-biblioref">Tulving and Kroll 1995</a>)</span>. Likewise, we also considered it plausible that familiar compared to novel stimuli could providing a benefit based on the many advantages reported for recognising personally familiar or famous individuals <span class="citation" data-cites="ramonFamiliarityMattersReview2018 youngAreWeFace2018">(<a href="#ref-ramonFamiliarityMattersReview2018" role="doc-biblioref">Ramon and Gobbini 2018</a>; <a href="#ref-youngAreWeFace2018" role="doc-biblioref">Young and Burton 2018</a>)</span>. Nonetheless, across a series of experiments, we used manipulations of familiarity that either only targeted the operation of core system only or the core and extended system of face perception (<a href="#tbl-exp" class="quarto-xref">Table&nbsp;2</a>), so that we could further understand the computational processes that underpin different types of familiar face recognition.</p>
 <div class="cell">
 <div id="tbl-exp" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
@@ -358,19 +361,19 @@ Table&nbsp;2: An overview of the experimental work
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_149wmyn88txvt87nzbox = TinyTable.createTableFunctions("tinytable_149wmyn88txvt87nzbox");
+      const tableFns_kw4apls0l0eibil6op8m = TinyTable.createTableFunctions("tinytable_kw4apls0l0eibil6op8m");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 }, { i: '4', j: 5 } ], css_id: 'tinytable_css_gepup26hkdnlgcyklmc6',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_lz35xmhmind8nv7a56up',}, 
+          { positions: [ { i: '5', j: 1 }, { i: '5', j: 2 }, { i: '5', j: 3 }, { i: '5', j: 4 }, { i: '5', j: 5 } ], css_id: 'tinytable_css_530hajxz9xrwhbxcdznt',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 } ], css_id: 'tinytable_css_w9jz6lk7htkx48wtz8qq',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_149wmyn88txvt87nzbox.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_kw4apls0l0eibil6op8m.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -379,11 +382,11 @@ Table&nbsp;2: An overview of the experimental work
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_149wmyn88txvt87nzbox td.tinytable_css_gepup26hkdnlgcyklmc6, #tinytable_149wmyn88txvt87nzbox th.tinytable_css_gepup26hkdnlgcyklmc6 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_149wmyn88txvt87nzbox td.tinytable_css_lz35xmhmind8nv7a56up, #tinytable_149wmyn88txvt87nzbox th.tinytable_css_lz35xmhmind8nv7a56up {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_kw4apls0l0eibil6op8m td.tinytable_css_530hajxz9xrwhbxcdznt, #tinytable_kw4apls0l0eibil6op8m th.tinytable_css_530hajxz9xrwhbxcdznt {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_kw4apls0l0eibil6op8m td.tinytable_css_w9jz6lk7htkx48wtz8qq, #tinytable_kw4apls0l0eibil6op8m th.tinytable_css_w9jz6lk7htkx48wtz8qq {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_149wmyn88txvt87nzbox" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_kw4apls0l0eibil6op8m" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
         <thead>
               <tr>
@@ -424,6 +427,13 @@ Table&nbsp;2: An overview of the experimental work
                   <td data-row="4" data-col="4">famous vs unknown</td>
                   <td data-row="4" data-col="5">core &amp; extended</td>
                 </tr>
+                <tr>
+                  <td data-row="5" data-col="1">5</td>
+                  <td data-row="5" data-col="2">online</td>
+                  <td data-row="5" data-col="3">visual &amp; person knowledge</td>
+                  <td data-row="5" data-col="4">famous vs unknown</td>
+                  <td data-row="5" data-col="5">core &amp; extended</td>
+                </tr>
         </tbody>
       </table>
     </div>
@@ -438,7 +448,7 @@ Table&nbsp;2: An overview of the experimental work
 <h1 data-number="2"><span class="header-section-number">2</span> Method and Materials</h1>
 <section id="pre-registration-and-open-science" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="pre-registration-and-open-science"><span class="header-section-number">2.1</span> Pre-registration and open science</h2>
-<p>We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures in the four experiments <span class="citation" data-cites="simonsConstraintsGeneralityCOG2017">(<a href="#ref-simonsConstraintsGeneralityCOG2017" role="doc-biblioref">Simons, Shoda, and Lindsay 2017</a>)</span>. For each experiment, the research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered (Experiment 1: <a href="https://osf.io/azyvu/overview" class="uri">https://osf.io/azyvu/overview</a>); Experiment 2: <a href="https://osf.io/tu2eh/overview" class="uri">https://osf.io/tu2eh/overview</a>; Experiment 3: <a href="https://osf.io/ut78f/overview" class="uri">https://osf.io/ut78f/overview</a>; Experiment 4 <a href="https://osf.io/vj2aq/overview" class="uri">https://osf.io/vj2aq/overview</a>. The raw data, experimental materials, and analysis code are available on GitHub (link) or the Open Science Framework (link).</p>
+<p>We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures in the four experiments <span class="citation" data-cites="simonsConstraintsGeneralityCOG2017">(<a href="#ref-simonsConstraintsGeneralityCOG2017" role="doc-biblioref">Simons et al. 2017</a>)</span>. For each experiment, the research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered ((Experiment 1: <a href="https://osf.io/azyvu/overview" class="uri">https://osf.io/azyvu/overview</a>); (Experiment 2: <a href="https://osf.io/tu2eh/overview" class="uri">https://osf.io/tu2eh/overview</a>); (Experiment 3: <a href="https://osf.io/ut78f/overview" class="uri">https://osf.io/ut78f/overview</a>); (Experiment 4 <a href="https://osf.io/vj2aq/overview" class="uri">https://osf.io/vj2aq/overview</a>) and (Experiment 5 <a href="https://osf.io/6tqxw/overview" class="uri">https://osf.io/6tqxw/overview</a>). The raw data, experimental materials, and analysis code are available on GitHub (link) or the Open Science Framework (link).</p>
 </section>
 <section id="experiment-1" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="experiment-1"><span class="header-section-number">2.2</span> Experiment 1</h2>
@@ -460,20 +470,20 @@ Table&nbsp;3: Participant summary across experiments.
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_h7sn41ixnyrur1tupze9 = TinyTable.createTableFunctions("tinytable_h7sn41ixnyrur1tupze9");
+      const tableFns_g14er6miosrv7qa9j53n = TinyTable.createTableFunctions("tinytable_g14er6miosrv7qa9j53n");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '4', j: 1 }, { i: '4', j: 2 }, { i: '4', j: 3 }, { i: '4', j: 4 }, { i: '4', j: 5 }, { i: '4', j: 6 }, { i: '4', j: 7 }, { i: '4', j: 8 }, { i: '4', j: 9 }, { i: '4', j: 10 } ], css_id: 'tinytable_css_k39n9ubemt11mnsaqx3z',}, 
-          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '1', j: 5 }, { i: '2', j: 5 }, { i: '3', j: 5 }, { i: '1', j: 6 }, { i: '2', j: 6 }, { i: '3', j: 6 }, { i: '1', j: 7 }, { i: '2', j: 7 }, { i: '3', j: 7 }, { i: '1', j: 8 }, { i: '2', j: 8 }, { i: '3', j: 8 }, { i: '1', j: 9 }, { i: '2', j: 9 }, { i: '3', j: 9 }, { i: '1', j: 10 }, { i: '2', j: 10 }, { i: '3', j: 10 } ], css_id: 'tinytable_css_gr9abvtwqpf0lizsw0rp',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 }, { i: '0', j: 7 }, { i: '0', j: 8 }, { i: '0', j: 9 }, { i: '0', j: 10 } ], css_id: 'tinytable_css_thjltfm457sn2pto5lf5',}, 
+          { positions: [ { i: '5', j: 1 }, { i: '5', j: 2 }, { i: '5', j: 3 }, { i: '5', j: 4 }, { i: '5', j: 5 }, { i: '5', j: 6 }, { i: '5', j: 7 }, { i: '5', j: 8 }, { i: '5', j: 9 }, { i: '5', j: 10 } ], css_id: 'tinytable_css_h51d1rmla2bf44fgg5jy',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '4', j: 4 }, { i: '1', j: 5 }, { i: '2', j: 5 }, { i: '3', j: 5 }, { i: '4', j: 5 }, { i: '1', j: 6 }, { i: '2', j: 6 }, { i: '3', j: 6 }, { i: '4', j: 6 }, { i: '1', j: 7 }, { i: '2', j: 7 }, { i: '3', j: 7 }, { i: '4', j: 7 }, { i: '1', j: 8 }, { i: '2', j: 8 }, { i: '3', j: 8 }, { i: '4', j: 8 }, { i: '1', j: 9 }, { i: '2', j: 9 }, { i: '3', j: 9 }, { i: '4', j: 9 }, { i: '1', j: 10 }, { i: '2', j: 10 }, { i: '3', j: 10 }, { i: '4', j: 10 } ], css_id: 'tinytable_css_1hg7xyd74wvywbgormfc',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 }, { i: '0', j: 7 }, { i: '0', j: 8 }, { i: '0', j: 9 }, { i: '0', j: 10 } ], css_id: 'tinytable_css_bj2yf85ki1zmm3va098e',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_h7sn41ixnyrur1tupze9.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_g14er6miosrv7qa9j53n.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -482,12 +492,12 @@ Table&nbsp;3: Participant summary across experiments.
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_h7sn41ixnyrur1tupze9 td.tinytable_css_k39n9ubemt11mnsaqx3z, #tinytable_h7sn41ixnyrur1tupze9 th.tinytable_css_k39n9ubemt11mnsaqx3z {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
-    #tinytable_h7sn41ixnyrur1tupze9 td.tinytable_css_gr9abvtwqpf0lizsw0rp, #tinytable_h7sn41ixnyrur1tupze9 th.tinytable_css_gr9abvtwqpf0lizsw0rp { font-size: 0.85em }
-    #tinytable_h7sn41ixnyrur1tupze9 td.tinytable_css_thjltfm457sn2pto5lf5, #tinytable_h7sn41ixnyrur1tupze9 th.tinytable_css_thjltfm457sn2pto5lf5 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
+    #tinytable_g14er6miosrv7qa9j53n td.tinytable_css_h51d1rmla2bf44fgg5jy, #tinytable_g14er6miosrv7qa9j53n th.tinytable_css_h51d1rmla2bf44fgg5jy {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
+    #tinytable_g14er6miosrv7qa9j53n td.tinytable_css_1hg7xyd74wvywbgormfc, #tinytable_g14er6miosrv7qa9j53n th.tinytable_css_1hg7xyd74wvywbgormfc { font-size: 0.85em }
+    #tinytable_g14er6miosrv7qa9j53n td.tinytable_css_bj2yf85ki1zmm3va098e, #tinytable_g14er6miosrv7qa9j53n th.tinytable_css_bj2yf85ki1zmm3va098e {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_h7sn41ixnyrur1tupze9" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_g14er6miosrv7qa9j53n" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
         <thead>
               <tr>
@@ -552,6 +562,18 @@ Table&nbsp;3: Participant summary across experiments.
                   <td data-row="4" data-col="8">13</td>
                   <td data-row="4" data-col="9">17</td>
                   <td data-row="4" data-col="10">39.5 (10)</td>
+                </tr>
+                <tr>
+                  <td data-row="5" data-col="1">Experiment 5</td>
+                  <td data-row="5" data-col="2">Online</td>
+                  <td data-row="5" data-col="3">46</td>
+                  <td data-row="5" data-col="4">0</td>
+                  <td data-row="5" data-col="5">3</td>
+                  <td data-row="5" data-col="6">12</td>
+                  <td data-row="5" data-col="7">31</td>
+                  <td data-row="5" data-col="8">17</td>
+                  <td data-row="5" data-col="9">14</td>
+                  <td data-row="5" data-col="10">37.4 (10.9)</td>
                 </tr>
         </tbody>
       </table>
@@ -640,7 +662,7 @@ Figure&nbsp;3: Non-masked and masked images
 </section>
 <section id="procedure-2" class="level3" data-number="2.4.4">
 <h3 data-number="2.4.4" class="anchored" data-anchor-id="procedure-2"><span class="header-section-number">2.4.4</span> Procedure</h3>
-<p>The experimental task was divided into two distinct parts: a rating part and a recognition part (<a href="#fig-proc-exp3" class="quarto-xref">Figure&nbsp;4</a>). During the rating part, participants were presented pictures of 60 celebrities. They were asked to rate these celebrities on two different features: how familiar the celebrity was to them (from 0: Highly unfamiliar to 10: Highly familiar) and how positive or negative were their feelings towards the celebrity (from 0:Highly negative to 10: Highly positive). After the two rating scales, participants were asked to choose the correct name of the same identity from four different naming options. From the 60 celebrities faces presented during the rating part, the 30 celebrities with the highest familiarity (with a minimum of 7 out of 10) and whose names were correctly assigned were for the “Famous” faces condition of the recognition part. In the recognition part, participants completed three blocks of 90 recognition trials. Each block was separated from another by a short break. Half of the trials were famous identities trials and the other half were new, previously unseen identities trials. At each trial, a gray scale image of a face was shown on the screen. Participants were asked to choose if they recognize the face (and not the picture) seen this face in the familiarization part or not. If they did, the should press the “q” key and if they did not, the “p” key. Based on pilot work, task difficulty was increased by adding a response time window of 0.9 second during each recognition trial. Response time [s] and accuracy were collected after each trial.</p>
+<p>The experimental task was divided into two distinct parts: a rating part and a recognition part (<a href="#fig-proc-exp3" class="quarto-xref">Figure&nbsp;4</a>). During the rating part, participants were presented pictures of 60 celebrities. They were asked to rate these celebrities on two different features: how familiar the celebrity was to them (from 0: Highly unfamiliar to 10: Highly familiar) and how positive or negative were their feelings towards the celebrity (from 0:Highly negative to 10: Highly positive). After the two rating scales, participants were asked to choose the correct name of the same identity from four different naming options. From the 60 celebrities faces presented during the rating part, the 30 celebrities with the highest familiarity (with a minimum of 7 out of 10) and whose names were correctly assigned were for the “Famous” faces condition of the recognition part. This procedure was individualized for each participant. In the recognition part, participants completed three blocks of 90 recognition trials. Each block was separated from another by a short break. Half of the trials were famous identities trials and the other half were new, previously unseen identities trials. At each trial, a gray scale image of a face was shown on the screen. Participants were asked to choose if they recognize the face (and not the picture) seen this face in the familiarization part or not. If they did, the should press the “q” key and if they did not, the “p” key. Based on pilot work, task difficulty was increased by adding a response time window of 0.9 second during each recognition trial. Response time [s] and accuracy were collected after each trial.</p>
 <div class="place" data-arguments="bottom, scope: &quot;parent&quot;, float: true">
 <div id="fig-proc-exp3" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -655,17 +677,23 @@ Figure&nbsp;4: Experimental procedure of Experiment 3
 <p><em>The experimental procedure was divided into two parts: a rating part and a recognition part. a) In the rating part, participants were asked to rate famous faces on two distinct features using rating scales (0-10): their familiarity (low to high) and the emotional valence (negative to positive). After the two rating scales, they had to chose the correct name of the celebrities from four different naming options.(Disclaimer: the picture used here was not used in the actual rating part of the experiment. Its purpose here is to demonstrate what participants had to realize in the first part of the experiment. Image attribution: Philip Romano, CC BY-SA 4.0 <a href="https://creativecommons.org/licenses/by-sa/4.0" class="uri">https://creativecommons.org/licenses/by-sa/4.0</a>, via Wikimedia Commons, <a href="https://commons.wikimedia.org/wiki/File:ChrisEvans2023.jpg" class="uri">https://commons.wikimedia.org/wiki/File:ChrisEvans2023.jpg</a>) b) In each trial of the recognition part, participants had to decided if they recognize the face shown on the screen. If they did, they had to press the “q” key and if the did not, the “p” key. They completed three blocks of 60 trials (half of them were famous faces, half were novel faces).</em></p>
 </div>
 </section>
+<section id="issues-with-response-times-collection" class="level3" data-number="2.4.5">
+<h3 data-number="2.4.5" class="anchored" data-anchor-id="issues-with-response-times-collection"><span class="header-section-number">2.4.5</span> Issues with response times collection</h3>
+<p>During data analysis, we observed that the distribution of the response times for Experiment 3 looked did not look positively skewed (right skewed). After investigation of the code used to run the experiment, we noticed that there was a coding error, which resulted in this abnormal response times distribution. We decided to not run further data analysis (LBA model) for this experiment because evidence-accumulation models expect the response times distribution to be right skewed. Instead, we decided to replicate Experiment 4, in which the same face familiarity levels (novel vs famous) were manipulated.</p>
 </section>
-<section id="experiment-4" class="level2" data-number="2.5">
-<h2 data-number="2.5" class="anchored" data-anchor-id="experiment-4"><span class="header-section-number">2.5</span> Experiment 4</h2>
+</section>
+<section id="experiment-4-and-experiment-5" class="level2" data-number="2.5">
+<h2 data-number="2.5" class="anchored" data-anchor-id="experiment-4-and-experiment-5"><span class="header-section-number">2.5</span> Experiment 4 and Experiment 5</h2>
 <section id="participants-3" class="level3" data-number="2.5.1">
 <h3 data-number="2.5.1" class="anchored" data-anchor-id="participants-3"><span class="header-section-number">2.5.1</span> Participants</h3>
-<p>All participant were recruited on the Prolific platform (<a href="https://www.prolific.com" class="uri">https://www.prolific.com</a>) using the same criteria as Experiment 2. 46 participants completed Experiment 4. Following our preregistered exclusion criterion, 12 did not show a sufficiently high level of familiarity with the famous faces. In addition, 1 participant was excluded because the percentage of missed trials was higher than 25% and 3 were removed because the overall accuracy was lower than 55% or higher than 95%. In the end, the data of 30 participants (17 men and 13 women) were retained for further analysis and LBA modeling. Ages ranged from 25 to 61 (<span class="math inline">\(M_{age} =\)</span> 39.5, <span class="math inline">\(SD_{age} =\)</span> 10). Following Prolific payment principles, each participant received 9£ for the completion of the study.</p>
+<p>All participant were recruited on the Prolific platform (<a href="https://www.prolific.com" class="uri">https://www.prolific.com</a>) using the same criteria as Experiment 2.</p>
+<p>For Experiment 4, 46 participants completed the experiment. Following our preregistered exclusion criterion, 12 did not show a sufficiently high level of familiarity with the famous faces. In addition, 1 participant was excluded because the percentage of missed trials was higher than 25% and 3 were removed because the overall accuracy was lower than 55% or higher than 95%. In the end, the data of 30 participants (17 men and 13 women) were retained for further analysis and LBA modeling. Ages ranged from 25 to 61 (<span class="math inline">\(M_{age} =\)</span> 39.5, <span class="math inline">\(SD_{age} =\)</span> 10). Following Prolific payment principles, each participant received 9£ for the completion of the study.</p>
+<p>46 participants completed Experiment 5. 12 did not show a sufficiently high level of familiarity with the famous faces and 3 were removed because the overall accuracy was lower than 55% or higher than 95%. In the end, the data of 31 participants (14 men and 17 women) were retained for further analysis and LBA modeling. Ages ranged from 18 to 59 (<span class="math inline">\(M_{age} =\)</span> 37.4, <span class="math inline">\(SD_{age} =\)</span> 10.9). Following Prolific payment principles, each participant received 9£ for the completion of the study.</p>
 </section>
 <section id="stimuli-3" class="level3" data-number="2.5.2">
 <h3 data-number="2.5.2" class="anchored" data-anchor-id="stimuli-3"><span class="header-section-number">2.5.2</span> Stimuli</h3>
-<p>Initially, we planned to use the exact same stimuli as the one used in Experiment 3. However, during the pilot, it was noticed that the “Famous” faces and the “Novel” faces contained differences in low visual features such as brightness, luminosity angle and the resolution of the picture. These differences might have aided the categorization between “famous” and “novel” stimuli and affected the estimation of our parameters of interest. To avoid that decisions are based on visual features and not on familiarity, we changed the face pictures data set for both conditions in Experiment 4.</p>
-<p>For the “Famous” condition, faces were all taken from <a href="https:://commons.wikimedia.org" class="uri">https:://commons.wikimedia.org</a>. For each of the famous identities (30 men, 30 women), four pictures were selected: one for the rating part of the experiment and three were used in the recognition part. The list of the attributions as well as the URL links to all the pictures can be found in the Supplementary Materials. For the “Novel” condition, face images were taken from the “10K US Adult Faces Database” <span class="citation" data-cites="bainbridgeIntrinsicMemorabilityFace2013">(<a href="#ref-bainbridgeIntrinsicMemorabilityFace2013" role="doc-biblioref">Bainbridge, Isola, and Oliva 2013</a>)</span>. These pictures depict faces in a natural environment, similar to the selected images of the celebrities. 103 faces were selected from this database and used in the recognition part of the experiment.</p>
+<p>Initially, we planned to use the exact same stimuli as the one used in Experiment 3. However, during the pilot, it was noticed that the “Famous” faces and the “Novel” faces contained differences in low visual features such as brightness, luminosity angle and the resolution of the picture. These differences might have aided the categorization between “famous” and “novel” stimuli and affected the estimation of our parameters of interest. To avoid that decisions are based on visual features and not on familiarity, we changed the face pictures data set for both conditions in Experiment 4 and Experiment 5.</p>
+<p>For the “Famous” condition, faces were all taken from <a href="https:://commons.wikimedia.org" class="uri">https:://commons.wikimedia.org</a>. For each of the famous identities (30 men, 30 women), four pictures were selected: one for the rating part of the experiment and three were used in the recognition part. The list of the attributions as well as the URL links to all the pictures can be found in the Supplementary Materials. For the “Novel” condition, face images were taken from the “10K US Adult Faces Database” <span class="citation" data-cites="bainbridgeIntrinsicMemorabilityFace2013">(<a href="#ref-bainbridgeIntrinsicMemorabilityFace2013" role="doc-biblioref">Bainbridge et al. 2013</a>)</span>. These pictures depict faces in a natural environment, similar to the selected images of the celebrities. 103 faces were selected from this database and used in the recognition part of the experiment.</p>
 <p>To avoid recognition based on low visual features, we decided to not standardize the brightness and luminosity angle of the entire picture dataset. The rationale behind this decision was to avoid adding modifications to the original image that might facilitate the categorization between the stimuli conditions. The only low level visual feature that we standardized across all the images was the resolution. After cropping, every images was down sampled to a 250 pixels (px) height, a height similar to the original height of the images from “10K US Adult Faces Database”, and grayscaled.</p>
 </section>
 <section id="material-3" class="level3" data-number="2.5.3">
@@ -698,19 +726,19 @@ Table&nbsp;4: Formula specification for the pre-registered linear ballistic accu
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_tz8j2guww19xdhpu8xo0 = TinyTable.createTableFunctions("tinytable_tz8j2guww19xdhpu8xo0");
+      const tableFns_bsdgj2bp22xdwbypaibp = TinyTable.createTableFunctions("tinytable_bsdgj2bp22xdwbypaibp");
       // tinytable span after
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '7', j: 1 }, { i: '7', j: 2 }, { i: '7', j: 3 }, { i: '7', j: 4 }, { i: '7', j: 5 }, { i: '7', j: 6 } ], css_id: 'tinytable_css_m8mwqhiggcst0hvcxcmh',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 } ], css_id: 'tinytable_css_repbki91fca5wjgydjlv',}, 
+          { positions: [ { i: '7', j: 1 }, { i: '7', j: 2 }, { i: '7', j: 3 }, { i: '7', j: 4 }, { i: '7', j: 5 }, { i: '7', j: 6 } ], css_id: 'tinytable_css_is7id1wllx8025bge5ri',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 }, { i: '0', j: 5 }, { i: '0', j: 6 } ], css_id: 'tinytable_css_e5lk48ente76t6cbmmk2',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_tz8j2guww19xdhpu8xo0.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_bsdgj2bp22xdwbypaibp.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -719,11 +747,11 @@ Table&nbsp;4: Formula specification for the pre-registered linear ballistic accu
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_tz8j2guww19xdhpu8xo0 td.tinytable_css_m8mwqhiggcst0hvcxcmh, #tinytable_tz8j2guww19xdhpu8xo0 th.tinytable_css_m8mwqhiggcst0hvcxcmh {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
-    #tinytable_tz8j2guww19xdhpu8xo0 td.tinytable_css_repbki91fca5wjgydjlv, #tinytable_tz8j2guww19xdhpu8xo0 th.tinytable_css_repbki91fca5wjgydjlv {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_bsdgj2bp22xdwbypaibp td.tinytable_css_is7id1wllx8025bge5ri, #tinytable_bsdgj2bp22xdwbypaibp th.tinytable_css_is7id1wllx8025bge5ri {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
+    #tinytable_bsdgj2bp22xdwbypaibp td.tinytable_css_e5lk48ente76t6cbmmk2, #tinytable_bsdgj2bp22xdwbypaibp th.tinytable_css_e5lk48ente76t6cbmmk2 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%;  }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_tz8j2guww19xdhpu8xo0" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_bsdgj2bp22xdwbypaibp" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
         <thead>
               <tr>
@@ -810,7 +838,7 @@ Table&nbsp;4: Formula specification for the pre-registered linear ballistic accu
 </section>
 <section id="data-analysis" class="level3" data-number="2.6.3">
 <h3 data-number="2.6.3" class="anchored" data-anchor-id="data-analysis"><span class="header-section-number">2.6.3</span> Data analysis</h3>
-<p>For every experiment, the separate analysis of response times and accuracy was conducted using Bayesian Multilevel Models with R Package brms <span class="citation" data-cites="brms">(<a href="#ref-brms" role="doc-biblioref">Bürkner 2017</a>)</span>. The evidence-accumulation modelling analyses of the distributions of response times for the correct and wrong answers were realized using the EMC2 R package <span class="citation" data-cites="EMC2">(<a href="#ref-EMC2" role="doc-biblioref">Stevenson, Donzallaz, and Heathcote 2025</a>)</span>. In order to make inference about the magnitude of familiarity effects, differences in parameter estimates across conditions were compared. To summarize the distribution of parameters of interest, we report the median of the posterior distribution together with 95% quantile interval of the posterior distribution in square brackets in the following section.</p>
+<p>For every experiment, the separate analysis of response times and accuracy was conducted using Bayesian Multilevel Models with R Package brms <span class="citation" data-cites="brms">(<a href="#ref-brms" role="doc-biblioref">Bürkner 2017</a>)</span>. The evidence-accumulation modelling analyses of the distributions of response times for the correct and wrong answers were realized using the EMC2 R package <span class="citation" data-cites="EMC2">(<a href="#ref-EMC2" role="doc-biblioref">Stevenson et al. 2025</a>)</span>. In order to make inference about the magnitude of familiarity effects, differences in parameter estimates across conditions were compared. To summarize the distribution of parameters of interest, we report the median of the posterior distribution together with 95% quantile interval of the posterior distribution in square brackets in the following section.</p>
 <p>We can elaborate here on inferential criteria… RR can do this.</p>
 </section>
 </section>
@@ -963,23 +991,24 @@ Table&nbsp;5: Posterior median and 95% quantile intervals for threshold and drif
 
     <script>
       // Create table-specific functions using external factory
-      const tableFns_fo4zfkpii77ud2gkg4u9 = TinyTable.createTableFunctions("tinytable_fo4zfkpii77ud2gkg4u9");
+      const tableFns_4rwusudqt5p80fw9owto = TinyTable.createTableFunctions("tinytable_4rwusudqt5p80fw9owto");
       // tinytable span after
-      window.addEventListener('load', function () { tableFns_fo4zfkpii77ud2gkg4u9.spanCell(15, 1, 1, 4) })
-      window.addEventListener('load', function () { tableFns_fo4zfkpii77ud2gkg4u9.spanCell(8, 1, 1, 4) })
-      window.addEventListener('load', function () { tableFns_fo4zfkpii77ud2gkg4u9.spanCell(1, 1, 1, 4) })
+      window.addEventListener('load', function () { tableFns_4rwusudqt5p80fw9owto.spanCell(22, 1, 1, 4) })
+      window.addEventListener('load', function () { tableFns_4rwusudqt5p80fw9owto.spanCell(15, 1, 1, 4) })
+      window.addEventListener('load', function () { tableFns_4rwusudqt5p80fw9owto.spanCell(8, 1, 1, 4) })
+      window.addEventListener('load', function () { tableFns_4rwusudqt5p80fw9owto.spanCell(1, 1, 1, 4) })
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: '21', j: 1 }, { i: '21', j: 2 }, { i: '21', j: 3 }, { i: '21', j: 4 } ], css_id: 'tinytable_css_hen0owq11jggwgjdox2m',}, 
-          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '10', j: 1 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '13', j: 1 }, { i: '14', j: 1 }, { i: '15', j: 1 }, { i: '16', j: 1 }, { i: '17', j: 1 }, { i: '18', j: 1 }, { i: '19', j: 1 }, { i: '20', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '10', j: 2 }, { i: '11', j: 2 }, { i: '12', j: 2 }, { i: '13', j: 2 }, { i: '14', j: 2 }, { i: '15', j: 2 }, { i: '16', j: 2 }, { i: '17', j: 2 }, { i: '18', j: 2 }, { i: '19', j: 2 }, { i: '20', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '10', j: 3 }, { i: '11', j: 3 }, { i: '12', j: 3 }, { i: '13', j: 3 }, { i: '14', j: 3 }, { i: '15', j: 3 }, { i: '16', j: 3 }, { i: '17', j: 3 }, { i: '18', j: 3 }, { i: '19', j: 3 }, { i: '20', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '4', j: 4 }, { i: '5', j: 4 }, { i: '6', j: 4 }, { i: '7', j: 4 }, { i: '8', j: 4 }, { i: '9', j: 4 }, { i: '10', j: 4 }, { i: '11', j: 4 }, { i: '12', j: 4 }, { i: '13', j: 4 }, { i: '14', j: 4 }, { i: '15', j: 4 }, { i: '16', j: 4 }, { i: '17', j: 4 }, { i: '18', j: 4 }, { i: '19', j: 4 }, { i: '20', j: 4 } ], css_id: 'tinytable_css_jo0zvx5j22hla74sscmy',}, 
-          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_3vzz1nqz5m60hpg75k5q',}, 
+          { positions: [ { i: '28', j: 1 }, { i: '28', j: 2 }, { i: '28', j: 3 }, { i: '28', j: 4 } ], css_id: 'tinytable_css_fvuxgzvczuhr8mu2o1ar',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '10', j: 1 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '13', j: 1 }, { i: '14', j: 1 }, { i: '15', j: 1 }, { i: '16', j: 1 }, { i: '17', j: 1 }, { i: '18', j: 1 }, { i: '19', j: 1 }, { i: '20', j: 1 }, { i: '21', j: 1 }, { i: '22', j: 1 }, { i: '23', j: 1 }, { i: '24', j: 1 }, { i: '25', j: 1 }, { i: '26', j: 1 }, { i: '27', j: 1 }, { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '10', j: 2 }, { i: '11', j: 2 }, { i: '12', j: 2 }, { i: '13', j: 2 }, { i: '14', j: 2 }, { i: '15', j: 2 }, { i: '16', j: 2 }, { i: '17', j: 2 }, { i: '18', j: 2 }, { i: '19', j: 2 }, { i: '20', j: 2 }, { i: '21', j: 2 }, { i: '22', j: 2 }, { i: '23', j: 2 }, { i: '24', j: 2 }, { i: '25', j: 2 }, { i: '26', j: 2 }, { i: '27', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '10', j: 3 }, { i: '11', j: 3 }, { i: '12', j: 3 }, { i: '13', j: 3 }, { i: '14', j: 3 }, { i: '15', j: 3 }, { i: '16', j: 3 }, { i: '17', j: 3 }, { i: '18', j: 3 }, { i: '19', j: 3 }, { i: '20', j: 3 }, { i: '21', j: 3 }, { i: '22', j: 3 }, { i: '23', j: 3 }, { i: '24', j: 3 }, { i: '25', j: 3 }, { i: '26', j: 3 }, { i: '27', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '4', j: 4 }, { i: '5', j: 4 }, { i: '6', j: 4 }, { i: '7', j: 4 }, { i: '8', j: 4 }, { i: '9', j: 4 }, { i: '10', j: 4 }, { i: '11', j: 4 }, { i: '12', j: 4 }, { i: '13', j: 4 }, { i: '14', j: 4 }, { i: '15', j: 4 }, { i: '16', j: 4 }, { i: '17', j: 4 }, { i: '18', j: 4 }, { i: '19', j: 4 }, { i: '20', j: 4 }, { i: '21', j: 4 }, { i: '22', j: 4 }, { i: '23', j: 4 }, { i: '24', j: 4 }, { i: '25', j: 4 }, { i: '26', j: 4 }, { i: '27', j: 4 } ], css_id: 'tinytable_css_5w8wltzs0jigu464jpsw',}, 
+          { positions: [ { i: '0', j: 1 }, { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_iqlzhb9fc4kt9ayuifst',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  tableFns_fo4zfkpii77ud2gkg4u9.styleCell(cell.i, cell.j, group.css_id);
+                  tableFns_4rwusudqt5p80fw9owto.styleCell(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -988,12 +1017,12 @@ Table&nbsp;5: Posterior median and 95% quantile intervals for threshold and drif
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css">
     <style>
     /* tinytable css entries after */
-    #tinytable_fo4zfkpii77ud2gkg4u9 td.tinytable_css_hen0owq11jggwgjdox2m, #tinytable_fo4zfkpii77ud2gkg4u9 th.tinytable_css_hen0owq11jggwgjdox2m {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
-    #tinytable_fo4zfkpii77ud2gkg4u9 td.tinytable_css_jo0zvx5j22hla74sscmy, #tinytable_fo4zfkpii77ud2gkg4u9 th.tinytable_css_jo0zvx5j22hla74sscmy { font-size: 0.85em }
-    #tinytable_fo4zfkpii77ud2gkg4u9 td.tinytable_css_3vzz1nqz5m60hpg75k5q, #tinytable_fo4zfkpii77ud2gkg4u9 th.tinytable_css_3vzz1nqz5m60hpg75k5q {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
+    #tinytable_4rwusudqt5p80fw9owto td.tinytable_css_fvuxgzvczuhr8mu2o1ar, #tinytable_4rwusudqt5p80fw9owto th.tinytable_css_fvuxgzvczuhr8mu2o1ar {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.08em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
+    #tinytable_4rwusudqt5p80fw9owto td.tinytable_css_5w8wltzs0jigu464jpsw, #tinytable_4rwusudqt5p80fw9owto th.tinytable_css_5w8wltzs0jigu464jpsw { font-size: 0.85em }
+    #tinytable_4rwusudqt5p80fw9owto td.tinytable_css_iqlzhb9fc4kt9ayuifst, #tinytable_4rwusudqt5p80fw9owto th.tinytable_css_iqlzhb9fc4kt9ayuifst {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: var(--tt-line-color); --line-color-left: var(--tt-line-color); --line-color-right: var(--tt-line-color); --line-color-top: var(--tt-line-color); --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.08em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; font-size: 0.85em }
     </style>
     <div class="container">
-      <table class="tinytable" id="tinytable_fo4zfkpii77ud2gkg4u9" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="tinytable" id="tinytable_4rwusudqt5p80fw9owto" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         
         <thead>
               <tr>
@@ -1131,6 +1160,48 @@ Table&nbsp;5: Posterior median and 95% quantile intervals for threshold and drif
                   <td data-row="21" data-col="3">2.92</td>
                   <td data-row="21" data-col="4">[2.53, 3.32]</td>
                 </tr>
+                <tr>
+                  <td data-row="22" data-col="1">Experiment 5</td>
+                  <td data-row="22" data-col="2">Experiment 5</td>
+                  <td data-row="22" data-col="3">Experiment 5</td>
+                  <td data-row="22" data-col="4">Experiment 5</td>
+                </tr>
+                <tr>
+                  <td data-row="23" data-col="1">Threshold</td>
+                  <td data-row="23" data-col="2">novel</td>
+                  <td data-row="23" data-col="3">2.29</td>
+                  <td data-row="23" data-col="4">[2.135, 2.45]</td>
+                </tr>
+                <tr>
+                  <td data-row="24" data-col="1">Threshold</td>
+                  <td data-row="24" data-col="2">famous</td>
+                  <td data-row="24" data-col="3">1.72</td>
+                  <td data-row="24" data-col="4">[1.594, 1.841]</td>
+                </tr>
+                <tr>
+                  <td data-row="25" data-col="1">Threshold contrast</td>
+                  <td data-row="25" data-col="2">novel - famous</td>
+                  <td data-row="25" data-col="3">0.58</td>
+                  <td data-row="25" data-col="4">[0.479, 0.679]</td>
+                </tr>
+                <tr>
+                  <td data-row="26" data-col="1">Drift rate</td>
+                  <td data-row="26" data-col="2">novel</td>
+                  <td data-row="26" data-col="3">2.16</td>
+                  <td data-row="26" data-col="4">[1.983, 2.34]</td>
+                </tr>
+                <tr>
+                  <td data-row="27" data-col="1">Drift rate</td>
+                  <td data-row="27" data-col="2">famous</td>
+                  <td data-row="27" data-col="3">-0.05</td>
+                  <td data-row="27" data-col="4">[-0.227, 0.113]</td>
+                </tr>
+                <tr>
+                  <td data-row="28" data-col="1">Drift rate contrast</td>
+                  <td data-row="28" data-col="2">novel - famous</td>
+                  <td data-row="28" data-col="3">2.21</td>
+                  <td data-row="28" data-col="4">[1.888, 2.546]</td>
+                </tr>
         </tbody>
       </table>
     </div>
@@ -1150,10 +1221,15 @@ Table&nbsp;5: Posterior median and 95% quantile intervals for threshold and drif
 <h3 data-number="3.2.3" class="anchored" data-anchor-id="experiment-3-1"><span class="header-section-number">3.2.3</span> Experiment 3</h3>
 <p>As explained in the Methods, due to a timing artefact in data collection (responses recorded in discrete 80ms bins), the RT distributions from Experiment 3 do not meet the continuity assumptions of the LBA and we do not report model parameter estimates for this experiment.</p>
 </section>
-<section id="experiment-4-1" class="level3" data-number="3.2.4">
-<h3 data-number="3.2.4" class="anchored" data-anchor-id="experiment-4-1"><span class="header-section-number">3.2.4</span> Experiment 4</h3>
+<section id="experiment-4" class="level3" data-number="3.2.4">
+<h3 data-number="3.2.4" class="anchored" data-anchor-id="experiment-4"><span class="header-section-number">3.2.4</span> Experiment 4</h3>
 <p><em>Threshold:</em> Inspection of the posterior distribution shows that there is an effect of familiarity on the threshold parameter. Threshold was greater for Novel faces than for Famous faces.</p>
-<p><em>Drift rate:</em> Inspection of the posterior distribution shows that there is a familiarity effect in drift rate difference, which mirrors the results from Experiment 1 and Experiment 2. The quality of the evidence accumulation was greater for Novel faces compared to Learned faces.</p>
+<p><em>Drift rate:</em> Inspection of the posterior distribution shows that there is a familiarity effect in drift rate difference, which mirrors the results from Experiment 1 and Experiment 2. The quality of the evidence accumulation was greater for Novel faces compared to Famous faces.</p>
+</section>
+<section id="experiment-5" class="level3" data-number="3.2.5">
+<h3 data-number="3.2.5" class="anchored" data-anchor-id="experiment-5"><span class="header-section-number">3.2.5</span> Experiment 5</h3>
+<p><em>Threshold:</em> Inspection of the posterior distribution shows that there is an effect of familiarity on the threshold parameter which mirrors the results from Experiment 4.</p>
+<p><em>Drift rate:</em> Inspection of the posterior distribution shows that there is a familiarity effect in drift rate difference, which mirrors the results from Experiment 1, Experiment 2 and Experiment 4. The quality of the evidence accumulation was greater for Novel faces compared to Famous faces.</p>
 </section>
 </section>
 </section>
@@ -1163,7 +1239,7 @@ Table&nbsp;5: Posterior median and 95% quantile intervals for threshold and drif
 <section id="the-impact-of-visual-familiarity" class="level2" data-number="4.1">
 <h2 data-number="4.1" class="anchored" data-anchor-id="the-impact-of-visual-familiarity"><span class="header-section-number">4.1</span> The impact of visual familiarity</h2>
 <p>The most theoretically important finding is the combination of drift rate and threshold effects. Across Experiments 1 and 2, the novelty advantage in drift rate was substantially larger than the novelty advantage in threshold. This dissociation matters because the two parameters reflect qualitatively different aspects of the decision process. Drift rate indexes the quality of evidence accumulation — how cleanly and rapidly perceptual and cognitive systems extract decision-relevant information from a face. Threshold indexes how much accumulated evidence is required before a decision is triggered. The dominance of the drift rate effect localises familiarity’s influence to the quality of signal from the image more so than as a function of response bias between novel and familiar key presses.</p>
-<p>Set within the Bruce and Young framework of face perception <span class="citation" data-cites="bruceUnderstandingFaceRecognition1986">(<a href="#ref-bruceUnderstandingFaceRecognition1986" role="doc-biblioref">Bruce and Young 1986</a>)</span>, visual familiarity modulates the quality of structural encoding and feature matching within the core face processing system <span class="citation" data-cites="bruceUnderstandingFaceRecognition1986 gobbiniNeuralResponseVisual2006">(<a href="#ref-bruceUnderstandingFaceRecognition1986" role="doc-biblioref">Bruce and Young 1986</a>; <a href="#ref-gobbiniNeuralResponseVisual2006" role="doc-biblioref">Gobbini and Haxby 2006</a>)</span>, thus generating a stronger perceptual signal that feeds into the decision process. Novel faces, by this account, provide a cleaner and less ambiguous perceptual signal than visually familiar faces — consistent with “pop-out” and attentional capture accounts <span class="citation" data-cites="johnstonAttentionCaptureNovel1990 lev-ariEcologicalViewSelective2022 lubowVisualSearchFunction1997">(<a href="#ref-johnstonAttentionCaptureNovel1990" role="doc-biblioref">W. A. Johnston et al. 1990</a>; <a href="#ref-lev-ariEcologicalViewSelective2022" role="doc-biblioref">Lev-Ari, Beeri, and Gutfreund 2022</a>; <a href="#ref-lubowVisualSearchFunction1997" role="doc-biblioref">Lubow and Kaplan 1997</a>)</span>. In contrast, visually familiar faces may generate noisier representations due to interference from accumulated but imperfectly consolidated memory traces <span class="citation" data-cites="rapcsakFaceRecognition2019">(<a href="#ref-rapcsakFaceRecognition2019" role="doc-biblioref">Rapcsak 2019</a>)</span>.</p>
+<p>Set within the Bruce and Young framework of face perception <span class="citation" data-cites="bruceUnderstandingFaceRecognition1986">(<a href="#ref-bruceUnderstandingFaceRecognition1986" role="doc-biblioref">Bruce and Young 1986</a>)</span>, visual familiarity modulates the quality of structural encoding and feature matching within the core face processing system <span class="citation" data-cites="bruceUnderstandingFaceRecognition1986 gobbiniNeuralResponseVisual2006">(<a href="#ref-bruceUnderstandingFaceRecognition1986" role="doc-biblioref">Bruce and Young 1986</a>; <a href="#ref-gobbiniNeuralResponseVisual2006" role="doc-biblioref">Gobbini and Haxby 2006</a>)</span>, thus generating a stronger perceptual signal that feeds into the decision process. Novel faces, by this account, provide a cleaner and less ambiguous perceptual signal than visually familiar faces — consistent with “pop-out” and attentional capture accounts <span class="citation" data-cites="johnstonAttentionCaptureNovel1990 lev-ariEcologicalViewSelective2022 lubowVisualSearchFunction1997">(<a href="#ref-johnstonAttentionCaptureNovel1990" role="doc-biblioref">Johnston et al. 1990</a>; <a href="#ref-lev-ariEcologicalViewSelective2022" role="doc-biblioref">Lev-Ari et al. 2022</a>; <a href="#ref-lubowVisualSearchFunction1997" role="doc-biblioref">Lubow and Kaplan 1997</a>)</span>. In contrast, visually familiar faces may generate noisier representations due to interference from accumulated but imperfectly consolidated memory traces <span class="citation" data-cites="rapcsakFaceRecognition2019">(<a href="#ref-rapcsakFaceRecognition2019" role="doc-biblioref">Rapcsak 2019</a>)</span>.</p>
 <p>The smaller but reliable threshold effect reflects a qualitatively different influence on performance. In a yes/no recognition task, participants must set separate response criteria for the “familiar” and “novel” responses, and the higher threshold for the novel response is consistent with a well-documented conservative rejection bias in recognition memory [ CITE glanzerMirrorEffectRecognition1985; stretchWixtedWhyPositive1998]: participants are more willing to endorse familiarity than to endorse novelty, requiring more evidence before committing to a rejection. Because the drift rate advantage is substantially larger, the net behavioural outcome remains a novel face advantage in speed and accuracy — the signal quality benefit outweighs the response caution cost.</p>
 </section>
 <section id="the-impact-of-person-knowledge" class="level2" data-number="4.2">
@@ -1173,8 +1249,8 @@ Table&nbsp;5: Posterior median and 95% quantile intervals for threshold and drif
 </section>
 <section id="limitations" class="level2" data-number="4.3">
 <h2 data-number="4.3" class="anchored" data-anchor-id="limitations"><span class="header-section-number">4.3</span> Limitations</h2>
-<p>A novelty advantage in drift rate is in conceptual agreement with studies that reported a better recognition ability for novel faces than for visually familiar faces <span class="citation" data-cites="bindemannPerceivedAbilityActual2014 readChangingPhotosFaces1990">(<a href="#ref-bindemannPerceivedAbilityActual2014" role="doc-biblioref">Bindemann, Attard, and Johnston 2014</a>; <a href="#ref-readChangingPhotosFaces1990" role="doc-biblioref">Read and Hammersley 1990</a>)</span>, whist being in apparent tension with prior work reporting better recognition performance for famous or personally familiar faces <span class="citation" data-cites="hancockRecognitionUnfamiliarFaces2000 jenkins2011 klatzkyRecognizingFamiliarUnfamiliar1984">(<a href="#ref-hancockRecognitionUnfamiliarFaces2000" role="doc-biblioref">Hancock, Bruce, and Burton 2000</a>; <a href="#ref-jenkins2011" role="doc-biblioref">Jenkins and Burton 2011</a>; <a href="#ref-klatzkyRecognizingFamiliarUnfamiliar1984" role="doc-biblioref">Klatzky and Forrest 1984</a>)</span>. We suggest two factors may contribute to this discrepancy. First, prior studies used manifest measures that conflate signal quality with response bias, which makes interpretation more difficult <span class="citation" data-cites="wagenmakersEZdiffusionModelResponse2007">(<a href="#ref-wagenmakersEZdiffusionModelResponse2007" role="doc-biblioref">Wagenmakers, Van Der Maas, and Grasman 2007</a>)</span>. Second, the yes/no recognition task used here creates an inherent asymmetry: a correct novel response requires only the absence of a recognition signal, whereas a correct famous response requires the presence of one. Novel faces may therefore benefit from a processing advantage that is specific to this task structure, and which would not generalise to tasks requiring positive identification of unfamiliar faces. Whether the novelty advantage in drift rate reflects a genuine signal quality effect, a task asymmetry, or both, remains an open question that future work should address by comparing LBA parameters across paradigms that vary the demands placed on novel versus familiar face processing.</p>
-<p>Previous evidence accumulation model development studies have emphasised how the number of trials per cell of the design can influence model fitting and parameter estimation <span class="citation" data-cites="alexandrowiczComparingEightParameter2020 lercheHowManyTrials2017 wagenmakersEZdiffusionModelResponse2007">(<a href="#ref-alexandrowiczComparingEightParameter2020" role="doc-biblioref">Alexandrowicz and Gula 2020</a>; <a href="#ref-lercheHowManyTrials2017" role="doc-biblioref">Lerche, Voss, and Nagler 2017</a>; <a href="#ref-wagenmakersEZdiffusionModelResponse2007" role="doc-biblioref">Wagenmakers, Van Der Maas, and Grasman 2007</a>)</span>. Our design (90 trials per condition) and control of error rates followed the minimum recommendations to apply EAM <span class="citation" data-cites="lukenParameterIdentifiabilityEvidenceaccumulation2025">(<a href="#ref-lukenParameterIdentifiabilityEvidenceaccumulation2025" role="doc-biblioref">Lüken et al. 2025</a>)</span>, as well as a parameter recovery study that showed 90 trials per condition was sufficient to recover simulated parameters. Practical considerations were also incorporated, including the challenge of finding face stimuli with standardized low-level visual features that includes a large number of identities. Nonetheless, adding more trials per condition (e.g., 200 per condition; REF Boag et al 2025) would have increased the robustness of our parameter estimates.</p>
+<p>A novelty advantage in drift rate is in conceptual agreement with studies that reported a better recognition ability for novel faces than for visually familiar faces <span class="citation" data-cites="bindemannPerceivedAbilityActual2014 readChangingPhotosFaces1990">(<a href="#ref-bindemannPerceivedAbilityActual2014" role="doc-biblioref">Bindemann et al. 2014</a>; <a href="#ref-readChangingPhotosFaces1990" role="doc-biblioref">Read and Hammersley 1990</a>)</span>, whist being in apparent tension with prior work reporting better recognition performance for famous or personally familiar faces <span class="citation" data-cites="hancockRecognitionUnfamiliarFaces2000 jenkins2011 klatzkyRecognizingFamiliarUnfamiliar1984">(<a href="#ref-hancockRecognitionUnfamiliarFaces2000" role="doc-biblioref">Hancock et al. 2000</a>; <a href="#ref-jenkins2011" role="doc-biblioref">Jenkins and Burton 2011</a>; <a href="#ref-klatzkyRecognizingFamiliarUnfamiliar1984" role="doc-biblioref">Klatzky and Forrest 1984</a>)</span>. We suggest two factors may contribute to this discrepancy. First, prior studies used manifest measures that conflate signal quality with response bias, which makes interpretation more difficult <span class="citation" data-cites="wagenmakersEZdiffusionModelResponse2007">(<a href="#ref-wagenmakersEZdiffusionModelResponse2007" role="doc-biblioref">Wagenmakers et al. 2007</a>)</span>. Second, the yes/no recognition task used here creates an inherent asymmetry: a correct novel response requires only the absence of a recognition signal, whereas a correct famous response requires the presence of one. Novel faces may therefore benefit from a processing advantage that is specific to this task structure, and which would not generalise to tasks requiring positive identification of unfamiliar faces. Whether the novelty advantage in drift rate reflects a genuine signal quality effect, a task asymmetry, or both, remains an open question that future work should address by comparing LBA parameters across paradigms that vary the demands placed on novel versus familiar face processing.</p>
+<p>Previous evidence accumulation model development studies have emphasised how the number of trials per cell of the design can influence model fitting and parameter estimation <span class="citation" data-cites="alexandrowiczComparingEightParameter2020 lercheHowManyTrials2017 wagenmakersEZdiffusionModelResponse2007">(<a href="#ref-alexandrowiczComparingEightParameter2020" role="doc-biblioref">Alexandrowicz and Gula 2020</a>; <a href="#ref-lercheHowManyTrials2017" role="doc-biblioref">Lerche et al. 2017</a>; <a href="#ref-wagenmakersEZdiffusionModelResponse2007" role="doc-biblioref">Wagenmakers et al. 2007</a>)</span>. Our design (90 trials per condition) and control of error rates followed the minimum recommendations to apply EAM <span class="citation" data-cites="lukenParameterIdentifiabilityEvidenceaccumulation2025">(<a href="#ref-lukenParameterIdentifiabilityEvidenceaccumulation2025" role="doc-biblioref">Lüken et al. 2025</a>)</span>, as well as a parameter recovery study that showed 90 trials per condition was sufficient to recover simulated parameters. Practical considerations were also incorporated, including the challenge of finding face stimuli with standardized low-level visual features that includes a large number of identities. Nonetheless, adding more trials per condition (e.g., 200 per condition; REF Boag et al 2025) would have increased the robustness of our parameter estimates.</p>
 </section>
 <section id="future-directions" class="level2" data-number="4.4">
 <h2 data-number="4.4" class="anchored" data-anchor-id="future-directions"><span class="header-section-number">4.4</span> Future directions</h2>
@@ -1212,7 +1288,7 @@ Project Administration: RF, RR</p>
 </section>
 <section id="references" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> References</h1>
-<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-akanHaventSeenYou2023" class="csl-entry" role="listitem">
 Akan, Melisa, and Aaron S. Benjamin. 2023. <span>“Haven’t i Seen You Before? Conceptual but Not Perceptual Prior Familiarity Enhances Face Recognition Memory.”</span> <em>Journal of Memory and Language</em> 131 (August): 104433. <a href="https://doi.org/10.1016/j.jml.2023.104433">https://doi.org/10.1016/j.jml.2023.104433</a>.
 </div>
@@ -1223,7 +1299,7 @@ Alexandrowicz, Rainer W., and Bartosz Gula. 2020. <span>“Comparing Eight Param
 Bainbridge, Wilma A., Phillip Isola, and Aude Oliva. 2013. <span>“The Intrinsic Memorability of Face Photographs.”</span> <em>Journal of Experimental Psychology: General</em> 142 (4): 1323–34. <a href="https://doi.org/10.1037/a0033872">https://doi.org/10.1037/a0033872</a>.
 </div>
 <div id="ref-bindemannPerceivedAbilityActual2014" class="csl-entry" role="listitem">
-Bindemann, Markus, Janice Attard, and Robert A. Johnston. 2014. <span>“Perceived Ability and Actual Recognition Accuracy for Unfamiliar and Famous Faces.”</span> Edited by Peter Walla. <em>Cogent Psychology</em> 1 (1): 986903. <a href="https://doi.org/10.1080/23311908.2014.986903">https://doi.org/10.1080/23311908.2014.986903</a>.
+Bindemann, Markus, Janice Attard, and Robert A. Johnston. 2014. <span>“Perceived Ability and Actual Recognition Accuracy for Unfamiliar and Famous Faces.”</span> <em>Cogent Psychology</em> 1 (1): 986903. <a href="https://doi.org/10.1080/23311908.2014.986903">https://doi.org/10.1080/23311908.2014.986903</a>.
 </div>
 <div id="ref-birdEffectsPreexperimentalKnowledge2011" class="csl-entry" role="listitem">
 Bird, Chris M., Rachel A. Davies, Jamie Ward, and Neil Burgess. 2011. <span>“Effects of Pre-Experimental Knowledge on Recognition Memory.”</span> <em>Learning &amp; Memory</em> 18 (1): 11–14. <a href="https://doi.org/10.1101/lm.1952111">https://doi.org/10.1101/lm.1952111</a>.
@@ -1235,13 +1311,13 @@ Brown, Scott D., and Andrew Heathcote. 2008. <span>“The Simplest Complete Mode
 Bruce, Vicki, and Andy Young. 1986. <span>“Understanding Face Recognition.”</span> <em>British Journal of Psychology</em> 77 (3): 305–27. <a href="https://doi.org/10.1111/j.2044-8295.1986.tb02199.x">https://doi.org/10.1111/j.2044-8295.1986.tb02199.x</a>.
 </div>
 <div id="ref-brms" class="csl-entry" role="listitem">
-Bürkner, Paul-Christian. 2017. <span>“<span></span>Brms<span></span>: An <span></span>r<span></span> Package for <span></span>Bayesian<span></span> Multilevel Models Using <span></span>Stan<span></span>”</span> 80. <a href="https://doi.org/10.18637/jss.v080.i01">https://doi.org/10.18637/jss.v080.i01</a>.
+Bürkner, Paul-Christian. 2017. <em><span></span>Brms<span></span>: An <span></span>r<span></span> Package for <span></span>Bayesian<span></span> Multilevel Models Using <span></span>Stan<span></span></em>. 80. <a href="https://doi.org/10.18637/jss.v080.i01">https://doi.org/10.18637/jss.v080.i01</a>.
 </div>
 <div id="ref-charpentierApplicationComputationalModels2018" class="csl-entry" role="listitem">
 Charpentier, Caroline J., and John P. O’Doherty. 2018. <span>“The Application of Computational Models to Social Neuroscience: Promises and Pitfalls.”</span> <em>Social Neuroscience</em> 13 (6): 637–47. <a href="https://doi.org/10.1080/17470919.2018.1518834">https://doi.org/10.1080/17470919.2018.1518834</a>.
 </div>
 <div id="ref-donkinGettingMoreAccuracy2009" class="csl-entry" role="listitem">
-Donkin, Chris, Lee Averell, Scott Brown, and Andrew Heathcote. 2009. <span>“Getting More from Accuracy and Response Time Data: Methods for Fitting the Linear Ballistic Accumulator.”</span> <em>Behavior Research Methods</em> 41 (4): 1095–1110. <a href="https://doi.org/10.3758/BRM.41.4.1095">https://doi.org/10.3758/BRM.41.4.1095</a>.
+Donkin, Chris, Lee Averell, Scott Brown, and Andrew Heathcote. 2009. <span>“Getting More from Accuracy and Response Time Data: Methods for Fitting the Linear Ballistic Accumulator.”</span> <em>Behavior Research Methods</em> 41 (4): 1095–110. <a href="https://doi.org/10.3758/BRM.41.4.1095">https://doi.org/10.3758/BRM.41.4.1095</a>.
 </div>
 <div id="ref-duchaineRevisedNeuralFramework2015" class="csl-entry" role="listitem">
 Duchaine, Brad, and Galit Yovel. 2015. <span>“A Revised Neural Framework for Face Processing.”</span> <em>Annual Review of Vision Science</em> 1 (1): 393–416. <a href="https://doi.org/10.1146/annurev-vision-082114-035518">https://doi.org/10.1146/annurev-vision-082114-035518</a>.
@@ -1256,10 +1332,10 @@ Glanzer, Murray, and John K. Adams. 1985. <span>“The Mirror Effect in Recognit
 Gobbini, M. Ida, and James V. Haxby. 2006. <span>“Neural Response to the Visual Familiarity of Faces.”</span> <em>Brain Research Bulletin</em> 71 (1-3): 76–82. <a href="https://doi.org/10.1016/j.brainresbull.2006.08.003">https://doi.org/10.1016/j.brainresbull.2006.08.003</a>.
 </div>
 <div id="ref-gobbiniNeuralSystemsRecognition2007" class="csl-entry" role="listitem">
-———. 2007. <span>“Neural Systems for Recognition of Familiar Faces.”</span> <em>Neuropsychologia</em> 45 (1): 32–41. <a href="https://doi.org/10.1016/j.neuropsychologia.2006.04.015">https://doi.org/10.1016/j.neuropsychologia.2006.04.015</a>.
+Gobbini, M. Ida, and James V. Haxby. 2007. <span>“Neural Systems for Recognition of Familiar Faces.”</span> <em>Neuropsychologia</em> 45 (1): 32–41. <a href="https://doi.org/10.1016/j.neuropsychologia.2006.04.015">https://doi.org/10.1016/j.neuropsychologia.2006.04.015</a>.
 </div>
 <div id="ref-hackelComputationalNeuroscienceApproaches2018" class="csl-entry" role="listitem">
-Hackel, Leor M, and David M Amodio. 2018. <span>“Computational Neuroscience Approaches to Social Cognition.”</span> <em>Current Opinion in Psychology</em>, Social neuroscience, 24 (December): 92–97. <a href="https://doi.org/10.1016/j.copsyc.2018.09.001">https://doi.org/10.1016/j.copsyc.2018.09.001</a>.
+Hackel, Leor M, and David M Amodio. 2018. <span>“Computational Neuroscience Approaches to Social Cognition.”</span> <em>Current Opinion in Psychology</em>, Social neuroscience, vol. 24 (December): 92–97. <a href="https://doi.org/10.1016/j.copsyc.2018.09.001">https://doi.org/10.1016/j.copsyc.2018.09.001</a>.
 </div>
 <div id="ref-hancockRecognitionUnfamiliarFaces2000" class="csl-entry" role="listitem">
 Hancock, Peter J. B., Vicki Bruce, and A.Mike Burton. 2000. <span>“Recognition of Unfamiliar Faces.”</span> <em>Trends in Cognitive Sciences</em> 4 (9): 330–37. <a href="https://doi.org/10.1016/S1364-6613(00)01519-9">https://doi.org/10.1016/S1364-6613(00)01519-9</a>.
@@ -1286,7 +1362,7 @@ Johnston, Robert A., and Andrew J. Edmonds. 2009. <span>“Familiar and Unfamili
 Johnston, William A., Kevin J. Hawley, Steven H. Plewe, John M. G. Elliott, and M. Jann DeWitt. 1990. <span>“Attention Capture by Novel Stimuli.”</span> <em>Journal of Experimental Psychology: General</em> 119 (4): 397–411. <a href="https://doi.org/10.1037/0096-3445.119.4.397">https://doi.org/10.1037/0096-3445.119.4.397</a>.
 </div>
 <div id="ref-kanwisher111FunctionalArchitecture2011" class="csl-entry" role="listitem">
-Kanwisher, Nancy, and Jason J. S. Barton. 2011. <span>“111 the Functional Architecture of the Face System: Integrating Evidence from fMRI and Patient Studies.”</span> In <em>Oxford Handbook of Face Perception</em>, edited by Andrew J. Calder, Gillian Rhodes, Mark H. Johnson, and James V. Haxby, 0. Oxford University Press. <a href="https://doi.org/10.1093/oxfordhb/9780199559053.013.0007">https://doi.org/10.1093/oxfordhb/9780199559053.013.0007</a>.
+Kanwisher, Nancy, and Jason J. S. Barton. 2011. <span>“111 the Functional Architecture of the Face System: Integrating Evidence from fMRI and Patient Studies.”</span> In <em>Oxford Handbook of Face Perception</em>, edited by Andrew J. Calder, Gillian Rhodes, Mark H. Johnson, and James V. Haxby. Oxford University Press. <a href="https://doi.org/10.1093/oxfordhb/9780199559053.013.0007">https://doi.org/10.1093/oxfordhb/9780199559053.013.0007</a>.
 </div>
 <div id="ref-klatzkyRecognizingFamiliarUnfamiliar1984" class="csl-entry" role="listitem">
 Klatzky, Roberta L., and Fiona H. Forrest. 1984. <span>“Recognizing Familiar and Unfamiliar Faces.”</span> <em>Memory &amp; Cognition</em> 12 (1): 60–70. <a href="https://doi.org/10.3758/BF03196998">https://doi.org/10.3758/BF03196998</a>.
@@ -1307,7 +1383,7 @@ Lerche, Veronika, Andreas Voss, and Markus Nagler. 2017. <span>“How Many Trial
 Lev-Ari, Tidhar, Hadar Beeri, and Yoram Gutfreund. 2022. <span>“The Ecological View of Selective Attention.”</span> <em>Frontiers in Integrative Neuroscience</em> 16 (March): 856207. <a href="https://doi.org/10.3389/fnint.2022.856207">https://doi.org/10.3389/fnint.2022.856207</a>.
 </div>
 <div id="ref-lewandowskyComputationalModelingCognition2018" class="csl-entry" role="listitem">
-Lewandowsky, Stephan, and Klaus Oberauer. 2018. <span>“Computational Modeling in Cognition and Cognitive Neuroscience.”</span> In <em>Stevens’ Handbook of Experimental Psychology and Cognitive Neuroscience</em>, edited by John T. Wixted, 1st ed., 1–35. Wiley. <a href="https://doi.org/10.1002/9781119170174.epcn501">https://doi.org/10.1002/9781119170174.epcn501</a>.
+Lewandowsky, Stephan, and Klaus Oberauer. 2018. <span>“Computational Modeling in Cognition and Cognitive Neuroscience.”</span> In <em>Stevens’ Handbook of Experimental Psychology and Cognitive Neuroscience</em>, 1st ed., edited by John T. Wixted. Wiley. <a href="https://doi.org/10.1002/9781119170174.epcn501">https://doi.org/10.1002/9781119170174.epcn501</a>.
 </div>
 <div id="ref-lockwoodComputationalModellingSocial2021" class="csl-entry" role="listitem">
 Lockwood, Patricia L, and Miriam C Klein-Flügge. 2021. <span>“Computational Modelling of Social Cognition and Behaviour<span></span>a Reinforcement Learning Primer.”</span> <em>Social Cognitive and Affective Neuroscience</em> 16 (8): 761–71. <a href="https://doi.org/10.1093/scan/nsaa040">https://doi.org/10.1093/scan/nsaa040</a>.
@@ -1328,7 +1404,7 @@ Myers, Catherine E., Alejandro Interian, and Ahmed A. Moustafa. 2022. <span>“A
 Natu, Vaidehi, and Alice J. O’Toole. 2011. <span>“The Neural Processing of Familiar and Unfamiliar Faces: A Review and Synopsis.”</span> <em>British Journal of Psychology</em> 102 (4): 726–47. <a href="https://doi.org/10.1111/j.2044-8295.2011.02053.x">https://doi.org/10.1111/j.2044-8295.2011.02053.x</a>.
 </div>
 <div id="ref-oberauerAddressingTheoryCrisis2019" class="csl-entry" role="listitem">
-Oberauer, Klaus, and Stephan Lewandowsky. 2019. <span>“Addressing the Theory Crisis in Psychology.”</span> <em>Psychonomic Bulletin &amp; Review</em> 26 (5): 1596–1618. <a href="https://doi.org/10.3758/s13423-019-01645-2">https://doi.org/10.3758/s13423-019-01645-2</a>.
+Oberauer, Klaus, and Stephan Lewandowsky. 2019. <span>“Addressing the Theory Crisis in Psychology.”</span> <em>Psychonomic Bulletin &amp; Review</em> 26 (5): 1596–618. <a href="https://doi.org/10.3758/s13423-019-01645-2">https://doi.org/10.3758/s13423-019-01645-2</a>.
 </div>
 <div id="ref-palestroTutorialJointModels2018" class="csl-entry" role="listitem">
 Palestro, James J., Giwon Bahg, Per B. Sederberg, Zhong-Lin Lu, Mark Steyvers, and Brandon M. Turner. 2018. <span>“A Tutorial on Joint Models of Neural and Behavioral Measures of Cognition.”</span> <em>Journal of Mathematical Psychology</em> 84 (June): 20–48. <a href="https://doi.org/10.1016/j.jmp.2018.03.003">https://doi.org/10.1016/j.jmp.2018.03.003</a>.
@@ -1337,10 +1413,10 @@ Palestro, James J., Giwon Bahg, Per B. Sederberg, Zhong-Lin Lu, Mark Steyvers, a
 Parker, Samantha, and Richard Ramsey. 2024. <span>“What Can Evidence Accumulation Modelling Tell Us about Human Social Cognition?”</span> <em>Quarterly Journal of Experimental Psychology</em> 77 (3): 639–55. <a href="https://doi.org/10.1177/17470218231176950">https://doi.org/10.1177/17470218231176950</a>.
 </div>
 <div id="ref-peircePsychoPy2ExperimentsBehavior2019" class="csl-entry" role="listitem">
-Peirce, Jonathan, Jeremy R. Gray, Sol Simpson, Michael MacAskill, Richard Höchenberger, Hiroyuki Sogo, Erik Kastman, and Jonas Kristoffer Lindeløv. 2019. <span>“PsychoPy2: Experiments in Behavior Made Easy.”</span> <em>Behavior Research Methods</em> 51 (1): 195–203. <a href="https://doi.org/10.3758/s13428-018-01193-y">https://doi.org/10.3758/s13428-018-01193-y</a>.
+Peirce, Jonathan, Jeremy R. Gray, Sol Simpson, et al. 2019. <span>“PsychoPy2: Experiments in Behavior Made Easy.”</span> <em>Behavior Research Methods</em> 51 (1): 195–203. <a href="https://doi.org/10.3758/s13428-018-01193-y">https://doi.org/10.3758/s13428-018-01193-y</a>.
 </div>
 <div id="ref-phillipsStateModellingFace2025" class="csl-entry" role="listitem">
-Phillips, P. Jonathon, and David White. 2025. <span>“The State of Modelling Face Processing in Humans with Deep Learning.”</span> <em>British Journal of Psychology</em>, May, bjop.12794. <a href="https://doi.org/10.1111/bjop.12794">https://doi.org/10.1111/bjop.12794</a>.
+Phillips, P. Jonathon, and David White. 2025. <span>“The State of Modelling Face Processing in Humans with Deep Learning.”</span> <em>British Journal of Psychology</em>, May 14, bjop.12794. <a href="https://doi.org/10.1111/bjop.12794">https://doi.org/10.1111/bjop.12794</a>.
 </div>
 <div id="ref-proulxStatisticalRitualTheory2021" class="csl-entry" role="listitem">
 Proulx, Travis, and Richard D. Morey. 2021. <span>“Beyond Statistical Ritual: Theory in Psychological Science.”</span> <em>Perspectives on Psychological Science</em> 16 (4): 671–81. <a href="https://doi.org/10.1177/17456916211017098">https://doi.org/10.1177/17456916211017098</a>.
@@ -1367,22 +1443,22 @@ Read, John, and Richard Hammersley. 1990. <span>“Changing Photos of Faces: Eff
 Schomaker, Judith, and Martijn Meeter. 2012. <span>“Novelty Enhances Visual Perception.”</span> <em>PLOS ONE</em> 7 (12): e50599. <a href="https://doi.org/10.1371/journal.pone.0050599">https://doi.org/10.1371/journal.pone.0050599</a>.
 </div>
 <div id="ref-schwaningerRoleFeaturalConfigural2002" class="csl-entry" role="listitem">
-Schwaninger, Adrian, Janek S. Lobmaier, and Stephan M. Collishaw. 2002. <span>“Role of Featural and Configural Information in Familiar and Unfamiliar Face Recognition.”</span> In <em>Biologically Motivated Computer Vision</em>, edited by Heinrich H. Bülthoff, Christian Wallraven, Seong-Whan Lee, and Tomaso A. Poggio, 2525:643–50. Springer Berlin Heidelberg. <a href="http://link.springer.com/10.1007/3-540-36181-2_64">http://link.springer.com/10.1007/3-540-36181-2_64</a>.
+Schwaninger, Adrian, Janek S. Lobmaier, and Stephan M. Collishaw. 2002. <span>“Role of Featural and Configural Information in Familiar and Unfamiliar Face Recognition.”</span> In <em>Biologically Motivated Computer Vision</em>, edited by Heinrich H. Bülthoff, Christian Wallraven, Seong-Whan Lee, and Tomaso A. Poggio, vol. 2525. Springer Berlin Heidelberg. <a href="http://link.springer.com/10.1007/3-540-36181-2_64">http://link.springer.com/10.1007/3-540-36181-2_64</a>.
 </div>
 <div id="ref-schwartzRolesPerceptualConceptual2016" class="csl-entry" role="listitem">
-Schwartz, Linoy, and Galit Yovel. 2016. <span>“The Roles of Perceptual and Conceptual Information in Face Recognition.”</span> <em>Journal of Experimental Psychology: General</em> 145 (11): 1493–1511. <a href="https://doi.org/10.1037/xge0000220">https://doi.org/10.1037/xge0000220</a>.
+Schwartz, Linoy, and Galit Yovel. 2016. <span>“The Roles of Perceptual and Conceptual Information in Face Recognition.”</span> <em>Journal of Experimental Psychology: General</em> 145 (11): 1493–511. <a href="https://doi.org/10.1037/xge0000220">https://doi.org/10.1037/xge0000220</a>.
 </div>
 <div id="ref-schwartzIndependentContributionPerceptual2019" class="csl-entry" role="listitem">
-———. 2019. <span>“Independent Contribution of Perceptual Experience and Social Cognition to Face Recognition.”</span> <em>Cognition</em> 183 (February): 131–38. <a href="https://doi.org/10.1016/j.cognition.2018.11.003">https://doi.org/10.1016/j.cognition.2018.11.003</a>.
+Schwartz, Linoy, and Galit Yovel. 2019. <span>“Independent Contribution of Perceptual Experience and Social Cognition to Face Recognition.”</span> <em>Cognition</em> 183 (February): 131–38. <a href="https://doi.org/10.1016/j.cognition.2018.11.003">https://doi.org/10.1016/j.cognition.2018.11.003</a>.
 </div>
 <div id="ref-simonsConstraintsGeneralityCOG2017" class="csl-entry" role="listitem">
 Simons, Daniel, Yuichi Shoda, and D. Lindsay. 2017. <span>“Constraints on Generality (COG): A Proposed Addition to All Empirical Papers.”</span> <em>Perspectives on Psychological Science</em> 12 (August): 174569161770863. <a href="https://doi.org/10.1177/1745691617708630">https://doi.org/10.1177/1745691617708630</a>.
 </div>
 <div id="ref-EMC2" class="csl-entry" role="listitem">
-Stevenson, Niek, Michelle Donzallaz, and Andrew Heathcote. 2025. <span>“EMC2: Bayesian Hierarchical Analysis of Cognitive Models of Choice.”</span> <a href="https://CRAN.R-project.org/package=EMC2">https://CRAN.R-project.org/package=EMC2</a>.
+Stevenson, Niek, Michelle Donzallaz, and Andrew Heathcote. 2025. <em>EMC2: Bayesian Hierarchical Analysis of Cognitive Models of Choice</em>. <a href="https://CRAN.R-project.org/package=EMC2">https://CRAN.R-project.org/package=EMC2</a>.
 </div>
 <div id="ref-GIMP" class="csl-entry" role="listitem">
-The GIMP Development Team. 2025. <span>“GNU Image Manipulation Program (GIMP), Version 3.0.6. Community, Free Software (License GPLv3).”</span> <a href="https://gimp.org/">https://gimp.org/</a>.
+The GIMP Development Team. 2025. <em>GNU Image Manipulation Program (GIMP), Version 3.0.6. Community, Free Software (License GPLv3)</em>. Released. <a href="https://gimp.org/">https://gimp.org/</a>.
 </div>
 <div id="ref-tulvingNoveltyAssessmentBrain1995" class="csl-entry" role="listitem">
 Tulving, Endel, and Neal Kroll. 1995. <span>“Novelty Assessment in the Brain and Long-Term Memory Encoding.”</span> <em>Psychonomic Bulletin &amp; Review</em> 2 (3): 387–90. <a href="https://doi.org/10.3758/BF03210977">https://doi.org/10.3758/BF03210977</a>.
