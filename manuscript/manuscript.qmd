@@ -156,11 +156,13 @@ Threshold represents the amount of accumulated evidence needed to trigger the de
 The starting point is the amount of evidence towards a response before the accumulation of evidence begins, reflecting the *a priori* bias towards a response.
 Finally, the non-decision time is an estimation of the time taken to complete processes that are not involved in the decision time, such as stimulus encoding and motor responses.
 
-::: {.place arguments="bottom, scope: \"parent\", float: true"}
-:::{#fig-LBA fig-cap = "Schematic of the linear ballistic accumulator (LBA) model"} ![](figures/LBA_schematique.png){width="90%"}
+:::: {.place arguments="bottom, scope: \"parent\", float: true"}
+:::{#fig-LBA fig-cap = "Schematic of the linear ballistic accumulator (LBA) model"}
+![](figures/LBA_schematique.png){width="90%"}
 :::
 
-*This diagram represents the accumulation process one trial of a perceptual decision task for the linear ballistic accumulator (LBA). Participants are required to chose between two options (Response 1 and Response 2). In a LBA model, there is a separated accumulation of evidence (v) for each response option. In this example, the correct response is Response 1. The accumulator on the left is the accumulator for the correct response (Response 1), and the green line in represents the rate at which the evidence accumulates in favor of that response option. The accumulator on the right is the accumulator for the incorrect response (Response 2), and the dash red line represents the rate at which the evidence accumulates in favor of this response option. Once the accumulated evidence crosses the threshold (b) of a response option, the corresponding response is chosen (in this case Response 1).* ::::
+*This diagram represents the accumulation process one trial of a perceptual decision task for the linear ballistic accumulator (LBA). Participants are required to chose between two options (Response 1 and Response 2). In a LBA model, there is a separated accumulation of evidence (v) for each response option. In this example, the correct response is Response 1. The accumulator on the left is the accumulator for the correct response (Response 1), and the green line in represents the rate at which the evidence accumulates in favor of that response option. The accumulator on the right is the accumulator for the incorrect response (Response 2), and the dash red line represents the rate at which the evidence accumulates in favor of this response option. Once the accumulated evidence crosses the threshold (b) of a response option, the corresponding response is chosen (in this case Response 1).* 
+::::
 
 ```{r}
 #| label: lba-params
@@ -497,11 +499,13 @@ It is important to note that participants never saw two pictures of the same lea
 Furthermore, each novel identity was only presented once in the entire recognition part.
 Response time \[s\] and accuracy were collected after each recognition trial.
 
-::: {.place arguments="bottom, scope: \"parent\", float: true"}
-:::{#fig-proc-exp1 fig-cap = "Experimental procedure of Experiment 1"} ![](figures/Experimental_procedure_exp1.png)
+:::: {.place arguments="bottom, scope: \"parent\", float: true"}
+:::{#fig-proc-exp1 fig-cap = "Experimental procedure of Experiment 1"}
+![](figures/Experimental_procedure_exp1.png)
 :::
 
-*The experimental procedure was divided into two parts: a familiarization part and a recognition part. a) In the familiarization part, participants were asked to memorize the face identity of 30 identities. For each identity, participants looked at 6 pictures depicting the same identity with different face orientation (3/4 left view, frontal view and 3/4 right view) and different colorimetry (color and gray scale images) in the order presented here: 3/4 left view, frontal view and 3/4 right view in color, followed by 3/4 right view, frontal view and 3/4 left view in gray scale. b) In each trial of the recognition part, participants had to decided if they recognize the face shown on the screen from the familiarization part. If they did, they had to press the "q" key and if the did not, the "p" key. They completed three blocks of 60 trials (half of them were from the familiarization part, half were novel faces). For the recognition part, only gray scale images of faces were used (for both learned faces and novel faces).* ::::
+*The experimental procedure was divided into two parts: a familiarization part and a recognition part. a) In the familiarization part, participants were asked to memorize the face identity of 30 identities. For each identity, participants looked at 6 pictures depicting the same identity with different face orientation (3/4 left view, frontal view and 3/4 right view) and different colorimetry (color and gray scale images) in the order presented here: 3/4 left view, frontal view and 3/4 right view in color, followed by 3/4 right view, frontal view and 3/4 left view in gray scale. b) In each trial of the recognition part, participants had to decided if they recognize the face shown on the screen from the familiarization part. If they did, they had to press the "q" key and if the did not, the "p" key. They completed three blocks of 60 trials (half of them were from the familiarization part, half were novel faces). For the recognition part, only gray scale images of faces were used (for both learned faces and novel faces).* 
+::::
 
 ## Experiment 2
 
@@ -573,11 +577,13 @@ Each mask was composed of 10 grey rectangles which position differs in function 
 The addition of a grey mask on top the face images decreased the overall accuracy of the recognition part during pilot work to a percentage of correct answer suited for the application of evidence-accumulation modeling.
 Without this addition, the overall accuracy would be too extreme.
 
-::: {.place arguments="bottom, scope: \"parent\", float: true"}
-:::{#fig-mask-exp3 fig-cap = "Non-masked and masked images"} ![](figures/Mask_exp3.png)
+:::: {.place arguments="bottom, scope: \"parent\", float: true"}
+:::{#fig-mask-exp3 fig-cap = "Non-masked and masked images"}
+![](figures/Mask_exp3.png)
 :::
 
-*a) Images showing faces used in Experiment 1 and 2 for the three different face orientation (3/4 left, frontal view, 3/4 right) b) Same faces with the gray mask added on top of the images. These images were used in the recognition part of Experiment 3. Each mask is composed of 10 gray rectangles which position was adapted in function of the face orientation.These faces were used in the "novel" condition of Experiment 3.* ::::
+*a) Images showing faces used in Experiment 1 and 2 for the three different face orientation (3/4 left, frontal view, 3/4 right) b) Same faces with the gray mask added on top of the images. These images were used in the recognition part of Experiment 3. Each mask is composed of 10 gray rectangles which position was adapted in function of the face orientation.These faces were used in the "novel" condition of Experiment 3.* 
+::::
 
 ### Material
 
@@ -601,11 +607,13 @@ If they did, the should press the "q" key and if they did not, the "p" key.
 Based on pilot work, task difficulty was increased by adding a response time window of 0.9 second during each recognition trial.
 Response time \[s\] and accuracy were collected after each trial.
 
-::: {.place arguments="bottom, scope: \"parent\", float: true"}
-:::{#fig-proc-exp3 fig-cap = "Experimental procedure of Experiment 3"} ![](figures/Experimental_procedure_exp3.png)
+:::: {.place arguments="bottom, scope: \"parent\", float: true"}
+:::{#fig-proc-exp3 fig-cap = "Experimental procedure of Experiment 3"}
+![](figures/Experimental_procedure_exp3.png)
 :::
 
-*The experimental procedure was divided into two parts: a rating part and a recognition part. a) In the rating part, participants were asked to rate famous faces on two distinct features using rating scales (0-10): their familiarity (low to high) and the emotional valence (negative to positive). After the two rating scales, they had to chose the correct name of the celebrities from four different naming options.(Disclaimer: the picture used here was not used in the actual rating part of the experiment. Its purpose here is to demonstrate what participants had to realize in the first part of the experiment. Image attribution: Philip Romano, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons, <https://commons.wikimedia.org/wiki/File:ChrisEvans2023.jpg>) b) In each trial of the recognition part, participants had to decided if they recognize the face shown on the screen. If they did, they had to press the "q" key and if the did not, the "p" key. They completed three blocks of 60 trials (half of them were famous faces, half were novel faces).* ::::
+*The experimental procedure was divided into two parts: a rating part and a recognition part. a) In the rating part, participants were asked to rate famous faces on two distinct features using rating scales (0-10): their familiarity (low to high) and the emotional valence (negative to positive). After the two rating scales, they had to chose the correct name of the celebrities from four different naming options.(Disclaimer: the picture used here was not used in the actual rating part of the experiment. Its purpose here is to demonstrate what participants had to realize in the first part of the experiment. Image attribution: Philip Romano, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons, <https://commons.wikimedia.org/wiki/File:ChrisEvans2023.jpg>) b) In each trial of the recognition part, participants had to decided if they recognize the face shown on the screen. If they did, they had to press the "q" key and if the did not, the "p" key. They completed three blocks of 60 trials (half of them were famous faces, half were novel faces).* 
+::::
 
 ### Issues with response times collection
 
