@@ -189,6 +189,26 @@ ok, a bunch of things to check:
 - Exp 3/4 exclusion ordering — confirm ratings-first (Exp 3) vs RT-first (Exp 4) is scientifically justified, or standardise to a common workflow
 - Exp 2/4 models may need refitting once original data files are confirmed.
 
-# July 9th
-- Introduction changes: I removed brain areas and neuroscience mentions in the introduction since we don't come back to them in the discussion
-- Need to add a reason for the different viewing points + colorimetry during the familiarization
+# July 27th
+I had a look at the comment that you sent me regarding our last meeting with Paul and here is what I've done:
+
+Experiment 5: so I added the results of Experiment 5 in the manuscript (ACC/RT, RT distributions and LBA param). I also added the Exp5 model to the OSF folder. 
+
+- Introduction changes: I removed brain areas and neuroscience mentions in the introduction since we don't come back to them in the discussion. I also cleaned a little bit the introduction.
+- Added the justification for 3 different viewpoints and colorimetry in familiarisation in Methods section
+- Memory trace argument in discussion: one interpretation
+- Stimuli are person specific for the famous vs novel faces experiments
+- I went through the manuscript to change "recognition of novel faces" to "perception/detection of novel faces". 
+
+I would need that you send me some papers to add them to my Zotero library because I don't have access to them through the ETH access. I added the rest of the missing references. 
+
+- Introduction: Hintzman., 1991/ Cheong et al., 2017
+- Discussion: Burton 2024 Encyclopedia
+
+Questions: 
+
+- There was a comment regarding the old vs new literature (original comment: old vs new literature. reframe and make it clearer.) but I don't really know where I should add those changes (intro, discussion, both?) and what to add.
+- Regarding the link for OSF and github in Methods/Pre-registration and open science, for the raw data, experiment materials and analysis code, I think that we should do like this: raw data (github + OSF), experiment materials (OSF), analysis code (github + OSF). What do you think?
+- Methods/Evidence-accumulation modelling/Inferential criteria: here it said RR can elaborate on this. So I checked the preregistration and we did not write inferential criteria there. We just said that we were going to calculate distribution differences. Do we need to add anything else to that? (Because that is technically what we did and said in the Methods/Evidence-accumulation modelling/Data analysis section).
+
+
