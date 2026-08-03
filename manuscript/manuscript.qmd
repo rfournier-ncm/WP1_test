@@ -142,8 +142,8 @@ Given the importance of knowing who it is you are interacting with, the study of
 Largely using manifest measures, such as response time and accuracy, research consistently shows that familiar faces, especially those imbued with person knowledge, facilitate a range of face recognition processes compared to previously unseen individuals or visually familiar faces [@ramonFamiliarityMattersReview2018; @youngAreWeFace2018].
 It has been argued that person knowledge involves a qualitatively different and deeper level of processing than visual familiarity [@schwartzIndependentContributionPerceptual2019], which facilitates the accurate discrimination of familiar from unfamiliar faces [@akanHaventSeenYou2023; @schwartzRolesPerceptualConceptual2016; @akanHaventSeenYou2023; @birdEffectsPreexperimentalKnowledge2011; @klatzkyRecognizingFamiliarUnfamiliar1984; @schwaningerRoleFeaturalConfigural2002].
 
-Although manifest (observed) measures of performance have formed the bedrock of research findings on face perception, there have been many calls in recent years to embrace more computational approaches in social and cognitive neuroscience research [@charpentierApplicationComputationalModels2018; @forstmannIntroductionModelBasedCognitive2024a; @hackelComputationalNeuroscienceApproaches2018; @lockwoodComputationalModellingSocial2021; @parker2024; @phillipsStateModellingFace2025] (Cheong et al., 2017).
-One benefit of adopting computational approaches is that relationships between parts of a system can be more explicitly specified [@yarkoniGeneralizabilityCrisis2022] (Hintzman, 1991), which aids the development of theory [@muthukrishnaProblemTheory2019; @oberauerAddressingTheoryCrisis2019; @proulxStatisticalRitualTheory2021].
+Although manifest (observed) measures of performance have formed the bedrock of research findings on face perception, there have been many calls in recent years to embrace more computational approaches in social and cognitive neuroscience research [@charpentierApplicationComputationalModels2018; @cheongComputationalModelsSocial2017; @forstmannIntroductionModelBasedCognitive2024a; @hackelComputationalNeuroscienceApproaches2018; @lockwoodComputationalModellingSocial2021; @parker2024; @phillipsStateModellingFace2025].
+One benefit of adopting computational approaches is that relationships between parts of a system can be more explicitly specified [@hintzmanWhyAreFormal1991; @yarkoniGeneralizabilityCrisis2022], which aids the development of theory [@muthukrishnaProblemTheory2019; @oberauerAddressingTheoryCrisis2019; @proulxStatisticalRitualTheory2021].
 A second benefit is that latent (unobserved) parameters can be estimated, which can give rise to different interpretations of the cognitive processes involved in task performance [@ratcliffEffectsAgingReaction2001].
 And at present, there is almost no understanding of the computational processes that support face recognition processes when familiarity is based on visual exposure compared to stored person knowledge [@phillipsStateModellingFace2025].
 
@@ -238,7 +238,7 @@ exp_details |>
 
 We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures in the four experiments [@simonsConstraintsGeneralityCOG2017].
 For each experiment, the research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered ((Experiment 1: <https://osf.io/azyvu/overview>); (Experiment 2: <https://osf.io/tu2eh/overview>); (Experiment 3: <https://osf.io/ut78f/overview>); (Experiment 4 <https://osf.io/vj2aq/overview>) and (Experiment 5 <https://osf.io/6tqxw/overview>).
-The raw data, experimental materials, and analysis code are available on GitHub (link) or the Open Science Framework (link).
+The raw data and analysis code are available on GitHub (<https://github.com/cbs-lab/face-familiarity-eam>).
 
 ```{r}
 #| label: exclusions-all
@@ -736,10 +736,7 @@ Refer to plots in Supps.
 For every experiment, the separate analysis of response times and accuracy was conducted using Bayesian Multilevel Models with R Package brms [@brms].
 The evidence-accumulation modelling analyses of the distributions of response times for the correct and wrong answers were realized using the EMC2 R package [@EMC2].
 In order to make inference about the magnitude of familiarity effects, differences in parameter estimates across conditions were compared.
-To summarize the distribution of parameters of interest, we report the median of the posterior distribution together with 95% quantile interval of the posterior distribution in square brackets in the following section.
-
-We can elaborate here on inferential criteria...
-RR can do this.
+Our inferences are based on the median and 95% quantile interval of the posterior distributions and the difference contrasts between the conditions of interest.
 
 # Results
 
@@ -1488,15 +1485,15 @@ This raises the possibility that the computational signature of novelty generali
 Moreover, the effects were larger for drift rate and threshold compared to Experiments 1 and 2, which might suggest that the more stable memory traces for famous people based on the added person knowledge could exaggerate the novelty or "pop-out" effect.
 
 At this stage, however, we remain cautious in our conclusion here and suggest that person knowledge effects on drift rate and threshold remain a largely open empirical question, which requires careful further investigation using improved and/or different stimuli, such as personally familiar people (e.g., family, friends or partners).
-More generally, our findings underscore that although the study of true familiarity - where person knowledge is available - is more akin to our real-world experiences of interacting with familiar people, it is inherently more difficult to study with tight experimental control (REF Burton, 2024 Encyclopedia chapter).
+More generally, our findings underscore that although the study of true familiarity - where person knowledge is available - is more akin to our real-world experiences of interacting with familiar people, it is inherently more difficult to study with tight experimental control [@burtonFacePerception2024].
 
 ## Limitations
 
 A novelty advantage in drift rate is in conceptual agreement with studies that reported a better perception ability for novel faces than for visually familiar faces [@bindemannPerceivedAbilityActual2014; @readChangingPhotosFaces1990], whist being in apparent tension with prior work reporting better recognition performance for famous or personally familiar faces [@hancockRecognitionUnfamiliarFaces2000; @jenkins2011; @klatzkyRecognizingFamiliarUnfamiliar1984].
 We suggest two factors may contribute to this discrepancy.
 First, prior studies used manifest measures that conflate signal quality with response bias, which makes interpretation more difficult [@wagenmakersEZdiffusionModelResponse2007].
-Second, the yes/no recognition task used here creates an inherent asymmetry: a correct novel response requires only the absence of a recognition signal, whereas a correct famous response requires the presence of one.
-Novel faces may therefore benefit from a processing advantage that is specific to this task structure, and which would not generalise to tasks requiring positive identification of unfamiliar faces.
+Second, novel faces may benefit from a processing advantage specific to the task structure (old/new detection task): a correct novel response requires only the absence of a recognition signal, whereas a correct famous response requires the presence of one.
+However, using this design also has benefits as it allows comparison to numerous previous works that did use an old/new recognition task with faces or other stimuli to study visual recognition.
 Whether the novelty advantage in drift rate reflects a genuine signal quality effect, a task asymmetry, or both, remains an open question that future work should address by comparing LBA parameters across paradigms that vary the demands placed on novel versus familiar face processing.
 
 Previous evidence accumulation model development studies have emphasised how the number of trials per cell of the design can influence model fitting and parameter estimation [@alexandrowiczComparingEightParameter2020; @lercheHowManyTrials2017; @wagenmakersEZdiffusionModelResponse2007].

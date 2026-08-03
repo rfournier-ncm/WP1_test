@@ -211,4 +211,10 @@ Questions:
 - Regarding the link for OSF and github in Methods/Pre-registration and open science, for the raw data, experiment materials and analysis code, I think that we should do like this: raw data (github + OSF), experiment materials (OSF), analysis code (github + OSF). What do you think?
 - Methods/Evidence-accumulation modelling/Inferential criteria: here it said RR can elaborate on this. So I checked the preregistration and we did not write inferential criteria there. We just said that we were going to calculate distribution differences. Do we need to add anything else to that? (Because that is technically what we did and said in the Methods/Evidence-accumulation modelling/Data analysis section).
 
+Meeting Rich
 
+- Limitations: shorter bit about old/new paradigm and mention other studies with old/new effect. Certain pattern to the task. Follow with benefit of using old/new task used before -> direct comparison with other studies. 
+
+- OSF: add stimuli + experimental code on common project with models -> new folder with experiments
+
+- Methods:

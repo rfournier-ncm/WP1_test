@@ -18,7 +18,7 @@ This project contains the analysis code and manuscript for a four-experiment stu
 | Exp 2 | [brief description] | 35 |
 | Exp 3 | [brief description — note: LBA not fitted due to quantised RTs] | 40 |
 | Exp 4 | [brief description] | 46 |
-
+| Exp 5 | [brief description] | 46 |
 ---
 
 ## Workflow components
