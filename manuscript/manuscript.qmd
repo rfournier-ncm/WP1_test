@@ -472,8 +472,8 @@ In total, the data set of face images used in Experiment 1 contained 756 images:
 
 ### Material
 
-Stimuli were presented on the screen of a MacBook Pro (Apple M2 Pro, macOS 13 Ventura).
-The experiment was run on Psychopy Coder (version: 2022.5, @peircePsychoPy2ExperimentsBehavior2019) and the code used for the experimental procedure is available on OSF (<https://osf.io/azyvu/overview>).
+Stimuli were presented on the screen of a MacBook Pro (Apple M2 Pro, macOS 13 Ventura) and 
+the experiment was run on Psychopy Coder (version: 2022.5, @peircePsychoPy2ExperimentsBehavior2019).
 
 ### Procedure
 
@@ -650,7 +650,7 @@ To avoid that decisions are based on visual features and not on familiarity, we 
 
 For the "Famous" condition, faces were all taken from <https:://commons.wikimedia.org>.
 For each of the famous identities (30 men, 30 women), four pictures were selected: one for the rating part of the experiment and three were used in the recognition part.
-The list of the attributions as well as the URL links to all the pictures can be found on OSF (Experiment 4: <https://osf.io/vj2aq/overview> and Experiment 5: <https://osf.io/6tqxw/overview>).
+The list of the attributions as well as the URL links to all the pictures can be found on OSF (<https://osf.io/65bt2/overview>).
 For the "Novel" condition, face images were taken from the "10K US Adult Faces Database" [@bainbridgeIntrinsicMemorabilityFace2013].
 These pictures depict faces in a natural environment, similar to the selected images of the celebrities.
 103 faces were selected from this database and used in the recognition part of the experiment.
