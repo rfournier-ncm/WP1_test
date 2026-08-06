@@ -31,7 +31,7 @@ affiliations:
     name: ETH Zürich
     department: Learning and Instruction Laboratory, Department of Humanities, Social and Political Sciences
 abstract: |
-  Recognising a familiar face is a fundamental social cognitive ability, yet the computational mechanisms that underlie this capacity remain poorly understood. Prior research has established that familiarity affects face recognition performance, but has relied primarily on manifest measures — accuracy and response time — that cannot distinguish between qualitatively different sources of performance change. Here, we used evidence accumulation modelling across four experiments to ask not merely whether familiarity affects face recognition, but how — specifically, which latent computational processes are modulated. Experiments 1 and 2 examined visual familiarity (briefly learned faces versus novel faces) and Experiments 3, 4 and 5 examined person knowledge (famous versus novel faces). Fitting linear ballistic accumulator models to recognition data revealed a consistent computational signature across experiments: novel faces produced substantially higher drift rates than familiar faces, accompanied by a smaller but reliable increase in response caution. The dominance of the drift rate effect localises familiarity's primary influence to the quality of evidence accumulation — how cleanly the perceptual system extracts decision-relevant information — rather than to response bias. We interpret this as reflecting a novelty pop-out effect combined with unstable memory traces for familiar faces, alongside a conservative rejection bias in recognition memory. These findings demonstrate that computational modelling reveals dissociable mechanisms underlying face recognition that are invisible to manifest measures alone, and provide a foundation for understanding how familiarity shapes the decision processes that support social perception.
+  Recognising a familiar face is a fundamental social cognitive ability, yet the computational mechanisms that underlie this capacity remain poorly understood. Prior research has established that familiarity affects face recognition performance, but has relied primarily on manifest measures — accuracy and response time — that cannot distinguish between qualitatively different sources of performance change. Here, we used evidence accumulation modelling across a series of experiments to ask not merely whether familiarity affects face recognition, but how — specifically, which latent computational processes are modulated. Experiments 1 and 2 examined visual familiarity (briefly learned faces versus novel faces) and Experiments 3, 4 and 5 examined person knowledge (famous versus novel faces). Fitting linear ballistic accumulator models to recognition data revealed a consistent computational signature across experiments: novel faces produced substantially higher drift rates than familiar faces, accompanied by a smaller but reliable increase in response caution. The dominance of the drift rate effect localises familiarity's primary influence to the quality of evidence accumulation — how cleanly the perceptual system extracts decision-relevant information — rather than to response bias. We interpret thes findings as reflecting a novelty pop-out effect combined with unstable memory traces for familiar faces. These findings demonstrate that computational modelling reveals dissociable mechanisms underlying face recognition that are invisible to manifest measures alone, and provide a foundation for understanding how familiarity shapes the decision processes that support social perception.
 keywords: [face perception, memory, familiarity, person knowledge, decision models, evidence accumulation modelling]
 wordcount: true
 date: last-modified
@@ -236,7 +236,7 @@ exp_details |>
 
 ## Pre-registration and open science
 
-We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures in the four experiments [@simonsConstraintsGeneralityCOG2017].
+We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures [@simonsConstraintsGeneralityCOG2017].
 For each experiment, the research question, hypotheses, experimental design, planned analysis, and exclusion criteria were preregistered ((Experiment 1: <https://osf.io/azyvu/overview>); (Experiment 2: <https://osf.io/tu2eh/overview>); (Experiment 3: <https://osf.io/ut78f/overview>); (Experiment 4 <https://osf.io/vj2aq/overview>) and (Experiment 5 <https://osf.io/6tqxw/overview>).
 The raw data and analysis code are available on GitHub (<https://github.com/cbs-lab/face-familiarity-eam>).
 
@@ -439,12 +439,12 @@ All participants were recruited using either an online recruiting platform (<htt
 Sample size was determined in advance.
 Following previous suggestions from @heathcoteDynamicModelsChoice2019, a parameter recovery study was run to estimate if 30 usable participant datasets were sufficient to accurately recover the parameter estimates.
 The parameter recovery study included 30 participant datasets, each with 180 trials (90 trials "familiar" and 90 trials "unfamiliar") and with our selected model parameterisation.
-The arameters were sufficiently well-recovered to suggest the combination of data and design were a reasonable choice (See Supplementary Materials).
+The parameters were sufficiently well-recovered to suggest the combination of data and design were a reasonable choice (See Supplementary Materials).
 
 `r completed_exp1` healthy participants completed Experiment 1 (@tbl-participants).
 All participants reported normal or corrected-to-normal vision and received payment (20 CHF) for participating in the experiment.
 Based on our preregistration, response times longer than 2.5 seconds were removed from the analysis.
-However, this cutoff value led to the the removal of 59% of the trials of one participant.
+However, this cutoff value led to the removal of 59% of the trials of one participant.
 Given the recommendation of having a certain number of trials per condition per participant when using evidence-accumulation models [@heathcoteDynamicModelsChoice2019; @parker2024], this participant was excluded from the data analysis.
 In the end, the data of `r final_n_exp1` participants (`r male_exp1` men and `r female_exp1` women) was retained for the analysis and the LBA modeling.
 Ages ranged from `r min_age_exp1` to `r max_age_exp1` years old ($M_{age} =$ `r mean_age_exp1`, $SD_{age} =$ `r sd_age_exp1`).
@@ -462,13 +462,13 @@ participant_summary |>
 
 ### Stimuli
 
-The stimuli consisted of images selected from two different data sets of face images: the Face Research Lab London Set (REF : DeBruine, Lisa; Jones, Benedict (2017): <https://doi.org/10.6084/m9.figshare.5047666.v5>) and the Color FERET Database (<https://www.nist.gov/itl/products-and-services/color-feret-database>).
+The stimuli consisted of images selected from two different data sets of face images: the Face Research Lab London Set (DeBruine, Lisa; Jones, Benedict (2017): <https://doi.org/10.6084/m9.figshare.5047666.v5>) and the Color FERET Database (<https://www.nist.gov/itl/products-and-services/color-feret-database>).
 Each of these data sets is composed of images of different identities taken from different angle points.
 102 identities were selected from the Face Research Lab London Set and 51 from the Color FERET Database.
 For each selected identity, three pictures of the face at three different view points (3/4 left view, frontal view and 3/4 right view) were cropped to only keep the internal features of the face.
 All of the images processing was realized using the free community-developed software GNU Image Manipulation Program (@GIMP).
-After 4 pilots experiments, we removed 27 identities (21 from the Face Research Lab London Set and 6 from the Color FERET Database) due to to the presence of identifiable features (i.e. skin marks, make-up...).
-In total, the data set of face images used in Experiment 1 contained 756 images: one set of three colorful face images and one set of three gray scaled face images for each of the 126 identities.
+After 4 pilot experiments, we removed 27 identities (21 from the Face Research Lab London Set and 6 from the Color FERET Database) due to the presence of identifiable features (i.e. skin marks, make-up...).
+In total, the data set of face images used in Experiment 1 contained 756 images: one set of three colour face images and one set of three gray scaled face images for each of the 126 identities.
 
 ### Material
 
@@ -479,7 +479,7 @@ the experiment was run on Psychopy Coder (version: 2022.5, @peircePsychoPy2Exper
 
 The experimental task was divided into two distinct parts: a familiarization part and a recognition part (@fig-proc-exp1).
 In the familiarization part, the face of 30 unknown identities were presented on the screen and participants were told to memorize the identity of the faces.
-One familiarization trial consisted of the presentation of 6 face images, one after the other, depicting the same identity but varying in viewing points (3/4 left view, frontal view and 3/4 right view) and the colorimetry (colorful image, gray scale image).
+One familiarization trial consisted of the presentation of 6 face images, one after the other, depicting the same identity but varying in viewing points (3/4 left view, frontal view and 3/4 right view) and the colorimetry (colour image, gray scale image).
 The variability of the face presentation (viewing points and colorimetry) was used to avoid that participants memorized the "picture" of the face instead of the "identity" of the face.
 The duration of each image presentation was 0.75 second.
 Each participant underwent 30 familiarization trials.
@@ -575,7 +575,6 @@ In total, the data set of face images used in this experiment contained 618 imag
 Furthermore, a gray mask was added on top of each pictures ("Novel" faces and "Learned" faces) during the recognition part.
 Each mask was composed of 10 grey rectangles which position differs in function of the face orientation (See @fig-mask-exp3 for an example of the mask in question).
 The addition of a grey mask on top the face images decreased the overall accuracy of the recognition part during pilot work to a percentage of correct answer suited for the application of evidence-accumulation modeling.
-Without this addition, the overall accuracy would be too extreme.
 
 :::: {.place arguments="bottom, scope: \"parent\", float: true"}
 :::{#fig-mask-exp3 fig-cap = "Non-masked and masked images"}

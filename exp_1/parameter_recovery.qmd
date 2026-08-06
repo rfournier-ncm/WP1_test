@@ -1,0 +1,1207 @@
+---
+title: "Parameter Recovery Study"
+author: "Raph & Rich"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+This file performs a parameter recovery study to estimate if the research design used can recover parameters in a reasonable manner from our LBA model specification.
+
+See here for more details: 
+
+<https://ampl-psych.github.io/EMC2/articles/Simulation-based-Calibration.html>
+
+And see the following papers, as they explain the approach in detail.
+
+Heathcote, A., Lin, Y. S., Reynolds, A., Strickland, L., Gretton, M., & Matzke, D. (2019). Dynamic models of choice. Behavior research methods, 51(2), 961-985. <https://link.springer.com/article/10.3758/s13428-018-1067-y>
+
+Boag, R. J., Innes, R. J., Stevenson, N., Bahg, G., Busemeyer, J. R., Cox, G. E., ... & Forstmann, B. U. (2025). An expert guide to planning experimental tasks for evidence-accumulation modeling. Advances in Methods and Practices in Psychological Science, 8(2), 25152459251336127.<https://doi.org/10.1177/25152459251336127>
+
+
+```{r}
+#| label: setup
+#| include: false
+
+pkgs <- c(
+  "tidyverse", "here", "patchwork", "EMC2", "parallel", "future"
+  )
+vapply(
+  pkgs, library, logical(1), character.only = TRUE, logical.return = TRUE
+  )
+
+set.seed(123)  # for reproducibility of prior draws and data simulation. Note: Exact reproduction of MCMC sampling results may not be possible due to the use of parallel processing.
+
+
+options(mc.cores = parallel::detectCores(),
+        future.fork.enable = TRUE,
+        future.rng.onMisuse = "ignore") ## automatically set in RStudio
+
+supportsMulticore()
+
+detectCores()
+
+plan(multicore)
+```
+
+# Non-hierarchical
+
+This approach fits a separate model per participant.
+It is much faster to fit than a hierarchical approach.
+
+## 1. Specify the model design and priors
+
+```{r}
+#| label: specify-model-single
+
+## design
+matchfun <- function(d) d$S == d$lR
+
+design_lba <- design(
+  factors = list(
+    subjects = 1,
+    S = c("Novel", "Learned")
+  ),
+  Rlevels = c("Novel", "Learned"),
+  model = LBA,
+  matchfun = matchfun,
+  formula = list(
+    v  ~ 0 + S:lM,
+    sv ~ 0 + lM,
+    B  ~ 0 + lR,
+    A  ~ 1,
+    t0 ~ 1
+  ),
+  constants = c(sv_lMFALSE = log(1))
+)
+
+## check the design
+p_vector <- c(
+  "v_SNovel:lMFALSE"   = 4, "v_SLearned:lMFALSE" = 4,
+  "v_SNovel:lMTRUE"    = 4, "v_SLearned:lMTRUE"  = 4,
+  sv_lMTRUE            = log(.5),
+  B_lRNovel            = log(2), B_lRLearned = log(2),
+  A                    = log(.5), t0 = log(.3)
+)
+
+mapped_pars(p_vector, x = design_lba)
+```
+
+```{r}
+#| label: set-priors-single
+
+## priors
+mu_mean <- c(
+  "v_SNovel:lMFALSE"   = 0, "v_SLearned:lMFALSE" = 0,
+  "v_SNovel:lMTRUE"    = 1, "v_SLearned:lMTRUE"  = 1,
+  sv_lMTRUE            = log(.5),
+  B_lRNovel            = log(1), B_lRLearned = log(1),
+  A                    = log(.5), t0 = log(.3)
+)
+
+mu_sd <- c(
+  "v_SNovel:lMFALSE"   = 2, "v_SLearned:lMFALSE" = 2,
+  "v_SNovel:lMTRUE"    = 2, "v_SLearned:lMTRUE"  = 2,
+  sv_lMTRUE            = .5,
+  B_lRNovel            = .5, B_lRLearned = .5,
+  A                    = .3, t0 = .3
+)
+
+prior_lba_single <- prior(
+  design_lba,
+  type  = "single",
+  pmean = mu_mean,
+  psd   = mu_sd
+)
+
+plot(prior_lba_single, N=1e3)
+plot(prior_lba_single, N=1e3, map=TRUE)
+```
+
+## 2. Run the simulation based calibration
+
+```{r}
+#| label: fit-sbc-single
+
+sbc_lba_single <- run_sbc(
+  design_lba,
+  prior_lba_single,
+  replicates = 500,
+  trials = 90,
+  plot_data = FALSE,
+  iter = 3000,
+  fileName = "exp_1/models/sbc/single/tmp.rds",
+  cores_for_chains = 3,
+  cores_per_chain = 9,
+  verbose = TRUE
+)
+
+saveRDS(sbc_lba_single, "exp_1/models/sbc/single/sbc_lba_single.rds")
+```
+
+## 3. Plot
+
+some diagnostics first
+
+```{r}
+#| label: single-diagnostics
+
+# check for failed replicates (run_SBC_subject returns NULL on failure)
+n_total    <- nrow(sbc_lba_single$rank$alpha)
+n_failed   <- sum(is.na(sbc_lba_single$rank$alpha[, 1]))
+n_complete <- n_total - n_failed
+
+cat("Total replicates:", n_total, "\n")
+cat("Completed:", n_complete, "\n")
+cat("Failed:", n_failed, "\n")
+
+# coverage as a rough calibration check
+# proportion of replicates where true value fell within 95% CI
+coverage_95 <- colMeans(sbc_lba_single$coverage$alpha, na.rm = TRUE)
+tibble(
+  param    = names(coverage_95),
+  coverage = coverage_95
+)
+```
+
+Evaluate rank statistics and check uniformity
+
+Ideally, we would use the EMC2 plotting tools. But I think they have a bug as of 3.4.1.
+
+```{r}
+#| label: load-sbc-single
+
+## EMC2 plotting tools
+## load if already computed
+sbc_lba_single <- readRDS("exp_1/models/sbc/single/sbc_lba_single.rds")
+
+# plot_sbc_hist(sbc_lba_single, bins = 20)
+# 
+# plot_sbc_ecdf(sbc_lba_single)
+```
+
+Use our own plotting function
+
+```{r}
+#| label: sbc-plot-functions
+
+#' Plot prior vs posterior density for a single parameter
+#'
+#' A helper function that produces a density plot comparing the distribution
+#' of true parameter values (drawn from the prior) against the distribution
+#' of posterior medians across SBC replicates. Useful for visually assessing
+#' whether the posterior is systematically shifted relative to the prior draws,
+#' which would indicate miscalibration.
+#'
+#' This function is called internally by \code{plot_sbc_parameter()} when
+#' \code{has_density} is TRUE. It works for both non-hierarchical
+#' (\code{level = "alpha"}) and hierarchical (\code{level = "mu"}) SBC
+#' objects, provided posterior medians and bias are stored. For hierarchical
+#' models this requires running \code{SBC_hierarchical_fixed()} rather than
+#' EMC2's native \code{run_sbc()}.
+#'
+#' @param sbc_obj An SBC results object. Must contain \code{$med[[level]]}
+#'   and \code{$bias[[level]]} for the specified level.
+#' @param par_name Character string. Name of the parameter to plot. Must match
+#'   a column name in \code{sbc_obj$med[[level]]}.
+#' @param level Character string. Which level of parameters to plot. Use
+#'   \code{"alpha"} for non-hierarchical (single-subject) models or
+#'   \code{"mu"} for hierarchical group-level means. Defaults to \code{"alpha"}.
+#'
+#' @return A ggplot object showing overlapping density curves for prior true
+#'   values (skyblue1) and posterior medians (grey20), faceted with the title
+#'   "Prior vs posterior".
+#'
+#' @examples
+#' # Non-hierarchical
+#' plot_prior_vs_posterior(sbc_lba_single, "v_SNovel:lMTRUE")
+#' plot_prior_vs_posterior(sbc_lba_single, "t0")
+#'
+#' # Hierarchical group means (requires SBC_hierarchical_fixed output)
+#' plot_prior_vs_posterior(sbc_lba_hierarchical, "v_SNovel:lMTRUE", level = "mu")
+plot_prior_vs_posterior <- function(sbc_obj, par_name, level = "alpha") {
+  
+  med  <- sbc_obj$med[[level]][, par_name]
+  bias <- sbc_obj$bias[[level]][[par_name]]
+  true <- med - bias
+  N    <- length(med)
+  
+  tibble(
+    type  = c(rep("Prior (true values)", N),
+              rep("Posterior medians", N)),
+    value = c(true, med),
+    facet = "Prior vs posterior"
+  ) |>
+    ggplot(aes(x = value, colour = type, fill = type)) +
+    geom_density(alpha = 0.3) +
+    scale_colour_manual(values = c("Prior (true values)" = "skyblue1",
+                                   "Posterior medians"   = "grey20")) +
+    scale_fill_manual(values = c("Prior (true values)" = "skyblue1",
+                                 "Posterior medians"   = "grey20")) +
+    facet_wrap(~facet) +
+    labs(x = "Parameter value", y = "Density",
+         colour = NULL, fill = NULL) +
+    theme_minimal() +
+    theme(legend.position = "bottom")
+}
+
+
+#' Plot SBC diagnostics for a single parameter
+#'
+#' Produces a multi-panel diagnostic plot for simulation-based calibration (SBC)
+#' results from EMC2. Handles both non-hierarchical (single-subject) and
+#' hierarchical model outputs. The ECDF diff plot uses EMC2's internal envelope
+#' functions directly to avoid the floating point normalisation bug in
+#' \code{plot_sbc_ecdf()} (see GitHub issue #157).
+#'
+#' The prior vs posterior density panel is shown when posterior medians and
+#' bias are available in the SBC object. For non-hierarchical models these are
+#' always stored by \code{run_sbc()}. For hierarchical models they are stored
+#' when using \code{SBC_hierarchical_fixed()} (not EMC2's native
+#' \code{run_sbc()}) and only for \code{level = "mu"} (not \code{"var"}).
+#'
+#' @param sbc_obj An SBC results object returned by \code{run_sbc()} or
+#'   \code{SBC_hierarchical_fixed()}. Must contain \code{$rank[[level]]}.
+#'   Optionally contains \code{$med[[level]]} and \code{$bias[[level]]} for
+#'   the prior vs posterior density panel.
+#' @param par_name Character string. Name of the parameter to plot. Must match
+#'   a column name in \code{sbc_obj$rank[[level]]}.
+#' @param level Character string. Which level of parameters to plot. Use
+#'   \code{"alpha"} for non-hierarchical (single-subject) models,
+#'   \code{"mu"} for hierarchical group-level means, or \code{"var"} for
+#'   hierarchical group-level variances/covariances. Defaults to \code{"alpha"}.
+#' @param K Integer. Number of replicates used in the SBC run, used for
+#'   computing the ECDF envelope via EMC2's internal functions. Defaults to 500.
+#' @param bins Integer or NULL. Number of bins for the rank histogram. If NULL
+#'   (default), bins are chosen automatically as \code{floor(N/25)} with a
+#'   minimum of 5, giving approximately 25 observations per bin.
+#' @param save Logical. If TRUE, saves the plot to disk as a PNG file.
+#'   Defaults to FALSE.
+#' @param path Character string. Directory path for saving the plot. Created
+#'   if it does not exist. Defaults to the current directory.
+#' @param width Numeric. Width of the saved plot in inches. Defaults to 10.
+#' @param height Numeric. Height of the saved plot in inches. Defaults to 12.
+#' @param dpi Numeric. Resolution of the saved plot in dots per inch.
+#'   Defaults to 150.
+#'
+#' @return A patchwork ggplot object. Includes 6 panels when posterior medians
+#'   and bias are available (prior vs posterior density, rank histogram, ECDF,
+#'   ECDF diff, coverage, coverage diff), or 5 panels otherwise (no density).
+#'   The prior vs posterior panel is available for: non-hierarchical models
+#'   (always), hierarchical \code{level = "mu"} when using
+#'   \code{SBC_hierarchical_fixed()}, but not for \code{level = "var"}.
+#'
+#' @examples
+#' # Non-hierarchical (default level = "alpha")
+#' plot_sbc_parameter(sbc_lba_single, "v_SNovel:lMTRUE")
+#'
+#' # Hierarchical - group means
+#' plot_sbc_parameter(sbc_lba_hierarchical, "v_SNovel:lMTRUE", level = "mu")
+#'
+#' # Hierarchical - group variances (diagonal only, no density panel)
+#' plot_sbc_parameter(sbc_lba_hierarchical,
+#'                    "v_SNovel:lMTRUE.v_SNovel:lMTRUE", level = "var")
+#'
+#' # Save a single parameter
+#' plot_sbc_parameter(sbc_lba_single, "v_SNovel:lMTRUE",
+#'                    save = TRUE, path = "figures/sbc")
+#'
+#' # Loop and save all parameters — non-hierarchical
+#' par_names <- colnames(sbc_lba_single$rank$alpha)
+#' walk(par_names, ~ plot_sbc_parameter(
+#'   sbc_lba_single, .x,
+#'   save = TRUE, path = here("exp_1", "figures", "sbc", "single")
+#' ))
+#'
+#' # Loop and save all mu parameters — hierarchical
+#' par_names_mu <- colnames(sbc_lba_hierarchical$rank$mu)
+#' walk(par_names_mu, ~ plot_sbc_parameter(
+#'   sbc_lba_hierarchical, .x,
+#'   level = "mu",
+#'   save  = TRUE,
+#'   path  = here("exp_1", "figures", "sbc", "hierarchical", "mu")
+#' ))
+#'
+#' # Loop and save diagonal variance parameters — hierarchical
+#' par_names_var <- colnames(sbc_lba_hierarchical$rank$var)
+#' diag_vars <- par_names_var[sapply(strsplit(par_names_var, "\\."),
+#'                                    function(x) x[1] == x[2])]
+#' walk(diag_vars, ~ plot_sbc_parameter(
+#'   sbc_lba_hierarchical, .x,
+#'   level = "var",
+#'   save  = TRUE,
+#'   path  = here("exp_1", "figures", "sbc", "hierarchical", "var")
+#' ))
+plot_sbc_parameter <- function(sbc_obj, par_name, level = "alpha", K = 500,
+                                bins = NULL, save = FALSE, path = ".",
+                                width = 10, height = 12, dpi = 150) {
+  
+  # extract ranks for the specified level
+  rank_mat <- sbc_obj$rank[[level]]
+  
+  if (is.null(rank_mat)) {
+    stop("No ranks found for level = '", level, "'. ",
+         "Use 'alpha' for non-hierarchical, 'mu' or 'var' for hierarchical.")
+  }
+  
+  r <- rank_mat[, par_name]
+  r <- r[is.finite(r)]
+  N <- length(r)
+  
+  if (N == 0) stop("No finite rank values found for parameter '", par_name, "'")
+  
+  # detect whether prior vs posterior density panel is available
+  # works for: non-hierarchical (alpha), hierarchical mu (SBC_hierarchical_fixed)
+  # not available for: hierarchical var
+  has_density <- !is.null(sbc_obj$med) &&
+                 !is.null(sbc_obj$bias) &&
+                 !is.null(sbc_obj$med[[level]]) &&
+                 !is.null(sbc_obj$bias[[level]])
+  
+  # auto bin selection — ~25 observations per bin, minimum 5
+  if (is.null(bins)) {
+    bins <- max(floor(N / 25), 5)
+    message("Auto-selected bins = ", bins,
+            " (~25 observations per bin, N=", N, ")")
+  }
+  
+  # ECDF envelope via EMC2 internals — avoids floating point bug in
+  # plot_sbc_ecdf() where ranks marginally > 1 trigger division by K
+  # see: https://github.com/ampl-psych/EMC2/issues/157
+  gamma <- EMC2:::get_gamma(N, K)
+  res   <- EMC2:::get_lims(N, K, gamma)
+  z     <- res[["z"]]
+  
+  # consistent colours
+  col_blue  <- "skyblue1"
+  col_dark  <- "grey20"
+  col_light <- "grey70"
+  
+  # 1. prior vs posterior density — when available
+  if (has_density) {
+    p_dens <- plot_prior_vs_posterior(sbc_obj, par_name, level = level)
+  }
+  
+  # 2. rank histogram
+  exp_n <- N / bins
+  ci_lo <- qpois(0.025, exp_n)
+  ci_hi <- qpois(0.975, exp_n)
+  
+  p_hist <- ggplot(tibble(r = r, facet = "Rank histogram"), aes(x = r)) +
+    geom_histogram(bins = bins, fill = col_dark, colour = "white",
+                   boundary = 0) +
+    geom_hline(yintercept = ci_hi, colour = col_blue, linewidth = 1) +
+    geom_hline(yintercept = ci_lo, colour = col_blue, linewidth = 1) +
+    geom_hline(yintercept = exp_n, linetype = "dashed", colour = col_dark) +
+    facet_wrap(~facet) +
+    labs(x = "Normalised rank", y = "Count") +
+    theme_minimal()
+  
+  # 3. ECDF
+  Fn     <- ecdf(r)
+  y_ecdf <- Fn(z)
+  
+  p_ecdf <- tibble(
+    z     = z,
+    y     = y_ecdf,
+    lower = z + res[["lower"]],
+    upper = z + res[["upper"]],
+    facet = "ECDF"
+  ) |>
+    ggplot(aes(x = z)) +
+    geom_ribbon(aes(ymin = lower, ymax = upper, fill = "theoretical CDF"),
+                alpha = 0.4) +
+    geom_step(aes(y = y, colour = "sample ECDF"), linewidth = 0.8) +
+    scale_colour_manual(values = c("sample ECDF" = col_dark)) +
+    scale_fill_manual(values = c("theoretical CDF" = col_blue)) +
+    facet_wrap(~facet) +
+    labs(x = "Normalised rank statistic (z)", y = "ECDF",
+         colour = NULL, fill = NULL) +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          legend.text = element_text(face = "italic"))
+  
+  # 4. ECDF diff
+  y_diff <- Fn(z) - z
+  
+  p_ecdf_diff <- tibble(
+    z     = z,
+    y     = y_diff,
+    lower = res[["lower"]],
+    upper = res[["upper"]],
+    facet = "ECDF diff"
+  ) |>
+    ggplot(aes(x = z)) +
+    geom_ribbon(aes(ymin = lower, ymax = upper, fill = "theoretical CDF"),
+                alpha = 0.4) +
+    geom_step(aes(y = y, colour = "sample ECDF"), linewidth = 0.8) +
+    scale_colour_manual(values = c("sample ECDF" = col_dark)) +
+    scale_fill_manual(values = c("theoretical CDF" = col_blue)) +
+    facet_wrap(~facet) +
+    labs(x = "Normalised rank statistic (z)",
+         y = "ECDF difference F(z) - z",
+         colour = NULL, fill = NULL) +
+    theme_minimal() +
+    theme(legend.position = "bottom",
+          legend.text = element_text(face = "italic"))
+  
+  # 5. coverage
+  probs   <- seq(0.01, 0.99, by = 0.01)
+  emp_cov <- sapply(probs, function(p) {
+    lo <- (1 - p) / 2
+    hi <- 1 - lo
+    mean(r >= lo & r <= hi)
+  })
+  
+  # bootstrap CI for coverage ribbon
+  boot_cov <- replicate(200, {
+    r_boot <- sample(r, replace = TRUE)
+    sapply(probs, function(p) {
+      lo <- (1 - p) / 2
+      hi <- 1 - lo
+      mean(r_boot >= lo & r_boot <= hi)
+    })
+  })
+  cov_lo <- apply(boot_cov, 1, quantile, 0.025)
+  cov_hi <- apply(boot_cov, 1, quantile, 0.975)
+  
+  p_cov <- tibble(
+    width   = probs,
+    obs_cov = emp_cov,
+    lo      = cov_lo,
+    hi      = cov_hi,
+    facet   = "Coverage"
+  ) |>
+    ggplot(aes(x = width)) +
+    geom_ribbon(aes(ymin = lo, ymax = hi), fill = col_light, alpha = 0.5) +
+    geom_abline(slope = 1, intercept = 0, colour = col_blue, linewidth = 1) +
+    geom_line(aes(y = obs_cov), colour = col_dark) +
+    scale_x_continuous(labels = scales::percent) +
+    scale_y_continuous(labels = scales::percent) +
+    facet_wrap(~facet) +
+    labs(x = "Central interval width", y = "Observed coverage") +
+    theme_minimal()
+  
+  # 6. coverage diff
+  p_cov_diff <- tibble(
+    width    = probs,
+    cov_diff = emp_cov - probs,
+    lo       = cov_lo - probs,
+    hi       = cov_hi - probs,
+    facet    = "Coverage diff"
+  ) |>
+    ggplot(aes(x = width)) +
+    geom_ribbon(aes(ymin = lo, ymax = hi), fill = col_light, alpha = 0.5) +
+    geom_hline(yintercept = 0, colour = col_blue, linewidth = 1) +
+    geom_line(aes(y = cov_diff), colour = col_dark) +
+    scale_x_continuous(labels = scales::percent) +
+    scale_y_continuous(labels = scales::percent) +
+    facet_wrap(~facet) +
+    labs(x = "Central interval width", y = "Coverage diff") +
+    theme_minimal()
+  
+  # combine panels — 6 with density, 5 without
+  title_str <- if (level == "alpha") par_name else
+               paste0(par_name, " (", level, ")")
+  
+  if (has_density) {
+    p <- p_dens + p_hist + p_ecdf + p_ecdf_diff + p_cov + p_cov_diff +
+      plot_layout(ncol = 2) +
+      plot_annotation(title = title_str)
+  } else {
+    p <- p_hist + p_ecdf + p_ecdf_diff + p_cov + p_cov_diff +
+      plot_layout(ncol = 2) +
+      plot_annotation(title = title_str)
+  }
+  
+  if (save) {
+    dir.create(path, recursive = TRUE, showWarnings = FALSE)
+    fname <- paste0(gsub("[^a-zA-Z0-9]", "_", par_name),
+                    "_", level, ".png")
+    ggsave(file.path(path, fname), plot = p,
+           width = width, height = height, dpi = dpi)
+    message("Saved: ", file.path(path, fname))
+  }
+  
+  p
+}
+```
+
+Create some plots
+
+```{r}
+#| label: plot-sbc-single
+
+## note: plot_sbc_ecdf() from EMC2 has a floating point bug — see
+## https://github.com/ampl-psych/EMC2/issues/157
+## use plot_sbc_parameter() instead
+
+# --- option 1: view a single parameter ---
+plot_sbc_parameter(sbc_lba_single, "v_SNovel:lMTRUE")
+
+# --- option 2: save a single parameter ---
+plot_sbc_parameter(
+  sbc_lba_single, "v_SNovel:lMTRUE",
+  save  = TRUE,
+  path  = here("exp_1", "figures", "sbc", "single"),
+  width = 6, height = 8, dpi = 150
+)
+
+# --- option 3: plot and save all parameters ---
+par_names <- colnames(sbc_lba_single$rank$alpha)
+
+walk(par_names, ~ plot_sbc_parameter(
+  sbc_lba_single, .x,
+  save  = TRUE,
+  path  = here("exp_1", "figures", "sbc", "single"),
+  width = 6, height = 8, dpi = 150
+))
+```
+
+# Hierarchical 
+
+## 1. Specify the model design and priors
+
+```{r}
+#| label: specify-model-hierarchical
+
+n_subjects <- 30
+# 
+matchfun <- function(d) d$S == d$lR
+
+design_lba_multi <- design(
+  factors = list(
+    subjects = 1:n_subjects,
+    S = c("Novel", "Learned")
+  ),
+  Rlevels = c("Novel", "Learned"),
+  model = LBA,
+  matchfun = matchfun,
+  formula = list(
+    v  ~ 0 + S:lM,
+    sv ~ 0 + lM,
+    B  ~ 0 + lR,
+    A  ~ 1,
+    t0 ~ 1
+  ),
+  constants = c(sv_lMFALSE = log(1))
+)
+
+# Parameter order (9 free params):
+# 1. v_SNovel:lMFALSE   - mismatching drift, Novel stimuli
+# 2. v_SLearned:lMFALSE - mismatching drift, Learned stimuli  
+# 3. v_SNovel:lMTRUE    - matching drift, Novel stimuli
+# 4. v_SLearned:lMTRUE  - matching drift, Learned stimuli
+# 5. sv_lMTRUE          - sv for matching (log scale; mismatching fixed to log(1))
+# 6. B_lRNovel          - threshold Novel (log scale)
+# 7. B_lRLearned        - threshold Learned (log scale)
+# 8. A                  - start point noise (log scale)
+# 9. t0                 - non-decision time (log scale)
+
+prior_lba_gamma <- prior(
+  design_lba_multi,
+  type    = "diagonal-gamma",
+  mu_mean = c(
+    "v_SNovel:lMFALSE"   = 0,       # mismatching drifts ~ 0 (natural scale ~0 after no transform)
+    "v_SLearned:lMFALSE" = 0,
+    "v_SNovel:lMTRUE"    = 1,       # matching drifts positive
+    "v_SLearned:lMTRUE"  = 1,     # slightly higher for learned — your key effect
+    sv_lMTRUE            = log(.5), # sv ~ 0.5
+    B_lRNovel            = log(1),  # threshold ~ 1
+    B_lRLearned          = log(1),
+    A                    = log(.5), # A ~ 0.5
+    t0                   = log(.3)  # t0 ~ 300ms
+  ),
+  mu_sd = c(
+    "v_SNovel:lMFALSE"   = 2.0,   # relatively broad for drift rates
+    "v_SLearned:lMFALSE" = 2.0,
+    "v_SNovel:lMTRUE"    = 2.0,
+    "v_SLearned:lMTRUE"  = 2.0,
+    sv_lMTRUE            = .5,
+    B_lRNovel            = .5,
+    B_lRLearned          = .5,
+    A                    = .3,
+    t0                   = .3
+  ),
+  shape = 10,                      # scalar OK — controls concentration of gamma
+  rate  = c(
+    "v_SNovel:lMFALSE"   = .3,    # E[SD] = shape/rate = 10/.3 ≈ 3.3 for drifts
+    "v_SLearned:lMFALSE" = .3,    # (in practice individual diffs will be << this)
+    "v_SNovel:lMTRUE"    = .3,
+    "v_SLearned:lMTRUE"  = .3,
+    sv_lMTRUE            = .5,    # E[SD] = 20 on log scale — broad but OK
+    B_lRNovel            = .5,    # E[SD] = 20 for log(B)
+    B_lRLearned          = .5,
+    A                    = .5,
+    t0                   = .5
+  )
+)
+
+# Check group-level mean prior
+plot(prior_lba_gamma, N = 1e3)
+plot(prior_lba_gamma, N = 1e3, map=TRUE)
+
+# Critically, also check the implied subject-level parameter range
+plot(prior_lba_gamma, selection = "alpha", N = 1e3, subject = 1)
+plot(prior_lba_gamma, selection = "alpha", N = 1e3, map=TRUE, subject = 1)
+```
+
+## 2. Run the simulation based calibration
+
+```{r}
+## this does not work - bug in code
+## see github report
+# sbc_lba_hierarchical <- run_sbc(
+#   design_lba_multi,
+#   prior_lba_gamma,
+#   replicates = 500,
+#   trials = 90,
+#   n_subjects = n_subjects,
+#   plot_data = FALSE,
+#   iter = 1000,
+#   n_post = 1000,
+#   fileName = "exp_1/models/sbc/tmp.rds",
+#   cores_per_chain = 28,
+#   verbose = TRUE
+# )
+# 
+# saveRDS(sbc_lba_hierarchical, "exp_1/models/sbc/hierarchical/sbc_lba_hierarchical.rds")
+```
+
+bug?
+
+https://github.com/ampl-psych/EMC2/issues/157
+
+workaround?
+
+fix the underling call e.g, run_sbc calls SBC_hierarchical, so fit it.
+
+```{r}
+#| label: fit-sbc-hierarchical-function
+
+#' Fixed version of EMC2's SBC_hierarchical with two bug fixes,
+#' additional storage of posterior medians and bias for mu parameters,
+#' and per-replicate convergence diagnostics.
+#'
+#' Bug fixes vs EMC2 3.4.1:
+#' 1. Dimension mismatch in rmvnorm: prior_var includes constant parameters
+#'    (e.g. sv_lMFALSE) while prior_mu does not. Fixed by stripping constants
+#'    from prior_var using normalised name matching (colon vs underscore).
+#' 2. Not a fix here but noted: plot_sbc_ecdf() has a floating point bug where
+#'    ranks marginally exceeding 1.0 trigger incorrect normalisation. Use
+#'    plot_sbc_parameter() instead.
+#'
+#' Additional features vs EMC2 3.4.1:
+#' - Stores posterior medians (med$mu) and bias (bias$mu) for group-level mean
+#'   parameters, enabling prior vs posterior density plots.
+#' - Stores per-replicate convergence diagnostics (final_rhats, final_ess,
+#'   final_iters) for post-hoc assessment of SBC quality.
+#'
+#' See: https://github.com/ampl-psych/EMC2/issues/157
+#'
+#' @param design_in An EMC2 design object created with \code{design()}.
+#' @param prior_in An EMC2 prior object created with \code{prior()}, must use
+#'   \code{type = "diagonal-gamma"} for unbiased hierarchical SBC.
+#' @param replicates Integer. Number of SBC replicates (simulated datasets) to
+#'   run. Defaults to 250. More replicates give more stable rank statistics;
+#'   500 is recommended.
+#' @param trials Integer. Number of trials per cell per simulated subject.
+#'   Defaults to 100.
+#' @param n_subjects Integer. Number of subjects per simulated dataset.
+#'   Defaults to 30.
+#' @param plot_data Logical. If TRUE, plots the simulated data for each
+#'   replicate. Defaults to FALSE.
+#' @param verbose Logical. If TRUE, prints progress messages. Defaults to TRUE.
+#' @param fileName Character string or NULL. If specified, saves intermediate
+#'   results to this path after each replicate. Strongly recommended to avoid
+#'   data loss on crash.
+#' @param ... Additional arguments passed to \code{make_emc()} and
+#'   \code{fit()}, such as \code{cores_per_chain}, \code{cores_for_chains},
+#'   \code{step_size}, and \code{stop_criteria}.
+#'
+#' @return A list with the following elements:
+#'   \describe{
+#'     \item{rank}{List with \code{$mu} (data.frame, replicates x 9) and
+#'       \code{$var} (data.frame, replicates x 45) of normalised rank
+#'       statistics for group-level means and variances respectively.}
+#'     \item{prior}{List with \code{$mu} (9 x replicates matrix) and
+#'       \code{$var} (9 x 9 x replicates array) of true parameter values
+#'       drawn from the prior.}
+#'     \item{med}{List with \code{$mu} (data.frame, replicates x 9) of
+#'       posterior medians for group-level mean parameters.}
+#'     \item{bias}{List with \code{$mu} (data.frame, replicates x 9) of
+#'       bias (posterior median minus true value) for group-level means.}
+#'     \item{final_rhats}{Numeric vector of length replicates. Maximum Rhat
+#'       across all parameters at the end of each replicate's sample stage.
+#'       Values above 1.1 indicate convergence failure.}
+#'     \item{final_ess}{Numeric vector of length replicates. Minimum effective
+#'       sample size across all parameters at the end of each replicate.}
+#'     \item{final_iters}{Integer vector of length replicates. Total number of
+#'       sample stage iterations completed per replicate.}
+#'     \item{rand_effects}{Matrix of subject-level parameters from the last
+#'       replicate only.}
+#'   }
+#'
+#' @examples
+#' \dontrun{
+#' sbc_lba_hierarchical <- SBC_hierarchical_fixed(
+#'   design_lba_multi,
+#'   prior_lba_gamma,
+#'   replicates = 500,
+#'   trials = 90,
+#'   n_subjects = 30,
+#'   fileName = "exp_1/data/sbc/sbc_lba_hierarchical.RData",
+#'   cores_per_chain = 9,
+#'   cores_for_chains = 3,
+#'   step_size = 200,
+#'   stop_criteria = list(
+#'     burn   = list(mean_gd = 1.1, max_tries = 30),
+#'     sample = list(min_es = 100, max_gd = 1.1, max_tries = 30)
+#'   )
+#' )
+#' }
+SBC_hierarchical_fixed <- function(design_in, prior_in, replicates = 250,
+    trials = 100, n_subjects = 30, plot_data = FALSE, verbose = TRUE,
+    fileName = NULL, ...) {
+    
+    dots <- add_defaults(list(...), max_tries = 50, compress = FALSE, 
+        rt_resolution = 1e-12, stop_criteria = list(min_es = 100, 
+            max_gd = 1.1, selection = c("alpha", "mu", "Sigma")))
+    dots$verbose <- verbose
+    type <- attr(prior_in, "type")
+    
+    if (type != "diagonal-gamma") 
+        warning("SBC in EMC2 is frequently biased for prior structures with ",
+                "heavy variance mass around 0.\n",
+                "Please consider using 'type = diagonal-gamma'.")
+    
+    prior_mu <- plot(prior_in, design_in, do_plot = FALSE, N = replicates, 
+        selection = "mu", return_mcmc = FALSE, map = FALSE)[[1]]
+    prior_var <- plot(prior_in, design_in, do_plot = FALSE, N = replicates, 
+        selection = "Sigma", return_mcmc = FALSE, 
+        remove_constants = FALSE)[[1]]
+    
+    # BUG FIX 1: remove constant parameters from prior_var to match prior_mu
+    # prior_mu uses colons (v_SNovel:lMFALSE), prior_var uses underscores
+    # (v_SNovel_lMFALSE) so naive %in% matching fails — normalise first
+    mu_names  <- rownames(prior_mu)
+    var_names <- rownames(prior_var[, , 1])
+    keep      <- var_names %in% gsub(":", "_", mu_names)
+    prior_var <- prior_var[keep, keep, , drop = FALSE]
+    
+    # initialise output containers
+    rank_mu     <- data.frame()
+    rank_var    <- data.frame()
+    med_mu      <- data.frame()
+    bias_mu     <- data.frame()
+    final_rhats <- rep(NA_real_,    replicates)
+    final_ess   <- rep(NA_real_,    replicates)
+    final_iters <- rep(NA_integer_, replicates)
+    
+    par_names <- names(sampled_pars(design_in))
+    
+    if (!is.null(fileName)) 
+        save(prior_mu, prior_var, file = fileName)
+    
+    all_rand_effects <- vector("list", length = replicates)
+    
+    for (i in 1:replicates) {
+        if (verbose) 
+            print(paste0("Sample ", i, " out of ", replicates))
+        
+        rand_effects <- make_random_effects(design_in, prior_mu[, i], 
+            n_subj = n_subjects, covariances = prior_var[, , i])
+        all_rand_effects[[i]] <- rand_effects
+        
+        data <- make_data(rand_effects, design_in, trials, 
+                          model = design_in$model, ...)
+        
+        if (plot_data) {
+            plot_density(data, factors = names(design_in$Ffactors)[
+                names(design_in$Ffactors) != "subjects"])
+        }
+        
+        emc <- do.call(make_emc, c(list(data = data, design = design_in, 
+            prior_list = prior_in, type = type), fix_dots(dots, make_emc)))
+        emc <- do.call(fit, c(list(emc = emc), fix_dots(dots, fit)))
+        
+        # --- convergence diagnostics ---
+        final_rhats[i] <- tryCatch(
+            gd_summary(emc, selection = "mu", stat_only = TRUE),
+            error = function(e) NA
+        )
+        final_ess[i] <- tryCatch(
+            ess_summary(emc, selection = "mu", stat_only = TRUE),
+            error = function(e) NA
+        )
+        final_iters[i] <- tryCatch(
+            chain_n(emc)[1, "sample"],
+            error = function(e) NA
+        )
+        if (!is.na(final_rhats[i]) && final_rhats[i] > 1.1) {
+            warning("Replicate ", i, " exited with Rhat = ", 
+                    round(final_rhats[i], 3), " > 1.1")
+        }
+        
+        # --- group-level means (mu) ---
+        ESS_mu <- round(pmin(unlist(ess_summary(emc, selection = "mu", 
+            stat = NULL)), chain_n(emc)[1, "sample"]))
+        mu_rec <- get_pars(emc, selection = "mu", return_mcmc = FALSE, 
+            merge_chains = TRUE, flatten = TRUE)
+        
+        # ranks
+        rank_mu <- rbind(rank_mu, mapply(get_ranks_ESS, 
+            split(mu_rec, row(mu_rec)), t(ESS_mu), prior_mu[, i]))
+        
+        # posterior medians and bias
+        mu_med_i  <- apply(mu_rec, 1, median)
+        mu_bias_i <- mu_med_i - prior_mu[, i]
+        med_mu    <- rbind(med_mu,  t(mu_med_i))
+        bias_mu   <- rbind(bias_mu, t(mu_bias_i))
+        
+        # --- group-level variances (Sigma) ---
+        ESS_var <- round(pmin(unlist(ess_summary(emc, selection = "Sigma", 
+            stat = NULL)), chain_n(emc)[1, "sample"]))
+        var_rec <- get_pars(emc, selection = "Sigma", return_mcmc = FALSE, 
+            merge_chains = TRUE, flatten = TRUE)
+        prior_var_input <- get_pars(emc, selection = "Sigma", 
+            flatten = TRUE, true_pars = prior_var[, , i])[[1]][[1]]
+        rank_var <- rbind(rank_var, mapply(get_ranks_ESS, 
+            split(var_rec, row(var_rec)), t(ESS_var), prior_var_input))
+        
+        # set column names
+        colnames(rank_mu)  <- par_names
+        colnames(rank_var) <- colnames(prior_var_input)
+        colnames(med_mu)   <- par_names
+        colnames(bias_mu)  <- par_names
+        
+        if (!is.null(fileName)) {
+            SBC_temp <- list(
+                rank         = list(mu = rank_mu, var = rank_var),
+                prior        = list(mu = prior_mu, var = prior_var),
+                med          = list(mu = med_mu),
+                bias         = list(mu = as.data.frame(bias_mu)),
+                final_rhats  = final_rhats,
+                final_ess    = final_ess,
+                final_iters  = final_iters,
+                rand_effects = rand_effects,
+                emc          = emc
+            )
+            save(SBC_temp, file = fileName)
+        }
+    }
+    
+    return(list(
+        rank         = list(mu = rank_mu, var = rank_var),
+        prior        = list(mu = prior_mu, var = prior_var),
+        med          = list(mu = med_mu),
+        bias         = list(mu = as.data.frame(bias_mu)),
+        final_rhats  = final_rhats,
+        final_ess    = final_ess,
+        final_iters  = final_iters,
+        rand_effects = rand_effects
+    ))
+}
+
+environment(SBC_hierarchical_fixed) <- asNamespace("EMC2")
+```
+
+Run the sbc
+
+```{r}
+#| label: fit-sbc-hierarchical
+
+# ## test it
+# sbc_test2 <- SBC_hierarchical_fixed(
+#   design_lba_multi,
+#   prior_lba_gamma,
+#   replicates = 2,
+#   trials = 90,
+#   n_subjects = n_subjects,
+#   plot_data = FALSE,
+#   fileName = "exp_1/models/sbc/test/tmp.rds",
+#   cores_per_chain = 9,
+#   cores_for_chains = 3,
+#   step_size = 200,
+#   stop_criteria = list(
+#     burn   = list(mean_gd = 1.5, max_tries = 3),
+#     sample = list(iter = 200, min_es = 50, max_gd = 1.5, max_tries = 3)
+#   ),
+#   verbose = TRUE
+# )
+# 
+# # save it
+# saveRDS(sbc_test2, "exp_1/models/sbc/test/sbc_test2.rds")
+# # read it in'
+# sbc_test <- readRDS("exp_1/models/sbc/test/sbc_test2.rds")
+# 
+# # check structure
+# str(sbc_test, max.level = 2)
+
+# # check diagnostics
+# tibble(
+#   replicate   = 1:2,
+#   final_rhat  = sbc_test2$final_rhats,
+#   final_ess   = sbc_test2$final_ess,
+#   final_iters = sbc_test2$final_iters
+# )
+
+## fit the full thing
+sbc_lba_hierarchical <- SBC_hierarchical_fixed(
+  design_lba_multi,
+  prior_lba_gamma,
+  replicates = 500,
+  trials = 90,
+  n_subjects = n_subjects,
+  plot_data = FALSE,
+  fileName = "exp_1/models/sbc/hierarchical/tmp.rds",
+  cores_for_chains = 3,
+  cores_per_chain = 9,
+  step_size = 500,
+  stop_criteria = list(
+    burn   = list(mean_gd = 1.1, max_tries = 20),
+    sample = list(iter = 5000, min_es = 100, max_gd = 1.1, max_tries = 20)
+  ),
+  verbose = TRUE
+)
+
+saveRDS(
+  sbc_lba_hierarchical, 
+  "exp_1/models/sbc/hierarchical/sbc_lba_hierarchical.rds"
+  )
+```
+
+## 3. Plot
+
+Model diagnostics summary
+
+```{r}
+#| label: hierarchical-diagnostics
+
+# convergence summary across all 500 replicates
+diag_summary <- tibble(
+  replicate   = 1:500,
+  final_rhat  = sbc_lba_hierarchical$final_rhats,
+  final_ess   = sbc_lba_hierarchical$final_ess,
+  final_iters = sbc_lba_hierarchical$final_iters
+)
+
+# how many converged?
+diag_summary |>
+  summarise(
+    n_converged     = sum(final_rhat <= 1.1, na.rm = TRUE),
+    n_not_converged = sum(final_rhat > 1.1, na.rm = TRUE),
+    n_na            = sum(is.na(final_rhat)),
+    mean_rhat       = mean(final_rhat, na.rm = TRUE),
+    max_rhat        = max(final_rhat, na.rm = TRUE),
+    mean_ess        = mean(final_ess, na.rm = TRUE),
+    min_ess         = min(final_ess, na.rm = TRUE),
+    mean_iters      = mean(final_iters, na.rm = TRUE),
+    min_iters       = min(final_iters, na.rm = TRUE)
+  )
+
+# plot distribution of final Rhats
+diag_summary |>
+  ggplot(aes(x = final_rhat)) +
+  geom_histogram(bins = 30, fill = "grey30", colour = "white") +
+  geom_vline(xintercept = 1.1, colour = "skyblue1", 
+             linetype = "dashed", linewidth = 1) +
+  labs(title = "Distribution of final Rhat across SBC replicates",
+       x = "Final Rhat", y = "Count") +
+  theme_minimal()
+
+# plot ESS
+diag_summary |>
+  ggplot(aes(x = final_ess)) +
+  geom_histogram(bins = 30, fill = "grey30", colour = "white") +
+  geom_vline(xintercept = 100, colour = "skyblue1",
+             linetype = "dashed", linewidth = 1) +
+  labs(title = "Distribution of minimum ESS across SBC replicates",
+       x = "Minimum ESS", y = "Count") +
+  theme_minimal()
+```
+
+Evaluate rank statistics and check uniformity
+
+```{r}
+#| label: load-sbc-hierarchical
+
+## load if previously computed
+sbc_lba_hierarchical <- readRDS("exp_1/models/sbc/hierarchical/sbc_lba_hierarchical.rds")
+
+## EMC2 plotting tools had a bug, as above.
+## so we use our own custom functions again
+# plot_sbc_hist(sbc_lba_hierarchical, bins = 10)
+# 
+# plot_sbc_ecdf(sbc_lba_hierarchical)
+```
+
+Create some plots
+
+```{r}
+#| label: plot-sbc-hierarchical
+
+## note: plot_sbc_ecdf() from EMC2 has a floating point bug — see
+## https://github.com/ampl-psych/EMC2/issues/157
+## use plot_sbc_parameter() instead
+
+# --- option 1: view a single parameter ---
+plot_sbc_parameter(sbc_lba_hierarchical, "v_SNovel:lMTRUE", level = "mu")
+
+# --- option 2: save a single parameter ---
+plot_sbc_parameter(
+  sbc_lba_hierarchical, "v_SNovel:lMTRUE",
+  level = "mu",
+  save  = TRUE,
+  path  = here("exp_1", "figures", "sbc", "multi"),
+  width = 6, height = 8, dpi = 150
+)
+
+# --- option 3: plot and save all parameters ---
+par_names <- colnames(sbc_lba_hierarchical$rank$mu)
+
+walk(par_names, ~ plot_sbc_parameter(
+  sbc_lba_hierarchical, .x,
+  level = "mu",
+  save  = TRUE,
+  path  = here("exp_1", "figures", "sbc", "multi"),
+  width = 6, height = 8, dpi = 150
+))
+```
+
+# Notes on interpreting the plots
+
+Plot panel summary
+
+```{r}
+#| label: sbc-plot-table
+#| echo: false
+
+tibble(
+  Plot = c(
+    "Prior vs posterior",
+    "Rank histogram",
+    "ECDF",
+    "ECDF diff",
+    "Coverage",
+    "Coverage diff"
+  ),
+  `Primarily sensitive to` = c(
+    "Location of point estimates only",
+    "Both location and spread",
+    "Both location and spread",
+    "Both location and spread — shape distinguishes them",
+    "Spread/interval width",
+    "Spread/interval width"
+  ),
+  `Canonical failure patterns` = c(
+    "Posterior shifted relative to prior = systematic over/underestimation; posterior narrower than prior = shrinkage (may be appropriate)",
+    "Spike left = overestimation; spike right = underestimation; U-shape = posterior too narrow; hump = posterior too wide",
+    "Line below diagonal early = overestimation; line above diagonal early = underestimation; S-shape = spread miscalibration",
+    "Positive diagonal = underestimation; negative diagonal = overestimation; positive hump = posterior too wide; negative hump = posterior too narrow",
+    "Line below diagonal = posterior too narrow (overconfident); line above diagonal = posterior too wide (underconfident)",
+    "Consistent negative offset = overconfident posteriors; consistent positive offset = underconfident posteriors; curved = miscalibration varies across interval widths"
+  )
+) |>
+  knitr::kable()
+```
+
+Plot descriptions
+
+## 1. Prior vs posterior density
+
+What it shows: Two overlapping density curves — the distribution of true parameter values drawn from the prior across all replicates (blue), and the distribution of posterior medians returned by the fitted model (dark grey).
+What it measures: Whether the model's posterior estimates are systematically located in the same region as the true values. In a well-calibrated model the two distributions should overlap substantially — the posterior medians should span the same range as the prior draws, since across many replicates the model should sometimes estimate high, sometimes low, tracking the true values.
+How to interpret: If the posterior distribution is narrower than the prior, the model is shrinking estimates toward a central value — which can be appropriate (hierarchical shrinkage) or indicate over-regularisation. If the posterior is shifted relative to the prior, the model is systematically over- or under-estimating. Importantly, this plot does not tell you about uncertainty — only about the location of point estimates.
+
+## 2. Rank histogram
+
+What it shows: A histogram of normalised rank statistics across replicates. For each replicate, the true parameter value is ranked among the posterior samples and normalised to [0,1]. The blue horizontal lines show the 95% Poisson confidence interval around the expected count per bin, and the dashed line shows the expected count under perfect uniformity.
+What it measures: Whether the true parameter value is equally likely to fall anywhere in the posterior distribution — i.e. whether the posterior is well-calibrated. Under perfect calibration the histogram should be flat (uniform).
+How to interpret: Systematic shapes indicate specific failure modes. A spike on the left (low ranks) means the true value tends to fall below most posterior samples — the model overestimates. A spike on the right means the model underestimates. A U-shape means the posterior is too narrow — the true value falls in the tails too often. A hump in the middle means the posterior is too wide — the true value clusters near the centre. Individual bins outside the blue lines are not necessarily concerning — some deviation is expected by chance, and the ECDF diff is more sensitive.
+
+## 3. ECDF
+
+What it shows: The empirical cumulative distribution function (ECDF) of the normalised rank statistics (black line) against the theoretical uniform CDF (the blue envelope, which represents expected deviations from a perfect diagonal at the 95% level).
+What it measures: The same information as the rank histogram but without binning — the ECDF is a non-parametric estimate of the full rank distribution. The theoretical CDF of a uniform distribution is a straight diagonal from (0,0) to (1,1), so any deviation of the black line from that diagonal indicates miscalibration.
+How to interpret: If the black line runs below the diagonal early and above it later (concave shape), ranks cluster at low values — overestimation. If it runs above then below (convex shape), ranks cluster at high values — underestimation. The blue envelope gives exact 95% confidence bounds. The ECDF plot is harder to read than the ECDF diff but provides the full distributional picture.
+
+## 4. ECDF diff
+
+What it shows: The difference between the empirical CDF of ranks and the theoretical uniform CDF — i.e. ECDF(z) − z plotted against z. This rotates the ECDF plot 45 degrees, making the reference line a horizontal zero rather than a diagonal, which greatly increases visual resolution for detecting deviations.
+What it measures: The same as the ECDF but more sensitively. Positive values mean the ECDF is above the uniform — too many low ranks (overestimation). Negative values mean the ECDF is below the uniform — too many high ranks (underestimation). The blue ellipse is the 95% confidence envelope.
+How to interpret: Four canonical shapes:
+
+Positive hump — posterior too uncertain (too wide)
+Negative hump — posterior too certain (too narrow)
+Positive diagonal — systematic underestimation
+Negative diagonal — systematic overestimation
+The line exiting the envelope indicates a statistically meaningful deviation. The shape and location of the deviation indicate its nature.
+
+
+## 5. Coverage
+
+What it shows: For a range of central credible interval widths (x-axis, 0-100%), the empirical coverage — the proportion of replicates where the true value fell within that interval (y-axis). The blue diagonal is the ideal (e.g. a 50% CI should contain the true value 50% of the time). The grey ribbon is a bootstrap 95% confidence band.
+What it measures: Whether the model's credible intervals are appropriately sized. This is a direct measure of interval calibration rather than point estimate calibration.
+How to interpret: If the black line tracks the diagonal, credible intervals have nominal coverage. If the line falls below the diagonal, intervals are too narrow — the model is overconfident. If above, intervals are too wide — the model is underconfident. The coverage plot is particularly useful because it shows this across all interval widths simultaneously, revealing whether the miscalibration is uniform or concentrated at specific levels (e.g. only at very wide or very narrow intervals).
+
+## 6. Coverage diff
+
+What it shows: The difference between empirical and nominal coverage (empirical − nominal) across interval widths. Equivalent to rotating the coverage plot so the reference is a horizontal line at zero. The grey ribbon is the bootstrap 95% confidence band.
+What it measures: The same as coverage but with higher visual resolution, making it easier to see both the direction and magnitude of miscalibration and whether it varies across interval widths.
+How to interpret: Values consistently below zero indicate overconfident posteriors (too narrow). Values above zero indicate underconfident posteriors (too wide). A flat line near zero is ideal. A curved or sloped line suggests the miscalibration varies across the posterior — e.g. the tails may be miscalibrated differently from the centre.
+
+## Worked example 1: sv_lMTRUE (mu)
+
+sv_lMTRUE is the group-level mean of the standard deviation of the matching drift rate — a variability parameter on the log scale.
+
+**Prior vs posterior:** The two distributions overlap almost perfectly, with the posterior median distribution sitting slightly narrower than the prior. This suggests the model is estimating sv in approximately the right region — there is no systematic location bias. The slight narrowing of the posterior distribution is expected: across replicates the model should show less spread than the prior because it has seen data.
+
+**Rank histogram:** The histogram shows a moderate spike in the leftmost bin with bars decreasing toward higher ranks. This suggests a mild tendency for ranks to be low — i.e. the posterior median tends to sit slightly above the true value more often than chance. However several bins remain within the confidence interval, so the pattern is not extreme.
+
+**ECDF:** The black line starts above the diagonal and gradually converges toward it. This is consistent with the histogram — ranks cluster somewhat at low values early in the distribution. The line exits the upper boundary of the envelope early before returning within it.
+
+**ECDF diff:** Shows a positive hump peaking around z = 0.2-0.3, then declining and becoming slightly negative toward z = 1. The positive hump indicates an excess of low ranks — more often than expected, the true sv falls below the posterior median. However the hump is relatively modest and the line returns toward zero, suggesting the miscalibration is concentrated in a specific region of the rank distribution rather than being global.
+
+**Coverage:** The empirical coverage falls slightly below the diagonal across most interval widths, with the gap being most pronounced around the 50-75% interval range. A 50% credible interval for sv contains the true value approximately 40-45% of the time rather than the nominal 50%, indicating moderate overconfidence.
+
+**Coverage diff:** Confirms the coverage story — a consistent negative offset of roughly 5-15% across most interval widths, with the largest gaps in the middle of the interval range. The grey ribbon is relatively wide, reflecting the smaller sample size at 250 replicates, but the negative trend is consistent and clear.
+
+**Taken together:** The six panels tell a coherent story for sv_lMTRUE. The location of estimates are good — the prior vs posterior overlap is close and there is no systematic directional bias in the point estimates. The miscalibration is primarily in the uncertainty quantification — the posterior is moderately overconfident, producing credible intervals that are somewhat too narrow. This means that while the estimated group-level mean of sv is likely in the right region, the model expresses more certainty about that estimate than is warranted. In the context of the full analysis this is a nuisance parameter whose primary role is to allow matching and mismatching drift rates to have different variability — its overconfidence is unlikely to substantially affect inference on the key drift rate or threshold parameters.
+
+## Worked example 2: v_SNovel:lMTRUE (mu) — matching drift rate, Novel faces
+
+This parameter represents the group-level mean of the matching drift rate for novel faces — one of the key parameters for the familiarity effect.
+
+Prior vs posterior: The two distributions overlap closely, with the posterior median distribution sitting slightly narrower than the prior and very slightly shifted toward zero. The overall location is well-matched — the model is recovering estimates in the right region of parameter space. The slight narrowing reflects appropriate hierarchical shrinkage rather than systematic bias.
+
+Rank histogram: A prominent spike in the leftmost bin (ranks near zero) with a rapid drop-off and then a relatively flat tail. This is the most visually striking feature — a substantial proportion of replicates produced ranks very close to zero, meaning the true value fell below most posterior samples in those replicates. The remaining bins are mostly within or close to the confidence interval.
+
+ECDF: The black line rises steeply from zero before gradually converging toward the diagonal. The early steep rise corresponds to the leftmost histogram spike — many ranks clustering near zero — and the line exits the upper boundary of the envelope before eventually returning within it.
+
+ECDF diff: Shows a strong positive peak around z = 0.1-0.2, then a gradual decline back toward zero by z = 1.0. This is predominantly a positive hump pattern, which in isolation would indicate a posterior that is too wide. However the spike at near-zero ranks in the histogram complicates this — the pattern is better described as an excess of very low ranks combined with relative depletion of middle ranks, rather than a classic spread miscalibration. The line exits the envelope substantially throughout most of its range.
+
+Coverage: Falls consistently below the diagonal across all interval widths, with the gap growing as interval width increases — a 75% credible interval contains the true value approximately 50% of the time. This confirms substantial overconfidence in the posteriors.
+
+Coverage diff: A consistent negative offset of 20-35% across most interval widths, with the largest gap around the 75-85% region before partially recovering at very wide intervals. The bootstrap ribbon is relatively tight, giving confidence that this negative offset is a reliable finding rather than sampling noise.
+
+Taken together: The six panels describe a model that is recovering the location of the matching drift rate for novel faces reasonably well — the prior vs posterior overlap is close — but is substantially overconfident in its uncertainty estimates. Credible intervals are considerably narrower than they should be. The spike of near-zero ranks suggests that in a subset of replicates the model places the posterior well above the true value, likely reflecting the partial identifiability between drift rates and thresholds in the LBA. The pattern is consistent across all four drift rate parameters, suggesting this is a structural feature of the hierarchical LBA rather than something specific to this parameter.
+
+## Worked example 3: B_lRNovel (mu) — response threshold, Novel responses
+
+This parameter represents the group-level mean of the response threshold for novel face responses.
+
+Prior vs posterior: The distributions overlap closely and are nearly superimposed, with the posterior median distribution only marginally narrower than the prior. Of all the parameters, this shows the best location recovery — the model produces posterior medians that closely track the prior draws with minimal systematic shift.
+
+Rank histogram: Shows an even more pronounced spike in the leftmost bin than the drift rate parameters — approximately 100 replicates (40% of the total) produce ranks near zero. The remaining bins drop sharply and stay low and flat, well below the expected count. This is a qualitatively more extreme version of the drift rate pattern.
+
+ECDF: The line rises very steeply from zero, reflecting the large mass of near-zero ranks, before gradually approaching the diagonal. The departure from the envelope is more extreme and sustained than for the drift rate parameters.
+
+ECDF diff: Shows a very strong positive peak around z = 0.1-0.15, reaching approximately 0.30 — nearly three times the maximum deviation seen for sv_lMTRUE. The line is far outside the envelope for the lower half of the rank distribution before returning toward zero. The pattern is qualitatively similar to the drift rate parameters but substantially larger in magnitude.
+
+Coverage: Falls steeply below the diagonal from early on, with a 50% credible interval containing the true value only around 20% of the time. The coverage gap is larger and more consistent across interval widths than for the drift rate parameters, and the line only begins to recover at very wide intervals (>90%).
+
+Coverage diff: A large and consistent negative offset of 25-40% across most interval widths, larger than any other parameter. The ribbon is tight, confirming this is a reliable and substantial finding.
+
+Taken together: The threshold parameter shows the most pronounced miscalibration of any parameter in the model. Like the drift rates, the location recovery is good — the prior vs posterior overlap is actually the cleanest of all parameters — but the uncertainty quantification is severely miscalibrated. The model produces posteriors that are far too narrow for the threshold, meaning it expresses considerably more certainty about the group-level threshold than the data actually support. The pattern of a large spike at near-zero ranks, combined with good location recovery, is consistent with a model that finds a plausible point estimate for the threshold but systematically underestimates the uncertainty around it. This likely reflects the well-known partial confound between threshold and drift rate in the LBA — when both are estimated jointly in a hierarchical model, the posterior geometry creates overconfident posteriors for both parameters simultaneously, which is consistent with the similar pattern observed across all drift rate and threshold parameters in this analysis.

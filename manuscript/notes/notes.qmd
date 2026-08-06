@@ -218,3 +218,23 @@ Meeting Rich
 - OSF: add stimuli + experimental code on common project with models -> new folder with experiments
 
 - Methods:
+
+# August 6th
+
+## Abstract
+
+you say four experiments, but then refer to exp 1-5. 
+This looks a bit odd.
+maybe just say across a series of experiments
+
+## methods
+
+This REF needs fixing in the stimuli section - DeBruine, Lisa; Jones, Benedict (2017):
+
+section 2.6.2 needs finishing. it is currently just notes as below.
+
+Priors here. Model checking here. Refer to plots in Supps.
+
+## results
+
+figure 6 - the x axis is hard to read. re-scale it?

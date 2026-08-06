@@ -1,0 +1,281 @@
+---
+title: "model"
+author: "Raph & Rich"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+This file fits a single-level LBA model for Exp 1 in the face familiarity study.
+
+```{r}
+#| label: setup
+#| include: false
+
+pkgs <- c(
+  "EMC2", "tidyverse", "here", "parallel", "future"
+  )
+vapply(
+  pkgs, library, logical(1), character.only = TRUE, logical.return = TRUE
+  )
+
+## set options
+options(mc.cores = parallel::detectCores(),
+        future.fork.enable = TRUE,
+        future.rng.onMisuse = "ignore") ## automatically set in RStudio
+
+supportsMulticore()
+
+detectCores()
+
+plan(multicore)
+
+```
+
+# 1. read in the raw data and wrangle
+
+raw data
+
+```{r}
+raw <- read_csv(here("exp_1", "data", "data_exp_1.csv"))
+head(raw)
+glimpse(raw)
+```
+
+wrangle 
+
+```{r}
+data_emc <- raw |>
+  select(pid, cond, keypress, rt) |>
+  rename(subjects = pid, S = cond, R = keypress) |>
+  mutate(
+    subjects = factor(subjects),
+    S = factor(S,
+      levels = c("Novel", "Learned")
+    ),
+    R = if_else(R == "q", "Learned", "Novel"),
+    R = factor(R,
+      levels = c("Novel", "Learned")
+    )
+  ) |>
+  as.data.frame() ## in EMC, post predict needs a df and not a tibble..
+head(data_emc)
+glimpse(data_emc)
+```
+
+# 2. Preregistered model
+
+## 2.1 Build model
+
+```{r}
+#| label: matchfun
+
+matchfun <- function(d) d$S == d$lR
+```
+
+```{r}
+#| label: design
+
+design_exp1 <- design(
+  data = data_emc,
+  model = LBA,
+  matchfun = matchfun,
+  formula = list(
+    v  ~ 0 + S:lM,
+    sv ~ 0 + lM,
+    B  ~ 0 + lR,
+    A  ~ 1,
+    t0 ~ 1
+  ),
+  constants = c(sv_lMFALSE = log(1))
+)
+```
+
+```{r}
+#| label: p-vector
+
+p_vector <- c(
+  "v_SNovel:lMFALSE"   = 4, "v_SLearned:lMFALSE" = 4,
+  "v_SNovel:lMTRUE"    = 4, "v_SLearned:lMTRUE"  = 4,
+  sv_lMTRUE            = log(.5),
+  B_lRNovel            = log(2), B_lRLearned = log(2),
+  A                    = log(.5), t0 = log(.3)
+)
+
+mapped_pars(p_vector, x = design_exp1)
+```
+
+```{r}
+#| label: priors
+
+mu_mean <- c(
+  "v_SNovel:lMFALSE"   = 0, "v_SLearned:lMFALSE" = 0,
+  "v_SNovel:lMTRUE"    = 1, "v_SLearned:lMTRUE"  = 1,
+  sv_lMTRUE            = log(.5),
+  B_lRNovel            = log(1), B_lRLearned = log(1),
+  A                    = log(.5), t0 = log(.3)
+)
+
+mu_sd <- c(
+  "v_SNovel:lMFALSE"   = 2, "v_SLearned:lMFALSE" = 2,
+  "v_SNovel:lMTRUE"    = 2, "v_SLearned:lMTRUE"  = 2,
+  sv_lMTRUE            = .5,
+  B_lRNovel            = .5, B_lRLearned = .5,
+  A                    = .3, t0 = .3
+)
+
+prior_exp1 <- prior(
+  design_exp1,
+  type  = "single",
+  pmean = mu_mean,
+  psd   = mu_sd
+)
+
+plot(x = prior_exp1)
+```
+
+## 2.2 Fit model
+
+```{r}
+#| label: fit
+#| eval: false
+
+LBA_exp1 <- make_emc(
+  data_emc, 
+  design_exp1,
+  type = "single", 
+  prior = prior_exp1,
+  compress = TRUE
+)
+
+LBA_exp1 <- fit(
+  LBA_exp1,
+  cores_for_chains = 3,
+  cores_per_chain = 9,
+  iter            = 3000,
+  step_size       = 500,
+  verbose         = TRUE,
+  fileName        = here("exp_1", "models", "single", "tmp.RData")
+)
+
+saveRDS(LBA_exp1, "exp_1/models/single/LBA_exp1_single.rds")
+```
+
+```{r}
+#| label: load
+
+LBA_exp1 <- readRDS("exp_1/models/single/LBA_exp1_single.rds")
+```
+
+## 2.3 Check model
+
+```{r}
+#| label: check
+
+# convergence checks
+gd_summary(LBA_exp1, selection = "alpha")
+ess_summary(LBA_exp1, selection = "alpha")
+
+# trace plots
+plot(LBA_exp1, selection = "alpha")
+
+check(LBA_exp1)
+summary(LBA_exp1)
+
+#get_pars(LBA_exp1, map = TRUE)
+
+## save out as necessary
+## exp 1 folder
+# png("exp_1/figures/single/chains.png", width = 8, height = 6, units = "in", res = 150)
+# plot(
+#   LBA_exp1,
+#   selection = "alpha",
+#   layout = c(6, 6)
+# )
+# dev.off()
+
+## manuscript folder
+# png("manuscript/figures/single/chains.png", width = 8, height = 6, units = "in", res = 150)
+# plot(
+#   LBA_exp1,
+#   selection = "mu",
+#   layout = c(3, 3)
+# )
+# dev.off()
+```
+
+```{r}
+#| label: plot-pars
+
+plot_pars(LBA_exp1, selection = "alpha", layout = c(5, 5))
+
+## save out as necessary
+## exp 1 folder
+# png("exp_1/figures/single/pars.png", width = 8, height = 6, units = "in", res = 300)
+# plot_pars(
+#   LBA_exp1,
+#   selection = "alpha",
+#   layout = c(4, 4)
+# )
+# dev.off()
+
+## manuscript folder
+# png("manuscript/figures/single/pars.png", width = 8, height = 6, units = "in", res = 300)
+# plot_pars(
+#   LBA_exp1,
+#   selection = "mu",
+#   layout = c(3, 3)
+# )
+# dev.off()
+```
+
+## 2.4 Posterior predictions
+
+```{r}
+#| label: posterior-predictions
+#| eval: false
+
+pp_LBA_exp1 <- predict(LBA_exp1, n_cores = 28)
+saveRDS(pp_LBA_exp1, "exp_1/models/single/pp_LBA_exp1.rds")
+```
+
+```{r}
+#| label: plot-fit
+
+pp_LBA_exp1 <- readRDS("exp_1/models/single/pp_LBA_exp1.rds")
+
+## exp 1 folder
+png("exp_1/figures/single/pp_density.png", width = 8, height = 6, units = "in", res = 150)
+plot_density(
+  data_emc, 
+  pp_LBA_exp1, 
+  factors = "S"
+)
+dev.off()
+
+png("exp_1/figures/single/pp_cdf.png", width = 8, height = 6, units = "in", res = 150)
+plot_cdf(
+  data_emc,
+  pp_LBA_exp1,  
+  factors = "S"
+)
+dev.off()
+
+## manuscript folder
+# png("manuscript/figures/single/pp_density.png", width = 8, height = 6, units = "in", res = 150)
+# plot_density(
+#   data_emc, 
+#   pp_LBA_exp1, 
+#   factors = "S"
+# )
+# dev.off()
+# 
+# png("manuscript/figures/single/pp_cdf.png", width = 8, height = 6, units = "in", res = 150)
+# plot_cdf(
+#   data_emc,
+#   pp_LBA_exp1,  
+#   factors = "S"
+# )
+# dev.off()
+```
