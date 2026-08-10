@@ -36,6 +36,7 @@ keywords: [face perception, memory, familiarity, person knowledge, decision mode
 wordcount: true
 date: last-modified
 bibliography: bibliography.bib
+csl: apa.csl
 functions: [place, appendix]
 format:
   html:
@@ -76,6 +77,9 @@ editor_options:
 editor: 
   markdown: 
     wrap: sentence
+knitr:
+  opts_chunk:
+    dev: "ragg_png"
 ---
 
 ```{r}
@@ -84,7 +88,7 @@ editor:
 
 pkgs <- c(
   "tidyverse", "RColorBrewer", "patchwork", "paletteer", "here", "EMC2", 
-  "tidybayes", "tinytable", "osfr"
+  "tidybayes", "tinytable", "osfr","ragg"
 )
 vapply(
   pkgs, library, logical(1),
@@ -92,6 +96,7 @@ vapply(
 )
 
 knitr::opts_chunk$set(echo = FALSE)
+
 
 theme_set(
   theme_bw() +
@@ -462,7 +467,7 @@ participant_summary |>
 
 ### Stimuli
 
-The stimuli consisted of images selected from two different data sets of face images: the Face Research Lab London Set (DeBruine, Lisa; Jones, Benedict (2017): <https://doi.org/10.6084/m9.figshare.5047666.v5>) and the Color FERET Database (<https://www.nist.gov/itl/products-and-services/color-feret-database>).
+The stimuli consisted of images selected from two different data sets of face images: the Face Research Lab London Set [@debruinefacelab2017] and the Color FERET Database (<https://www.nist.gov/itl/products-and-services/color-feret-database>).
 Each of these data sets is composed of images of different identities taken from different angle points.
 102 identities were selected from the Face Research Lab London Set and 51 from the Color FERET Database.
 For each selected identity, three pictures of the face at three different view points (3/4 left view, frontal view and 3/4 right view) were cropped to only keep the internal features of the face.
@@ -472,8 +477,7 @@ In total, the data set of face images used in Experiment 1 contained 756 images:
 
 ### Material
 
-Stimuli were presented on the screen of a MacBook Pro (Apple M2 Pro, macOS 13 Ventura) and 
-the experiment was run on Psychopy Coder (version: 2022.5, @peircePsychoPy2ExperimentsBehavior2019).
+Stimuli were presented on the screen of a MacBook Pro (Apple M2 Pro, macOS 13 Ventura) and the experiment was run on Psychopy Coder (version: 2022.5, @peircePsychoPy2ExperimentsBehavior2019).
 
 ### Procedure
 
@@ -725,10 +729,7 @@ Priors were chosen to be weakly-informative meaning that they have little influe
 The parameter were estimated through two sampling steps.
 First, a separate estimation of the fixed effects for each participants was conducted.
 These estimations were used as the starting point for the full hierarchical model.
-
-Priors here.
-Model checking here.
-Refer to plots in Supps.
+Chains convergence diagnostics, as well as priors distributions and predictive checks can be found in Supplementary Materials.
 
 ### Data analysis
 
@@ -911,7 +912,7 @@ rt_density <- data_all |>
   ) +
   scale_fill_manual(values = myColors_3) +
   scale_colour_manual(values = myColors_3) +
-  scale_x_continuous(breaks = seq(0, 2.5, by = 0.5)) +
+  scale_x_continuous(breaks = scales::breaks_pretty(n = 3)) +
   facet_grid(
     ~experiment,
     scales   = "free_x",
