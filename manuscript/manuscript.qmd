@@ -702,13 +702,12 @@ A single value for the start point (A) and non-decision time (t0) was estimated 
 # create a df
 lba_formula <- tribble(
   ~Parameter, ~Label, ~Condition, ~Response, ~Accuracy, ~Fixed,
-  "Start point", "A", "-", "-", "-", "1",
+  "Start point", "A", "-", "-", "-", "-",
   "Mean drift rate", "v", "yes", "no", "yes", "-",
   "SD drift rate", "sd_v", "no", "no", "yes", "-",
   "SD false drift rate", "false.sd_v", "-", "-", "-", "1",
-  "Threshold", "b", "yes", "yes", "no", "-",
-  "Non-decision time", "t0", "yes", "no", "no", "-",
-  "SD Non-decision time", "st_0", "-", "-", "-", "0",
+  "Threshold", "b", "no", "yes", "no", "-",
+  "Non-decision time", "t0", "-", "-", "-", "-",
 )
 ```
 

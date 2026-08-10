@@ -43,6 +43,9 @@ format:
     toc-depth: 3
 editor_options: 
   chunk_output_type: console
+knitr:
+  opts_chunk:
+    dev: "ragg_png"
 ---
 
 ```{r}
@@ -51,7 +54,7 @@ editor_options:
 
 pkgs <- c(
   "tidyverse", "RColorBrewer", "patchwork", "paletteer", 
-  "here", "EMC2", "tidybayes", "tinytable", "osfr"
+  "here", "EMC2", "tidybayes", "tinytable", "osfr", "ragg"
 )
 vapply(
   pkgs, library, logical(1),
@@ -196,4 +199,79 @@ knitr::include_graphics(here("manuscript", "figures", "pars.png"))
 
 ## Exploratory models
 
+For each experiments where an LBA model was fitted (Experiment 1, 2, 4 and 5), exploratory models were fitted as well. Three exploratory models were fitted for each experiment, where we allowed other parameters from the LBA model to vary in addition to the two preregistered parameters (Drift rate and Threshold). Start point (A) was allowed to vary based on the response (Learned vs Novel for Experiment 1 and 2, Famous vs Novel for Experiment 4 and 5) and non-decision time (t0) were allowed to vary based on the stimulus condition (Learned vs Novel for Experiment 1 and 2, Famous vs Novel for Experiment 4 and 5).
+
+
+```{r}
+#| label: data-model-formula-all
+#| include: FALSE
+
+lba_formula_start <- tribble(
+  ~Parameter, ~Label, ~Condition, ~Response, ~Accuracy, ~Fixed,
+  "Start point", "A", "no", "yes", "no", "-",
+  "Mean drift rate", "v", "yes", "no", "yes", "-",
+  "SD drift rate", "sd_v", "no", "no", "yes", "-",
+  "SD false drift rate", "false.sd_v", "-", "-", "-", "1",
+  "Threshold", "b", "yes", "yes", "no", "-",
+  "Non-decision time", "t0", "no", "no", "no", "-",
+) |> 
+  tt() |> 
+  style_tt(fontsize = 0.85)
+
+lba_formula_t0 <- tribble(
+  ~Parameter, ~Label, ~Condition, ~Response, ~Accuracy, ~Fixed,
+  "Start point", "A", "no", "no", "no", "-",
+  "Mean drift rate", "v", "yes", "no", "yes", "-",
+  "SD drift rate", "sd_v", "no", "no", "yes", "-",
+  "SD false drift rate", "false.sd_v", "-", "-", "-", "1",
+  "Threshold", "b", "yes", "yes", "no", "-",
+  "Non-decision time", "t0", "yes", "no", "no", "-",
+) |> 
+  tt() |> 
+  style_tt(fontsize = 0.85)
+
+lba_formula_all <- tribble(
+  ~Parameter, ~Label, ~Condition, ~Response, ~Accuracy, ~Fixed,
+  "Start point", "A", "no", "yes", "no", "-",
+  "Mean drift rate", "v", "yes", "no", "yes", "-",
+  "SD drift rate", "sd_v", "no", "no", "yes", "-",
+  "SD false drift rate", "false.sd_v", "-", "-", "-", "1",
+  "Threshold", "b", "yes", "yes", "no", "-",
+  "Non-decision time", "t0", "yes", "no", "no", "-",
+) |> 
+  tt() |> 
+  style_tt(fontsize = 0.85)
+
+
+```
+
+::: {#tbl-formula-all layout-ncol=1}
+
+::: {#tbl-formula-start}
+```{r}
+#| echo: false
+lba_formula_start
+```
+Start point models
 :::
+
+::: {#tbl-formula-t0}
+```{r}
+#| echo: false
+lba_formula_t0
+```
+Non-decision time models
+:::
+
+::: {#tbl-formula-full}
+```{r}
+#| echo: false
+lba_formula_all
+```
+Full models
+:::
+
+Formula specification for the exploratory LBA models.
+:::
+
+
