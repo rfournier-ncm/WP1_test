@@ -1523,17 +1523,20 @@ All materials are available on GitHub (link) and the OSF (link).
 [CRediT](https://www.elsevier.com/researcher/author/policies-and-guidelines/credit-author-statement) author statement:
 
 Conceptualization: RF, PD, RR\
-Methodology: RF, RR\
-Software: RF, RR\
-Validation: RF, RR\
-Formal analysis: RF, RR\
+Data Curation:RF, RR\
+Formal Analysis: RF, RR\
+Funding Acquisition: RR\
 Investigation: RF\
-Data Curation: RF, RR\
+Methodology: RF, RR\
+Project Administration: RF, RR\
+Resources: RR\
+Software: RF, RR\
+Supervision: RR\
+Validation: RF, RR\
+Visualisation: RF, RR\
 Writing - Original Draft: RF\
 Writing - Review & Editing: RF, PD, RR\
-Visualisation: RF, RR\
-Supervision: RR\
-Project Administration: RF, RR
+
 
 ## Competing interests
 
