@@ -60,7 +60,7 @@ format:
         href: supplementary.pdf
         icon: file-pdf
       - text: GitHub Repository
-        href: https://github.com/rich-ramsey/
+        href: https://github.com/cbs-lab/face-familiarity-eam
         icon: github
       - text: OSF Repository
         href: https://osf.io/65bt2
@@ -1543,8 +1543,6 @@ Writing - Review & Editing: RF, PD, RR\
 The authors declare no competing interests.
 
 {{< pagebreak >}}
-
-# References
 
 ::: {#refs}
 :::
