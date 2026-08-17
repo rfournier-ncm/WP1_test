@@ -95,6 +95,36 @@ pd2 <- position_dodge(1)
 
 ## Parameter recovery study
 
+We ran a parameter recovery study that included 30 participant datasets, each with 180 trials (90 trials “familiar” and 90 trials “unfamiliar”) and with our selected model parameterisation. 
+Code can found in the parameter_recovery.qmd file in the /exp_1/ subfolder. 
+For more details on parameter recovery studies, see Heathcote et al., (2019).
+The hierarchical model showed good recovery of the parameter value (top left panel), but other aspects of the model, such as the precision of the estimates, we less well-calibrated @fig-param-recovery-exp1.
+The example in the figure below is for one parameter, but all model parameters showed the same general pattern.
+
+```{r}
+#| label: fig-param-recovery-exp1
+#| fig-cap: "Parameter recovery for the hierarchical design in Experiment 1"
+#| fig-width: 8
+#| fig-height: 6
+
+knitr::include_graphics(here("manuscript", "figures", "sv_lMTRUE_mu.png"))
+```
+
+We then ran a parameter recovery study for a simpler, non-hierarchical model, where each participant is modelled separately. 
+The simpler model showed better overall recovery @fig-param-recovery-single-exp1.
+Importantly, when we fit the single model to our data, we got the same pattern of results as the hierarchical model.
+This gives us confidence that we can have reasonable trust in our model estimates, whilst also recognising that collecting more data would sharpen the precision of our estimates when fitting hierarchical models.
+
+```{r}
+#| label: fig-param-recovery-single-exp1
+#| fig-cap: "Parameter recovery for the single level design in Experiment 1"
+#| fig-width: 8
+#| fig-height: 6
+
+knitr::include_graphics(here("manuscript", "figures", "sv_lMTRUE_alpha.png"))
+```
+
+
 ## Priors
 
 These are the priors used for our pre-registered models. 
