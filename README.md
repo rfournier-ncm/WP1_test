@@ -10,7 +10,7 @@
 
 ## Overview
 
-This project contains the analysis code and manuscript for a four-experiment study examining familiarity effects in face recognition using evidence accumulation modelling (LBA). Each experiment is self-contained in its own folder but follows a shared structure and file naming convention (see below).
+This project contains the raw data, analysis code and manuscript for a four-experiment study examining familiarity effects in face recognition using evidence accumulation modelling (LBA). Each experiment is self-contained in its own folder but follows a shared structure and file naming convention (see below). Since the model objects are too big to be uploaded on github, model objects can be found in this OSF project: https://osf.io/65bt2/overview.
 
 | Experiment | Design | N |
 |-----------|--------|---|
